@@ -1,0 +1,8 @@
+export/
+.DS_Store
+*/.DS_Store
+*.sublime-workspace
+*.sublime-project
+*.hxml
+*.keystore
+Project-Release.xml

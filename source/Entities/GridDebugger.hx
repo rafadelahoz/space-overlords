@@ -37,6 +37,10 @@ class GridDebugger extends FlxSprite
     {
         FlxSpriteUtil.fill(this, 0x00000000);
         FlxSpriteUtil.drawRect(this, grid.x, grid.y, grid.columns * Constants.TileSize, grid.rows * Constants.TileSize, Palette.Black, {thickness: 2, color: Palette.LightGray});
+
+        // Separator line?
+        // FlxSpriteUtil.drawRect(this, grid.x, grid.y + 2 * Constants.TileSize, grid.columns * Constants.TileSize, 4, Palette.Green, {thickness: 2, color: Palette.Red});
+
         var pos : FlxPoint = null;
         for (c in 0...grid.columns)
             for (r in 0...grid.rows)
@@ -44,7 +48,7 @@ class GridDebugger extends FlxSprite
                 pos = grid.getCellPosition(c, r);
                 var tileColor : Int = grid.get(c, r) == null ? Palette.Black : Palette.Blue;
                 var borderColor : Int = (c == mouseCell.x && r == mouseCell.y) ? Palette.Yellow : Palette.DarkGray;
-                
+
                 FlxSpriteUtil.drawRect(this, pos.x, pos.y, Constants.TileSize, Constants.TileSize, tileColor, {color: borderColor});
             }
 

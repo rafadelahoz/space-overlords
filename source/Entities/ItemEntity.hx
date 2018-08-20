@@ -86,16 +86,16 @@ class ItemEntity extends FlxSprite
         var nextPos : FlxPoint = grid.getCellAt(x, y+height);
         var nextData : ItemData = grid.get(nextPos.x, nextPos.y);
 
-        if (nextData == null && grid.isCellValid(nextPos.x, nextPos.y)) {
+        if (canMoveTo(nextPos.x, nextPos.y)) {
             // Go down, allow movement
             if (GamePad.checkButton(GamePad.Down))
-                velocity.set(0, vspeed * 2);
+                velocity.set(0, vspeed * 4);
             else
                 velocity.set(0, vspeed);
 
             if (horizontalTween == null)
             {
-                if (GamePad.justPressed(GamePad.Left))
+                if (GamePad.checkButton(GamePad.Left) && canMoveTo(currentPos.x-1, currentPos.y) && canMoveTo(nextPos.x-1, nextPos.y))
                 {
                     // TODO: Check position
                     horizontalTween = FlxTween.tween(this, {x: x-Constants.TileSize}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: function(t:FlxTween) {
@@ -103,7 +103,7 @@ class ItemEntity extends FlxSprite
                         horizontalTween = null;
                     }});
                 }
-                else if (GamePad.justPressed(GamePad.Right))
+                else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentPos.x+1, currentPos.y) && canMoveTo(nextPos.x+1, nextPos.y))
                 {
                     // TODO: Check position
                     horizontalTween = FlxTween.tween(this, {x: x+Constants.TileSize}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: function(t:FlxTween) {
@@ -128,6 +128,10 @@ class ItemEntity extends FlxSprite
 
             world.onCurrentItemPositioned();
         }
+    }
 
+    function canMoveTo(cellX : Float, cellY : Float) : Bool
+    {
+        return grid.get(cellX, cellY) == null && grid.isCellValid(cellX, cellY);
     }
 }

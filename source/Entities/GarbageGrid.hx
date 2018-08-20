@@ -5,7 +5,7 @@ import flixel.math.FlxPoint;
 class GarbageGrid
 {
     public var columns : Int = 6;
-    public var rows : Int = 7;
+    public var rows : Int = 9;
 
     public var data : Array<Array<ItemData>>;
 

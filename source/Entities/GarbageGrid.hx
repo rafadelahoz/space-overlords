@@ -86,4 +86,178 @@ class GarbageGrid
         point.set(x + Column * Constants.TileSize, y + Row * Constants.TileSize);
         return point;
     }
+
+    public function findMatches(baseCell : FlxPoint) : Array<ItemData>
+    {
+        var matches : Array<ItemData> = [];
+
+        // baseCell and cell top of baseCell will be checked
+        matches = findMatchesFromCell(baseCell.x, baseCell.y);
+        trace("Base matches", matches);
+        var slaveMatches : Array<ItemData> = findMatchesFromCell(baseCell.x, baseCell.y-1);
+        trace("Slave matches", slaveMatches);
+
+        for (cell in slaveMatches)
+        {
+            if (matches.indexOf(cell) < 0)
+            {
+                matches.push(cell);
+            }
+        }
+
+        trace("Result matches", matches);
+
+        return matches;
+    }
+
+    public function findMatchesFromCell(col : Float, row : Float) : Array<ItemData>
+    {
+        var matches : Array<ItemData> = [];
+
+        var baseCol : Int = Std.int(col);
+        var baseRow : Int = Std.int(row);
+
+        if (get(baseCol, baseRow) == null)
+        {
+            throw "Nothing found at " + baseCol + ", " + baseRow;
+        }
+
+        var target : Int = get(baseCol, baseRow).type;
+
+        var cell : ItemData = null;
+
+        // Check rightwards
+        var col : Int = baseCol+1;
+        while (col < columns)
+        {
+            cell = get(col, baseRow);
+            if (cell != null && cell.type == target)
+            {
+                matches.push(get(col, baseRow));
+                col += 1;
+            }
+            else
+                break;
+        }
+
+        // Leftwards
+        col = baseCol-1;
+        while (col >= 0)
+        {
+            cell = get(col, baseRow);
+            if (cell != null && cell.type == target)
+            {
+                matches.push(get(col, baseRow));
+                col -= 1;
+            }
+            else
+                break;
+        }
+
+        // Downwards
+        var row : Int = baseRow+1;
+        while (row < rows)
+        {
+            cell = get(baseCol, row);
+            if (cell != null && cell.type == target)
+            {
+                matches.push(get(baseCol, row));
+                row += 1;
+            }
+            else
+                break;
+        }
+
+        // Upwards
+        row = baseRow-1;
+        while (row >= 2)
+        {
+            cell = get(baseCol, row);
+            if (cell != null && cell.type == target)
+            {
+                matches.push(get(baseCol, row));
+                row -= 1;
+            }
+            else
+                break;
+        }
+
+        // If there have been matches, add the current cell
+        if (matches.length > 0)
+        {
+            matches.push(get(baseCol, baseRow));
+        }
+
+        return matches;
+    }
+
+    public function getLowerFreeCellFrom(cellX : Float, cellY : Float) : FlxPoint
+    {
+        var col : Int = Std.int(cellX);
+        var row : Int = Std.int(cellY);
+
+        while (row < rows)
+        {
+            row += 1;
+            if (get(cellX, row) != null || !isCellValid(cellX, row))
+            {
+                row -= 1;
+                break;
+            }
+        }
+
+        return new FlxPoint(col, row);
+    }
+
+    public function getAll() : Array<ItemData>
+    {
+        var all : Array<ItemData> = [];
+
+        var col = -1;
+        var row = rows-1;
+        while (row >= 0)
+        {
+            col = 0;
+            while (col < columns)
+            {
+                if (get(col, row) != null)
+                    all.push(get(col, row));
+                col += 1;
+            }
+
+            row -= 1;
+        }
+
+        return all;
+    }
+
+    /* DEBUG */
+    public function dump()
+    {
+        var str = "";
+
+        for (row in 0...rows)
+        {
+            for (col in 0...columns)
+            {
+                var item : ItemData = get(col, row);
+                if (item == null)
+                    str += "[ ]";
+                else
+                    str += "[" + item.type + "]";
+            }
+
+            str += "\n";
+
+            // Start zone delimiter
+            if (row == 1)
+            {
+                for (i in 0...columns)
+                    str += "---";
+                str += "\n";
+            }
+        }
+
+        trace(str);
+    }
 }

@@ -14,25 +14,31 @@ class ItemEntity extends Entity
     public static var StateGrace        : Int = 2;
     public static var StatePositioned   : Int = 3;
     public static var StateSlave        : Int = 4;
+    public static var StateLeaving      : Int = 5;
+
+    var FlipTime : Float = 0.1;
+    var GraceTime : Float = 0.2;
+    var HorizontalMovementDuration : Float = 0.15;
+    var LeaveTime : Float = 0.3;
+    var ForcedFallTime : Float = 0.5;
 
     var world : PlayState;
     var grid : GarbageGrid;
 
     var charType : Int;
     var flipCharTypeTween : FlxTween;
-    var FlipTime : Float = 0.1;
 
     var state : Int;
     var scaleTween : FlxTween;
-    var horizontalTween : FlxTween;
+    var movementTween : FlxTween;
 
-    var GraceTime : Float = 0.2;
     var graceTimer : FlxTimer;
 
-    var HorizontalMovementDuration : Float = 0.15;
     var vspeed : Float = 15;
 
     var finishPositioningAfterMovement : Bool;
+
+    var leaveCallback : Void -> Void;
 
     public var slave : ItemEntity;
 
@@ -79,7 +85,7 @@ class ItemEntity extends Entity
     {
         destroyTimer(graceTimer);
         destroyTween(scaleTween);
-        destroyTween(horizontalTween);
+        destroyTween(movementTween);
         destroyTween(flipCharTypeTween);
 
         super.destroy();
@@ -109,6 +115,15 @@ class ItemEntity extends Entity
             case ItemEntity.StateGrace:
                 finishPositioningAfterMovement = false;
                 graceTimer.start(GraceTime, onGraceEnd);
+            case ItemEntity.StateLeaving:
+                scaleTween = FlxTween.tween(this.scale, {x: 0, y: 0}, LeaveTime, {ease: FlxEase.quadOut, onComplete: function(t:FlxTween) {
+                    world.items.remove(this);
+                    kill();
+                    destroy();
+
+                    if (leaveCallback != null)
+                        leaveCallback();
+                }});
             default:
         }
     }
@@ -132,6 +147,8 @@ class ItemEntity extends Entity
                 // Stay still!
             case ItemEntity.StateSlave:
                 // color = Palette.DarkPurple;
+            case ItemEntity.StateLeaving:
+                // nopes?
         }
 
         super.update(elapsed);
@@ -184,7 +201,7 @@ class ItemEntity extends Entity
                     slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 1, 0.4);
             }
 
-            if (horizontalTween == null)
+            if (movementTween == null)
             {
                 if (GamePad.checkButton(GamePad.Left) && canMoveTo(currentCell.x-1, currentCell.y) && canMoveTo(nextFallingCell.x-1, nextFallingCell.y))
                 {
@@ -218,7 +235,7 @@ class ItemEntity extends Entity
             slave.scale.x = 1;
         velocity.set(0, 0);
 
-        if (horizontalTween == null)
+        if (movementTween == null)
         {
             if (GamePad.checkButton(GamePad.Left) && canMoveTo(currentCell.x-1, currentCell.y))
             {
@@ -265,21 +282,21 @@ class ItemEntity extends Entity
         /* End of hacky effect */
 
         setState(ItemEntity.StatePositioned);
-        grid.set(currentCell.x, currentCell.y, new ItemData(charType, this));
+        grid.set(currentCell.x, currentCell.y, new ItemData(currentCell.x, currentCell.y, charType, this));
         if (slave != null)
         {
             slave.setState(ItemEntity.StatePositioned);
-            grid.set(currentCell.x, currentCell.y-1, new ItemData(slave.charType, slave));
+            grid.set(currentCell.x, currentCell.y-1, new ItemData(currentCell.x, currentCell.y-1, slave.charType, slave));
         }
 
-        world.onCurrentItemPositioned();
+        world.onCurrentItemPositioned(currentCell);
     }
 
     function onGraceEnd(t : FlxTimer)
     {
         t.cancel();
         // When the grace period ends...
-        if (horizontalTween == null)
+        if (movementTween == null)
         {
             // ...if the piece is not currently moving horizontally,
             // finsih right now
@@ -300,13 +317,13 @@ class ItemEntity extends Entity
 
     function moveHorizontallyToCell(cellX : Float, cellY : Float)
     {
-        horizontalTween = FlxTween.tween(this, {x: grid.getCellPosition(cellX, cellY).x}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: onHorizontalMovementEnd});
+        movementTween = FlxTween.tween(this, {x: grid.getCellPosition(cellX, cellY).x}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: onHorizontalMovementEnd});
     }
 
     function onHorizontalMovementEnd(?t : FlxTween = null)
     {
         t.destroy();
-        horizontalTween = null;
+        movementTween = null;
 
         if (finishPositioningAfterMovement)
         {
@@ -346,5 +363,39 @@ class ItemEntity extends Entity
 
             flipCharTypeTween = FlxTween.tween(this.scale, {x : 1}, FlipTime * 0.5, {onComplete: destroyTween});
         }});
+    }
+
+    public function triggerLeave(?callback : Void -> Void = null)
+    {
+        leaveCallback = callback;
+        setState(StateLeaving);
+    }
+
+    public function fallToFreePosition() : Bool
+    {
+        var currentCell : FlxPoint = grid.getCellAt(x, y);
+        var targetCell : FlxPoint = grid.getLowerFreeCellFrom(currentCell.x, currentCell.y);
+        var targetPos : FlxPoint = grid.getCellPosition(targetCell.x, targetCell.y);
+
+        trace("[" + charType + "]@" + currentCell + " is trying to fall");
+
+        if (currentCell.y != targetCell.y)
+        {
+            // Switch positions
+            grid.set(currentCell.x, currentCell.y, null);
+            grid.set(targetCell.x, targetCell.y, new ItemData(targetCell.x, targetCell.y, charType, this));
+
+            trace("[" + charType + "]@" + currentCell + " falls to " + targetCell);
+
+            // And go
+            movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.circIn});
+
+            return true;
+        }
+        else
+        {
+            trace("[" + charType + "]@" + currentCell + " does not fall");
+            return false;
+        }
     }
 }

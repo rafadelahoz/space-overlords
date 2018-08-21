@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxG;
+import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
 import flixel.text.FlxBitmapText;
@@ -14,13 +15,21 @@ class PlayState extends GarbageState
     public static var StateAftermath   : Int = 4;
     public static var StateLost        : Int = 5;
 
+    var CleanUpDelay : Float = 0.2;
+    var ItemLeaveTime : Float = 0.5;
+    var ItemFallTime : Float = 0.55;
+
     public var state : Int;
 
     public var grid : GarbageGrid;
-    var items : FlxGroup;
+    public var items : FlxGroup;
     var currentItem : ItemEntity;
 
     var screenButtons : ScreenButtons;
+
+    var lastPositionedCell : FlxPoint;
+
+    var aftermathTimer : FlxTimer;
 
     // Debug
     var stateLabel : FlxBitmapText;
@@ -44,6 +53,8 @@ class PlayState extends GarbageState
 
         screenButtons = new ScreenButtons(0, 0, this, 240);
 		add(screenButtons);
+
+        aftermathTimer = new FlxTimer();
 
         switchState(StateIntro);
 
@@ -82,23 +93,8 @@ class PlayState extends GarbageState
                 items.add(currentItem);
                 items.add(currentItem.slave);
 
-                // TODO: Remove items
-
-                // Lose game
-                if (checkForLoseConditions(currentItem))
-                {
-                    // You lost!
-                    switchState(StateLost);
-                }
-                else
-                {
-                    // Clear current item references
-                    currentItem.slave = null;
-                    currentItem = null;
-
-                    // Go on
-                    switchState(StateGenerate);
-                }
+                // Call cleanupo!
+                aftermathTimer.start(CleanUpDelay, handleAftermathCleanup);
             case PlayState.StateLost:
                 trace("Game over!");
                 FlxG.camera.flash(Palette.Red, function() {
@@ -134,9 +130,74 @@ class PlayState extends GarbageState
         switchState(StateWait);
     }
 
-    public function onCurrentItemPositioned()
+    public function onCurrentItemPositioned(cell : FlxPoint)
     {
+        lastPositionedCell = cell;
         switchState(StateAftermath);
+    }
+
+    public function handleAftermathCleanup(?t:FlxTimer)
+    {
+        // Check and remove items
+        var matches : Array<ItemData> = grid.findMatches(lastPositionedCell);
+
+        trace("======= BEFORE MATCHES REMOVAL =========");
+        grid.dump();
+
+        for (itemData in matches)
+        {
+            grid.set(itemData.cellX, itemData.cellY, null);
+            itemData.entity.triggerLeave();
+        }
+
+        trace("======= AFTER MATCHES REMOVAL =========");
+        grid.dump();
+
+        // Wait a bit if things are leaving, otherwise finish now
+        if (matches.length > 0)
+        {
+            aftermathTimer.start(ItemLeaveTime, function(t:FlxTimer) {
+                var somethingFell : Bool = false;
+
+                // Make all items fall down
+                // grid.getAll shall return things from bottom to top
+                trace("Things will start falling. There are " + grid.getAll().length);
+                for (itemData in grid.getAll())
+                {
+                    if (itemData.entity != null)
+                    {
+                        if (itemData.entity.fallToFreePosition())
+                            somethingFell = true;
+                    }
+                }
+
+                aftermathTimer.start((somethingFell ? ItemFallTime : 0.01), handleAftermathResult);
+            });
+        }
+        else
+        {
+            aftermathTimer.start(0.01, handleAftermathResult);
+        }
+
+    }
+
+    public function handleAftermathResult(?t:FlxTimer)
+    {
+        // Lose game
+        if (checkForLoseConditions(currentItem))
+        {
+            // You lost!
+            switchState(StateLost);
+        }
+        else
+        {
+            // Clear current item references
+            currentItem.slave = null;
+            currentItem = null;
+
+            // Go on
+            switchState(StateGenerate);
+        }
     }
 
     public function onAftermathFinished()

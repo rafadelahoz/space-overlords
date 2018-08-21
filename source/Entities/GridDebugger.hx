@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.util.FlxSpriteUtil;
+import flixel.text.FlxBitmapText;
 
 class GridDebugger extends FlxSprite
 {
@@ -12,10 +13,14 @@ class GridDebugger extends FlxSprite
     var mousePos : FlxPoint;
     var mouseCell : FlxPoint;
 
+    var infoLabel : FlxBitmapText;
+
     public function new(Grid : GarbageGrid)
     {
         super(0, 0);
         grid = Grid;
+
+        infoLabel = text.PixelText.New(Constants.Width-72, 32, "");
 
         makeGraphic(Constants.Width, Constants.Height, 0x00000000);
     }
@@ -25,15 +30,19 @@ class GridDebugger extends FlxSprite
         mousePos = FlxG.mouse.getPosition();
         mouseCell = grid.getCellAt(mousePos.x, mousePos.y);
 
+        infoLabel.text = Std.int(mouseCell.x) + ", " + Std.int(mouseCell.y);
+
         if (mousePos.x > grid.x && mousePos.y > grid.y &&
             mousePos.x < grid.x + grid.columns * Constants.TileSize &&
             mousePos.y < grid.x + grid.rows * Constants.TileSize)
         {
             if (FlxG.mouse.justPressed)
             {
-                grid.set(mouseCell.x, mouseCell.y, new ItemData(1, null));
+                grid.set(mouseCell.x, mouseCell.y, new ItemData(mouseCell.x, mouseCell.y, 0, null));
             }
         }
+
+        infoLabel.update(elapsed);
 
         super.update(elapsed);
     }
@@ -58,5 +67,7 @@ class GridDebugger extends FlxSprite
             }
 
         super.draw();
+
+        infoLabel.draw();
     }
 }

@@ -63,7 +63,7 @@ class PlayState extends GarbageState
 
     public function getNextCharType() : Int
     {
-        var next : Int = FlxG.random.int(1, 4);
+        var next : Int = FlxG.random.int(1, 8);
         return next;
     }
 
@@ -91,6 +91,10 @@ class PlayState extends GarbageState
             case PlayState.StateAftermath:
                 items.add(currentItem);
                 items.add(currentItem.slave);
+
+                // Clear current item references
+                currentItem.slave = null;
+                currentItem = null;
 
                 // Call cleanupo!
                 aftermathTimer.start(CleanUpDelay, handleAftermathCleanup);
@@ -194,10 +198,6 @@ class PlayState extends GarbageState
         }
         else
         {
-            // Clear current item references
-            currentItem.slave = null;
-            currentItem = null;
-
             // Go on
             switchState(StateGenerate);
         }
@@ -211,7 +211,6 @@ class PlayState extends GarbageState
     function checkForLoseConditions(currentItem : ItemEntity) : Bool
     {
         // TODO: input currentItem may not be required, check whole grid?
-        return (grid.getCellAt(currentItem.x, currentItem.y).y < 2 ||
-            grid.getCellAt(currentItem.slave.x, currentItem.slave.y).y < 2);
+        return grid.checkForItemsOnTopRows();
     }
 }

@@ -264,6 +264,20 @@ class GarbageGrid
         return all;
     }
 
+    public function checkForItemsOnTopRows() : Bool
+    {
+        for (row in 0...1)
+        {
+            for (col in 0...columns)
+            {
+                if (get(col, row) != null)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     /* DEBUG */
     public function dump()
     {

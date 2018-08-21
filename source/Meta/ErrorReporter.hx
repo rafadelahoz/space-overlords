@@ -6,9 +6,9 @@ class ErrorReporter
 {
     public static function handle(error : Dynamic)
     {
-        // trace(error);
+        trace(error);
         var stack : String = CallStack.toString(CallStack.exceptionStack());
-        // trace(stack);
+        trace(stack);
 
         Logger.batch("### ERROR @ " + Date.now().toString() + " ###");
         Logger.batch(error);

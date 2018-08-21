@@ -34,7 +34,7 @@ class ItemEntity extends Entity
 
     var graceTimer : FlxTimer;
 
-    var vspeed : Float = 15;
+    var vspeed : Float = 35;
 
     var finishPositioningAfterMovement : Bool;
 
@@ -63,7 +63,7 @@ class ItemEntity extends Entity
         else
             flixel.util.FlxSpriteUtil.fill(this, 0x00000000);
 
-        var lineStyle : Dynamic = {thickness: 2, color: Palette.White};
+        var lineStyle : Dynamic = {thickness: 1, color: Palette.White};
 
         // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
         switch (charType)
@@ -76,6 +76,14 @@ class ItemEntity extends Entity
                 flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, lineStyle);
             case 4:
                 flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Blue, lineStyle);
+            case 5:
+                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, lineStyle);
+            case 6:
+                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Orange, lineStyle);
+            case 7:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Indigo, lineStyle);
+            case 8:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red, lineStyle);
             default:
                 flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.White);
         }

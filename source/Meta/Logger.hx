@@ -11,7 +11,7 @@ class Logger
 
         try
         {
-            #if (!flash)
+            #if (!flash && !html5)
                 sys.FileSystem.createDirectory(path);
                 var file : sys.io.FileOutput = sys.io.File.append(filepath, false);
                 file.writeString(line + "\n");

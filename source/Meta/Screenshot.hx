@@ -6,7 +6,7 @@ class Screenshot
 {
     public static function take(?fname : String = null) : String
     {
-        #if (!flash || html5)
+        #if (!flash && !html5)
         var b : flash.display.Bitmap = flixel.addons.plugin.screengrab.FlxScreenGrab.grab();
         return save(b, fname);
         #else
@@ -43,7 +43,7 @@ class Screenshot
 
         try
         {
-            #if (!flash)
+            #if (!flash && !html5)
                 sys.FileSystem.createDirectory(path);
                 // trace("Saving to " + sys.FileSystem.absolutePath(path));
                 var ba : openfl.utils.ByteArray = bitmap.bitmapData.encode(bitmap.bitmapData.rect, new openfl.display.PNGEncoderOptions());
@@ -61,7 +61,7 @@ class Screenshot
 
     public static function memtake() : openfl.display.BitmapData
     {
-        #if (!flash)
+        #if (!flash && !html5)
             return flixel.addons.plugin.screengrab.FlxScreenGrab.grab().bitmapData;
         #else
             return null;

@@ -20,7 +20,7 @@ class ItemEntity extends Entity
     var GraceTime : Float = 0.2;
     var HorizontalMovementDuration : Float = 0.15;
     var LeaveTime : Float = 0.3;
-    var ForcedFallTime : Float = 0.5;
+    var ForcedFallTime : Float = 0.25;
 
     var world : PlayState;
     var grid : GarbageGrid;
@@ -58,35 +58,10 @@ class ItemEntity extends Entity
 
     function handleGraphic(?doMakeGraphic : Bool = true)
     {
-        if (doMakeGraphic)
-            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-        else
-            flixel.util.FlxSpriteUtil.fill(this, 0x00000000);
-
-        var lineStyle : Dynamic = {thickness: 1, color: Palette.White};
-
-        // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
-        switch (charType)
-        {
-            case 1:
-                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Pink, lineStyle);
-            case 2:
-                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Peach, lineStyle);
-            case 3:
-                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, lineStyle);
-            case 4:
-                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Blue, lineStyle);
-            case 5:
-                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, lineStyle);
-            case 6:
-                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Orange, lineStyle);
-            case 7:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Indigo, lineStyle);
-            case 8:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red, lineStyle);
-            default:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.White);
-        }
+        loadGraphic("assets/images/pieces.png", true, 16, 16);
+        animation.add("idle", [charType-1]);
+        animation.play("idle");
+        // TODO: Add small animations per type
     }
 
     override public function destroy()

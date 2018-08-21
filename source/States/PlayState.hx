@@ -17,7 +17,7 @@ class PlayState extends GarbageState
 
     var CleanUpDelay : Float = 0.2;
     var ItemLeaveTime : Float = 0.5;
-    var ItemFallTime : Float = 0.55;
+    var ItemFallTime : Float = 0.3;
 
     public var state : Int;
 
@@ -39,6 +39,8 @@ class PlayState extends GarbageState
     {
         grid = new GarbageGrid(16, 16);
         grid.init();
+
+        add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
 
         gridDebugger = new GridDebugger(grid);
         add(gridDebugger);

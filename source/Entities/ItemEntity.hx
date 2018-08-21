@@ -377,15 +377,11 @@ class ItemEntity extends Entity
         var targetCell : FlxPoint = grid.getLowerFreeCellFrom(currentCell.x, currentCell.y);
         var targetPos : FlxPoint = grid.getCellPosition(targetCell.x, targetCell.y);
 
-        trace("[" + charType + "]@" + currentCell + " is trying to fall");
-
         if (currentCell.y != targetCell.y)
         {
             // Switch positions
             grid.set(currentCell.x, currentCell.y, null);
             grid.set(targetCell.x, targetCell.y, new ItemData(targetCell.x, targetCell.y, charType, this));
-
-            trace("[" + charType + "]@" + currentCell + " falls to " + targetCell);
 
             // And go
             movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.circIn});
@@ -394,7 +390,6 @@ class ItemEntity extends Entity
         }
         else
         {
-            trace("[" + charType + "]@" + currentCell + " does not fall");
             return false;
         }
     }

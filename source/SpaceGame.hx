@@ -6,7 +6,7 @@ class SpaceGame extends FlxGame
 {
     override public function step() : Void
     {
-        #if release
+        #if android
         try
         {
             super.step();

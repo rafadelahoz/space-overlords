@@ -64,7 +64,6 @@ class PlayState extends GarbageState
     public function getNextCharType() : Int
     {
         var next : Int = FlxG.random.int(1, 4);
-        trace("Next is " + next);
         return next;
     }
 
@@ -142,8 +141,8 @@ class PlayState extends GarbageState
         var matches : Array<ItemData> = grid.findMatches(lastPositionedCell);
         lastPositionedCell = null;
 
-        trace("======= BEFORE MATCHES REMOVAL =========");
-        grid.dump();
+        /*trace("======= BEFORE MATCHES REMOVAL =========");
+        grid.dump();*/
 
         for (itemData in matches)
         {
@@ -151,8 +150,8 @@ class PlayState extends GarbageState
             itemData.entity.triggerLeave();
         }
 
-        trace("======= AFTER MATCHES REMOVAL =========");
-        grid.dump();
+        /*trace("======= AFTER MATCHES REMOVAL =========");
+        grid.dump();*/
 
         // Wait a bit if things are leaving, otherwise finish now
         if (matches.length > 0)
@@ -162,7 +161,6 @@ class PlayState extends GarbageState
 
                 // Make all items fall down
                 // grid.getAll shall return things from bottom to top
-                trace("Things will start falling. There are " + grid.getAll().length);
                 for (itemData in grid.getAll())
                 {
                     if (itemData.entity != null)

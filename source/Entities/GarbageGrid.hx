@@ -100,8 +100,6 @@ class GarbageGrid
             matches = findBoardMatches();
         }
 
-        trace("Result matches", matches);
-
         return matches;
     }
 
@@ -111,9 +109,7 @@ class GarbageGrid
 
         // baseCell and cell top of baseCell will be checked
         matches = findMatchesFromCell(baseCell.x, baseCell.y);
-        trace("Base matches", matches);
         var slaveMatches : Array<ItemData> = findMatchesFromCell(baseCell.x, baseCell.y-1);
-        trace("Slave matches", slaveMatches);
 
         for (cell in slaveMatches)
         {
@@ -122,8 +118,6 @@ class GarbageGrid
                 matches.push(cell);
             }
         }
-
-        trace("Result matches", matches);
 
         return matches;
     }

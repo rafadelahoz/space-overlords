@@ -19,6 +19,8 @@ class ItemEntity extends Entity
     var grid : GarbageGrid;
 
     var charType : Int;
+    var flipCharTypeTween : FlxTween;
+    var FlipTime : Float = 0.1;
 
     var state : Int;
     var scaleTween : FlxTween;
@@ -48,19 +50,29 @@ class ItemEntity extends Entity
         grid = world.grid;
     }
 
-    function handleGraphic()
+    function handleGraphic(?doMakeGraphic : Bool = true)
     {
-        makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+        if (doMakeGraphic)
+            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+        else
+            flixel.util.FlxSpriteUtil.fill(this, 0x00000000);
+
+        var lineStyle : Dynamic = {thickness: 2, color: Palette.White};
 
         // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
-        var lineStyle : Dynamic = {thickness: 0, color: Palette.LightGray};
-        if (charType & 1 == 1)
-            lineStyle.thickness = 3;
-
-        if (charType < 3)
-            flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 3, 3, Palette.White, lineStyle);
-        else if (charType < 5)
-            flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.White, lineStyle);
+        switch (charType)
+        {
+            case 1:
+                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Pink, lineStyle);
+            case 2:
+                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Peach, lineStyle);
+            case 3:
+                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, lineStyle);
+            case 4:
+                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Blue, lineStyle);
+            default:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.White);
+        }
     }
 
     override public function destroy()
@@ -68,6 +80,8 @@ class ItemEntity extends Entity
         destroyTimer(graceTimer);
         destroyTween(scaleTween);
         destroyTween(horizontalTween);
+        destroyTween(flipCharTypeTween);
+
         super.destroy();
     }
 
@@ -109,15 +123,15 @@ class ItemEntity extends Entity
                 // Scale?
             case ItemEntity.StateFalling:
                 handleFallingState(elapsed);
-                color = Palette.Green;
+                // color = Palette.Green;
             case ItemEntity.StateGrace:
                 handleGraceState(elapsed);
-                color = Palette.DarkGreen;
+                // color = Palette.DarkGreen;
             case ItemEntity.StatePositioned:
-                color = Palette.Blue;
+                // color = Palette.Blue;
                 // Stay still!
             case ItemEntity.StateSlave:
-                color = Palette.DarkPurple;
+                // color = Palette.DarkPurple;
         }
 
         super.update(elapsed);
@@ -171,6 +185,12 @@ class ItemEntity extends Entity
                     moveHorizontallyToCell(currentCell.x+1, currentCell.y);
                 }
             }
+
+            if (GamePad.justPressed(GamePad.Shoot))
+            {
+                flipCharType();
+                slave.flipCharType();
+            }
         }
         else
         {
@@ -194,6 +214,12 @@ class ItemEntity extends Entity
             else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentCell.x+1, currentCell.y))
             {
                 moveHorizontallyToCell(currentCell.x+1, currentCell.y);
+            }
+
+            if (GamePad.justPressed(GamePad.Shoot))
+            {
+                flipCharType();
+                slave.flipCharType();
             }
         }
     }
@@ -269,5 +295,25 @@ class ItemEntity extends Entity
     public function setSlave(Slave : ItemEntity)
     {
         slave = Slave;
+    }
+
+    public function flipCharType()
+    {
+        flipCharTypeTween = FlxTween.tween(this.scale, {x : 0}, FlipTime * 0.5, {onComplete: function(t : FlxTween) {
+            t.destroy();
+
+            if (charType & 1 == 1)
+            {
+                charType += 1;
+            }
+            else
+            {
+                charType -= 1;
+            }
+
+            handleGraphic(false);
+
+            flipCharTypeTween = FlxTween.tween(this.scale, {x : 1}, FlipTime * 0.5, {onComplete: destroyTween});
+        }});
     }
 }

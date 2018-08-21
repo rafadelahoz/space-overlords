@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
 import flixel.text.FlxBitmapText;
@@ -51,14 +52,23 @@ class PlayState extends GarbageState
         switch (state)
         {
             case PlayState.StateGenerate:
-                var generationPosition : FlxPoint = grid.getCellPosition(0, 0);
+                // Generate the next item at a random position
+                var generationPosition : FlxPoint = grid.getCellPosition(FlxG.random.int(0, grid.columns-1), 1);
                 currentItem = new ItemEntity(generationPosition.x, generationPosition.y, this);
+
+                // Generate the pair item on top of that
+                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y - Constants.TileSize, this);
+                slaveItem.setState(ItemEntity.StateSlave);
+                currentItem.setSlave(slaveItem);
+
+                // Go
                 currentItem.setState(ItemEntity.StateGenerating);
                 add(currentItem);
             case PlayState.StateWait:
                 currentItem.setState(ItemEntity.StateFalling);
             case PlayState.StateAftermath:
                 items.add(currentItem);
+                items.add(currentItem.slave);
                 currentItem = null;
                 // Other things?
                 switchState(StateGenerate);

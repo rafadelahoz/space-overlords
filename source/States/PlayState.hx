@@ -69,9 +69,29 @@ class PlayState extends GarbageState
             case PlayState.StateAftermath:
                 items.add(currentItem);
                 items.add(currentItem.slave);
-                currentItem = null;
-                // Other things?
-                switchState(StateGenerate);
+
+                // TODO: Remove items
+
+                // Lose game
+                if (checkForLoseConditions(currentItem))
+                {
+                    // You lost!
+                    switchState(StateLost);
+                }
+                else
+                {
+                    // Clear current item references
+                    currentItem.slave = null;
+                    currentItem = null;
+
+                    // Go on
+                    switchState(StateGenerate);
+                }
+            case PlayState.StateLost:
+                trace("Game over!");
+                FlxG.camera.flash(Palette.Red, function() {
+                    GameController.GameOver(Constants.ModeEndless, {});
+                });
         }
     }
 
@@ -110,5 +130,12 @@ class PlayState extends GarbageState
     public function onAftermathFinished()
     {
         switchState(StateGenerate);
+    }
+
+    function checkForLoseConditions(currentItem : ItemEntity) : Bool
+    {
+        // TODO: input currentItem may not be required, check whole grid?
+        return (grid.getCellAt(currentItem.x, currentItem.y).y < 2 ||
+            grid.getCellAt(currentItem.slave.x, currentItem.slave.y).y < 2);
     }
 }

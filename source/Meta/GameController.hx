@@ -49,6 +49,7 @@ class GameController
 	public static function GameOver(mode : Int, data : Dynamic)
 	{
 		// Handle GameOver, store data, go to results screen?
+		ToMenu();
 	}
 }
 

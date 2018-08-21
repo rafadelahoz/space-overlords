@@ -87,7 +87,25 @@ class GarbageGrid
         return point;
     }
 
-    public function findMatches(baseCell : FlxPoint) : Array<ItemData>
+    public function findMatches(?baseCell : FlxPoint = null) : Array<ItemData>
+    {
+        var matches : Array<ItemData> = [];
+
+        if (baseCell != null)
+        {
+            matches = findMatchesFromBaseCell(baseCell);
+        }
+        else
+        {
+            matches = findBoardMatches();
+        }
+
+        trace("Result matches", matches);
+
+        return matches;
+    }
+
+    public function findMatchesFromBaseCell(baseCell : FlxPoint) : Array<ItemData>
     {
         var matches : Array<ItemData> = [];
 
@@ -110,7 +128,28 @@ class GarbageGrid
         return matches;
     }
 
-    public function findMatchesFromCell(col : Float, row : Float) : Array<ItemData>
+    function findBoardMatches() : Array<ItemData>
+    {
+        var matches : Array<ItemData> = [];
+
+        var all : Array<ItemData> = getAll();
+        var singleCellMatches : Array<ItemData> = null;
+        for (each in all)
+        {
+            singleCellMatches = findMatchesFromCell(each.cellX, each.cellY);
+            for (cell in singleCellMatches)
+            {
+                if (matches.indexOf(cell) < 0)
+                {
+                    matches.push(cell);
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    function findMatchesFromCell(col : Float, row : Float) : Array<ItemData>
     {
         var matches : Array<ItemData> = [];
 

@@ -140,6 +140,7 @@ class PlayState extends GarbageState
     {
         // Check and remove items
         var matches : Array<ItemData> = grid.findMatches(lastPositionedCell);
+        lastPositionedCell = null;
 
         trace("======= BEFORE MATCHES REMOVAL =========");
         grid.dump();
@@ -171,7 +172,11 @@ class PlayState extends GarbageState
                     }
                 }
 
-                aftermathTimer.start((somethingFell ? ItemFallTime : 0.01), handleAftermathResult);
+                // If something fell, we need to recompute the matches
+                if (somethingFell)
+                    aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
+                else
+                    aftermathTimer.start(0.01, handleAftermathResult);
             });
         }
         else

@@ -29,13 +29,14 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(16, 16);
         grid.init();
 
+        gridDebugger = new GridDebugger(grid);
+        add(gridDebugger);
+
         items = new FlxGroup();
         add(items);
 
         currentItem = null;
 
-        gridDebugger = new GridDebugger(grid);
-        add(gridDebugger);
 
         stateLabel = text.PixelText.New(0, 0, "", Palette.White);
         add(stateLabel);
@@ -43,6 +44,13 @@ class PlayState extends GarbageState
         switchState(StateIntro);
 
         super.create();
+    }
+
+    public function getNextCharType() : Int
+    {
+        var next : Int = FlxG.random.int(1, 4);
+        trace("Next is " + next);
+        return next;
     }
 
     public function switchState(Next : Int)
@@ -54,10 +62,10 @@ class PlayState extends GarbageState
             case PlayState.StateGenerate:
                 // Generate the next item at a random position
                 var generationPosition : FlxPoint = grid.getCellPosition(FlxG.random.int(0, grid.columns-1), 1);
-                currentItem = new ItemEntity(generationPosition.x, generationPosition.y, this);
+                currentItem = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
 
                 // Generate the pair item on top of that
-                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y - Constants.TileSize, this);
+                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y - Constants.TileSize, getNextCharType(), this);
                 slaveItem.setState(ItemEntity.StateSlave);
                 currentItem.setSlave(slaveItem);
 

@@ -34,18 +34,33 @@ class ItemEntity extends Entity
 
     public var slave : ItemEntity;
 
-    public function new(X : Float, Y : Float, World : PlayState)
+    public function new(X : Float, Y : Float, CharType : Int, World : PlayState)
     {
         super(X, Y);
 
-        makeGraphic(Constants.TileSize, Constants.TileSize, Palette.White);
+        charType = CharType;
 
-        charType = 1;
+        handleGraphic();
 
         graceTimer = new FlxTimer();
 
         world = World;
         grid = world.grid;
+    }
+
+    function handleGraphic()
+    {
+        makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+
+        // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
+        var lineStyle : Dynamic = {thickness: 0, color: Palette.LightGray};
+        if (charType & 1 == 1)
+            lineStyle.thickness = 3;
+
+        if (charType < 3)
+            flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 3, 3, Palette.White, lineStyle);
+        else if (charType < 5)
+            flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.White, lineStyle);
     }
 
     override public function destroy()

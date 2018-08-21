@@ -46,7 +46,7 @@ class GridDebugger extends FlxSprite
             for (r in 0...grid.rows)
             {
                 pos = grid.getCellPosition(c, r);
-                var tileColor : Int = grid.get(c, r) == null ? Palette.Black : Palette.Blue;
+                var tileColor : Int = grid.get(c, r) == null ? Palette.Black : Palette.DarkBlue;
                 var borderColor : Int = (c == mouseCell.x && r == mouseCell.y) ? Palette.Yellow : Palette.DarkGray;
 
                 FlxSpriteUtil.drawRect(this, pos.x, pos.y, Constants.TileSize, Constants.TileSize, tileColor, {color: borderColor});

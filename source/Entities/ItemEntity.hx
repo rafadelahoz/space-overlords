@@ -170,9 +170,19 @@ class ItemEntity extends Entity
         if (canMoveTo(nextFallingCell.x, nextFallingCell.y)) {
             // Go down, allow movement
             if (GamePad.checkButton(GamePad.Down))
+            {
                 velocity.set(0, vspeed * 4);
+                scale.x = flixel.math.FlxMath.lerp(scale.x, 0.8, 0.2);
+                if (slave != null)
+                    slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 0.8, 0.2);
+            }
             else
+            {
                 velocity.set(0, vspeed);
+                scale.x = flixel.math.FlxMath.lerp(scale.x, 1, 0.4);
+                if (slave != null)
+                    slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 1, 0.4);
+            }
 
             if (horizontalTween == null)
             {
@@ -203,6 +213,9 @@ class ItemEntity extends Entity
     {
         var currentCell : FlxPoint = grid.getCellAt(x, y);
 
+        scale.x = 1;
+        if (slave != null)
+            slave.scale.x = 1;
         velocity.set(0, 0);
 
         if (horizontalTween == null)
@@ -229,9 +242,27 @@ class ItemEntity extends Entity
         // The piece can stop
         var currentCell : FlxPoint = grid.getCellAt(x, y);
         var targetPos : FlxPoint = grid.getCellPosition(currentCell.x, currentCell.y);
+
         x = targetPos.x;
-        y = targetPos.y;
         velocity.y = 0;
+
+        /* Hacky effect begins, pay no mind */
+        // Add a little bounce for positioning
+        y = targetPos.y-4;
+        FlxTween.tween(this, {y: targetPos.y}, 0.1, {ease: FlxEase.bounceOut, onComplete: function(t:FlxTween) {
+            y = targetPos.y;
+        }});
+        if (slave != null)
+        {
+            // Add a little bounce for positioning the slave
+            slave.y = targetPos.y-Constants.TileSize-4;
+            FlxTween.tween(slave, {y: targetPos.y-Constants.TileSize}, 0.1, {ease: FlxEase.bounceOut, onComplete: function(t:FlxTween) {
+                // The slave reference may be null at this point!
+                if (slave != null)
+                    slave.y = targetPos.y-Constants.TileSize;
+            }});
+        }
+        /* End of hacky effect */
 
         setState(ItemEntity.StatePositioned);
         grid.set(currentCell.x, currentCell.y, new ItemData(charType, this));

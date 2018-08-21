@@ -8,17 +8,19 @@ import flixel.addons.transition.FlxTransitionableState;
 
 class PlayState extends GarbageState
 {
-    static var StateIntro       : Int = 1;
-    static var StateGenerate    : Int = 2;
-    static var StateWait        : Int = 3;
-    static var StateAftermath   : Int = 4;
-    static var StateLost        : Int = 5;
+    public static var StateIntro       : Int = 1;
+    public static var StateGenerate    : Int = 2;
+    public static var StateWait        : Int = 3;
+    public static var StateAftermath   : Int = 4;
+    public static var StateLost        : Int = 5;
 
-    var state : Int;
+    public var state : Int;
 
     public var grid : GarbageGrid;
     var items : FlxGroup;
     var currentItem : ItemEntity;
+
+    var screenButtons : ScreenButtons;
 
     // Debug
     var stateLabel : FlxBitmapText;
@@ -37,9 +39,11 @@ class PlayState extends GarbageState
 
         currentItem = null;
 
-
         stateLabel = text.PixelText.New(0, 0, "", Palette.White);
         add(stateLabel);
+
+        screenButtons = new ScreenButtons(0, 0, this, 240);
+		add(screenButtons);
 
         switchState(StateIntro);
 

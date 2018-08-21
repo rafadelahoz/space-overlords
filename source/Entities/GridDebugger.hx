@@ -25,9 +25,14 @@ class GridDebugger extends FlxSprite
         mousePos = FlxG.mouse.getPosition();
         mouseCell = grid.getCellAt(mousePos.x, mousePos.y);
 
-        if (FlxG.mouse.justPressed)
+        if (mousePos.x > grid.x && mousePos.y > grid.y &&
+            mousePos.x < grid.x + grid.columns * Constants.TileSize &&
+            mousePos.y < grid.x + grid.rows * Constants.TileSize)
         {
-            grid.set(mouseCell.x, mouseCell.y, new ItemData(1, null));
+            if (FlxG.mouse.justPressed)
+            {
+                grid.set(mouseCell.x, mouseCell.y, new ItemData(1, null));
+            }
         }
 
         super.update(elapsed);

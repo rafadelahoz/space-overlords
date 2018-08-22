@@ -41,7 +41,7 @@ class PlayState extends GarbageState
 
     override public function create()
     {
-        grid = new GarbageGrid(16, 16);
+        grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
         // add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));

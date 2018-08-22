@@ -42,6 +42,11 @@ class MenuState extends GarbageState
 
 		bgColor = 0xFF000000;
 
+		var stars : flixel.addons.display.FlxStarField.FlxStarField2D =
+			new flixel.addons.display.FlxStarField.FlxStarField2D();
+		stars.starVelocityOffset.set(0, 0.0125);
+		add(stars);
+
 		var titleText : String = "SPACE OVERLORDS\n       ~       \n GALAXY PUZZLE";
 		var logo : FlxObject = PixelText.New(Constants.Width / 2 - (15/2)*8, -164, titleText);
 		add(logo);

@@ -15,6 +15,7 @@ class PlayState extends GarbageState
     public static var StateAftermath   : Int = 4;
     public static var StateLost        : Int = 5;
 
+    // var GenerationDelay : Float = 1;
     var CleanUpDelay : Float = 0.1;
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
@@ -23,12 +24,15 @@ class PlayState extends GarbageState
 
     public var grid : GarbageGrid;
     public var items : FlxGroup;
+
+    var nextItem : ItemEntity;
     var currentItem : ItemEntity;
 
     var screenButtons : ScreenButtons;
 
     var lastPositionedCell : FlxPoint;
 
+    // var generationTimer : FlxTimer;
     var aftermathTimer : FlxTimer;
 
     // Debug
@@ -57,6 +61,7 @@ class PlayState extends GarbageState
 		add(screenButtons);
 
         aftermathTimer = new FlxTimer();
+        // generationTimer = new FlxTimer();
 
         switchState(StateIntro);
 
@@ -81,26 +86,17 @@ class PlayState extends GarbageState
         switch (state)
         {
             case PlayState.StateGenerate:
-                // Generate the next item at a random position
-                var generationPosition : FlxPoint = grid.getCellPosition(FlxG.random.int(0, grid.columns-1), 1);
-                var shape : ItemEntity.CellPosition = getNextItemShape();
-                if (shape == ItemEntity.CellPosition.Right && generationPosition.x == grid.getCellPosition(grid.columns-1, 0).x)
+                if (nextItem == null)
                 {
-                    generationPosition.x -= Constants.TileSize;
+                    generateNextItem();
                 }
-
-                currentItem = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
-
-                // Generate the pair item on top of that
-                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
-                slaveItem.setState(ItemEntity.StateSlave);
-                currentItem.setSlave(slaveItem, shape);
-
-                // Go
-                currentItem.setState(ItemEntity.StateGenerating);
-                add(currentItem);
+                else
+                {
+                    finishGeneration();
+                }
             case PlayState.StateWait:
                 currentItem.setState(ItemEntity.StateFalling);
+                // generationTimer.start(GenerationDelay, generateNextItem);
             case PlayState.StateAftermath:
                 items.add(currentItem);
                 items.add(currentItem.slave);
@@ -119,6 +115,34 @@ class PlayState extends GarbageState
         }
     }
 
+    function generateNextItem(?t:FlxTimer)
+    {
+        // Generate the next item at a random position
+        var generationPosition : FlxPoint = grid.getCellPosition(FlxG.random.int(0, grid.columns-1), 1);
+        var shape : ItemEntity.CellPosition = getNextItemShape();
+        if (shape == ItemEntity.CellPosition.Right && generationPosition.x == grid.getCellPosition(grid.columns-1, 0).x)
+        {
+            generationPosition.x -= Constants.TileSize;
+        }
+
+        nextItem = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
+
+        // Generate the pair item on top of that
+        var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
+        slaveItem.setState(ItemEntity.StateSlave);
+        nextItem.setSlave(slaveItem, shape);
+
+        // Go
+        nextItem.setState(ItemEntity.StateGenerating);
+        add(nextItem);
+    }
+
+    function finishGeneration()
+    {
+        currentItem = nextItem;
+        switchState(StateWait);
+    }
+
     override public function update(elapsed : Float)
     {
         switch (state)
@@ -128,8 +152,14 @@ class PlayState extends GarbageState
                 switchState(StateGenerate);
             case PlayState.StateGenerate:
                 stateLabel.text = "Generating";
+                if (nextItem != null)
+                    finishGeneration();
             case PlayState.StateWait:
                 stateLabel.text = "Waiting";
+                if (!currentItem.inGenerationArea())
+                {
+                    generateNextItem();
+                }
             case PlayState.StateAftermath:
                 stateLabel.text = "Aftermath";
             case PlayState.StateLost:
@@ -143,7 +173,9 @@ class PlayState extends GarbageState
 
     public function onNextItemGenerated()
     {
-        switchState(StateWait);
+        if (state == StateGenerate)
+            finishGeneration();
+        // else notify somehow? Using nextItem for now
     }
 
     public function onCurrentItemPositioned(cell : FlxPoint)

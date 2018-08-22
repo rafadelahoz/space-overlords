@@ -18,7 +18,7 @@ class ItemEntity extends Entity
 
     var GenerationTime : Float = 0.2;
     var FlipTime : Float = 0.1;
-    var GraceTime : Float = 0.01;
+    var GraceTime : Float = 0.1;
     var HorizontalMovementDuration : Float = 0.15;
     var LeaveTime : Float = 0.3;
     var ForcedFallTime : Float = 0.1;
@@ -436,6 +436,20 @@ class ItemEntity extends Entity
         {
             return false;
         }
+    }
+
+    public function inGenerationArea() : Bool
+    {
+        var inArea : Bool = false;
+        // Check self
+        inArea = (y <= grid.getCellPosition(0, 2).y);
+        // Check slave when positioned on top
+        if (!inArea && slave != null && slaveCellOffset.y < 0)
+        {
+            inArea = (slave.y <= grid.getCellPosition(0, 2).y);
+        }
+
+        return inArea;
     }
 }
 

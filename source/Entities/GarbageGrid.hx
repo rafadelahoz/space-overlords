@@ -91,18 +91,20 @@ class GarbageGrid
     {
         var matches : Array<ItemData> = [];
 
-        if (baseCell != null)
+        // Avoid using the single cell + slave approach for now
+        /*if (baseCell != null)
         {
             matches = findMatchesFromBaseCell(baseCell);
         }
         else
-        {
+        {*/
             matches = findBoardMatches();
-        }
+        //}
 
         return matches;
     }
 
+    @Deprecated
     public function findMatchesFromBaseCell(baseCell : FlxPoint) : Array<ItemData>
     {
         var matches : Array<ItemData> = [];

@@ -16,11 +16,13 @@ class ItemEntity extends Entity
     public static var StateSlave        : Int = 4;
     public static var StateLeaving      : Int = 5;
 
+    var GenerationTime : Float = 0.2;
     var FlipTime : Float = 0.1;
-    var GraceTime : Float = 0.2;
+    var GraceTime : Float = 0.01;
     var HorizontalMovementDuration : Float = 0.15;
     var LeaveTime : Float = 0.3;
-    var ForcedFallTime : Float = 0.25;
+    var ForcedFallTime : Float = 0.1;
+    var SpeedUpFactor : Float = 5;
 
     var world : PlayState;
     var grid : GarbageGrid;
@@ -34,13 +36,15 @@ class ItemEntity extends Entity
 
     var graceTimer : FlxTimer;
 
-    var vspeed : Float = 35;
+    var vspeed : Float = 16;
 
     var finishPositioningAfterMovement : Bool;
 
     var leaveCallback : Void -> Void;
 
     public var slave : ItemEntity;
+    var slaveOffset : FlxPoint;
+    var slaveCellOffset : FlxPoint;
 
     public function new(X : Float, Y : Float, CharType : Int, World : PlayState)
     {
@@ -62,6 +66,39 @@ class ItemEntity extends Entity
         animation.add("idle", [charType-1]);
         animation.play("idle");
         // TODO: Add small animations per type
+    }
+
+    function handleGraphicBasic(?doMakeGraphic : Bool = true)
+    {
+        if (doMakeGraphic)
+            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+        else
+            flixel.util.FlxSpriteUtil.fill(this, 0x00000000);
+
+        var lineStyle : Dynamic = {thickness: 1, color: Palette.White};
+
+        // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
+        switch (charType)
+        {
+            case 1:
+                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Pink, lineStyle);
+            case 2:
+                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Peach, lineStyle);
+            case 3:
+                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, lineStyle);
+            case 4:
+                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Blue, lineStyle);
+            case 5:
+                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, lineStyle);
+            case 6:
+                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Orange, lineStyle);
+            case 7:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Indigo, lineStyle);
+            case 8:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red, lineStyle);
+            default:
+                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.White);
+        }
     }
 
     override public function destroy()
@@ -87,12 +124,12 @@ class ItemEntity extends Entity
                 }
 
                 scale.set(0, 0);
-                scaleTween = FlxTween.tween(this.scale, {x : 1, y: 1}, 0.5, {onComplete: onGenerationFinished});
+                scaleTween = FlxTween.tween(this.scale, {x : 1, y: 1}, GenerationTime, {onComplete: onGenerationFinished});
                 // Apply the same for the slave, if any
                 if (slave != null)
                 {
                     slave.scale.set(0, 0);
-                    FlxTween.tween(slave.scale, {x : 1, y: 1}, 0.5);
+                    FlxTween.tween(slave.scale, {x : 1, y: 1}, GenerationTime);
                 }
             case ItemEntity.StateFalling:
             case ItemEntity.StateGrace:
@@ -138,8 +175,8 @@ class ItemEntity extends Entity
 
         if (slave != null)
         {
-            slave.x = x;
-            slave.y = y - Constants.TileSize;
+            slave.x = x + slaveOffset.x;
+            slave.y = y + slaveOffset.y;
             slave.update(elapsed);
         }
     }
@@ -167,11 +204,11 @@ class ItemEntity extends Entity
         var nextFallingCell : FlxPoint = grid.getCellAt(x, y+height);
         var nextData : ItemData = grid.get(nextFallingCell.x, nextFallingCell.y);
 
-        if (canMoveTo(nextFallingCell.x, nextFallingCell.y)) {
+        if (canMoveTo(nextFallingCell.x, nextFallingCell.y) && canMoveTo(nextFallingCell.x + (slave != null ? slaveCellOffset.x : 0), nextFallingCell.y)) {
             // Go down, allow movement
             if (GamePad.checkButton(GamePad.Down))
             {
-                velocity.set(0, vspeed * 4);
+                velocity.set(0, vspeed * SpeedUpFactor);
                 scale.x = flixel.math.FlxMath.lerp(scale.x, 0.8, 0.2);
                 if (slave != null)
                     slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 0.8, 0.2);
@@ -190,7 +227,7 @@ class ItemEntity extends Entity
                 {
                     moveHorizontallyToCell(currentCell.x-1, currentCell.y);
                 }
-                else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentCell.x+1, currentCell.y) && canMoveTo(nextFallingCell.x+1, nextFallingCell.y))
+                else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentCell.x+(slave != null ? slaveCellOffset.x : 0)+1, currentCell.y) && canMoveTo(currentCell.x+(slave != null ? slaveCellOffset.x : 0)+1, nextFallingCell.y))
                 {
                     moveHorizontallyToCell(currentCell.x+1, currentCell.y);
                 }
@@ -224,7 +261,8 @@ class ItemEntity extends Entity
             {
                 moveHorizontallyToCell(currentCell.x-1, currentCell.y);
             }
-            else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentCell.x+1, currentCell.y))
+            // Note: special "(slave != null ? slaveCellOffset.x : 0)" check here for moving right correctly
+            else if (GamePad.checkButton(GamePad.Right) && canMoveTo(currentCell.x+(slave != null ? slaveCellOffset.x : 0)+1, currentCell.y))
             {
                 moveHorizontallyToCell(currentCell.x+1, currentCell.y);
             }
@@ -244,7 +282,16 @@ class ItemEntity extends Entity
         var targetPos : FlxPoint = grid.getCellPosition(currentCell.x, currentCell.y);
 
         x = targetPos.x;
+        // y = targetPos.y;
+        scale.set(1, 1);
         velocity.y = 0;
+
+        if (slave != null)
+        {
+            slave.x = targetPos.x + slaveOffset.x;
+            // slave.y = targetPos.y + slaveOffset.y;
+            slave.scale.set(1, 1);
+        }
 
         /* Hacky effect begins, pay no mind */
         // Add a little bounce for positioning
@@ -255,11 +302,11 @@ class ItemEntity extends Entity
         if (slave != null)
         {
             // Add a little bounce for positioning the slave
-            slave.y = targetPos.y-Constants.TileSize-4;
-            FlxTween.tween(slave, {y: targetPos.y-Constants.TileSize}, 0.1, {ease: FlxEase.bounceOut, onComplete: function(t:FlxTween) {
+            slave.y = targetPos.y + slaveOffset.y - 4;
+            FlxTween.tween(slave, {y: targetPos.y + slaveOffset.y}, 0.1, {ease: FlxEase.bounceOut, onComplete: function(t:FlxTween) {
                 // The slave reference may be null at this point!
                 if (slave != null)
-                    slave.y = targetPos.y-Constants.TileSize;
+                    slave.y = targetPos.y + slaveOffset.y;
             }});
         }
         /* End of hacky effect */
@@ -269,7 +316,8 @@ class ItemEntity extends Entity
         if (slave != null)
         {
             slave.setState(ItemEntity.StatePositioned);
-            grid.set(currentCell.x, currentCell.y-1, new ItemData(currentCell.x, currentCell.y-1, slave.charType, slave));
+            var slaveCell : FlxPoint = new FlxPoint(currentCell.x + slaveCellOffset.x, currentCell.y + slaveCellOffset.y);
+            grid.set(slaveCell.x, slaveCell.y, new ItemData(slaveCell.x, slaveCell.y, slave.charType, slave));
         }
 
         world.onCurrentItemPositioned(currentCell);
@@ -323,9 +371,22 @@ class ItemEntity extends Entity
         }
     }
 
-    public function setSlave(Slave : ItemEntity)
+    public function setSlave(Slave : ItemEntity, Position : CellPosition)
     {
         slave = Slave;
+        if (slave != null)
+        {
+
+            switch (Position)
+            {
+                case CellPosition.Right:
+                    slaveCellOffset = new FlxPoint(1, 0);
+                case CellPosition.Top:
+                    slaveCellOffset = new FlxPoint(0, -1);
+            }
+
+            slaveOffset = new FlxPoint(slaveCellOffset.x * Constants.TileSize, slaveCellOffset.y * Constants.TileSize);
+        }
     }
 
     public function flipCharType()
@@ -367,7 +428,7 @@ class ItemEntity extends Entity
             grid.set(targetCell.x, targetCell.y, new ItemData(targetCell.x, targetCell.y, charType, this));
 
             // And go
-            movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.circIn});
+            movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.sineIn});
 
             return true;
         }
@@ -377,3 +438,5 @@ class ItemEntity extends Entity
         }
     }
 }
+
+enum CellPosition {Top; Right;}

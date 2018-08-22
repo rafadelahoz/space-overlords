@@ -15,9 +15,9 @@ class PlayState extends GarbageState
     public static var StateAftermath   : Int = 4;
     public static var StateLost        : Int = 5;
 
-    var CleanUpDelay : Float = 0.2;
-    var ItemLeaveTime : Float = 0.5;
-    var ItemFallTime : Float = 0.3;
+    var CleanUpDelay : Float = 0.1;
+    var ItemLeaveTime : Float = 0.35;
+    var ItemFallTime : Float = 0.2;
 
     public var state : Int;
 
@@ -40,7 +40,7 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(16, 16);
         grid.init();
 
-        add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
+        // add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
 
         gridDebugger = new GridDebugger(grid);
         add(gridDebugger);
@@ -69,6 +69,11 @@ class PlayState extends GarbageState
         return next;
     }
 
+    public function getNextItemShape() : ItemEntity.CellPosition
+    {
+        return FlxG.random.getObject([ItemEntity.CellPosition.Right, ItemEntity.CellPosition.Top]);
+    }
+
     public function switchState(Next : Int)
     {
         state = Next;
@@ -78,12 +83,18 @@ class PlayState extends GarbageState
             case PlayState.StateGenerate:
                 // Generate the next item at a random position
                 var generationPosition : FlxPoint = grid.getCellPosition(FlxG.random.int(0, grid.columns-1), 1);
+                var shape : ItemEntity.CellPosition = getNextItemShape();
+                if (shape == ItemEntity.CellPosition.Right && generationPosition.x == grid.getCellPosition(grid.columns-1, 0).x)
+                {
+                    generationPosition.x -= Constants.TileSize;
+                }
+
                 currentItem = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
 
                 // Generate the pair item on top of that
-                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y - Constants.TileSize, getNextCharType(), this);
+                var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
                 slaveItem.setState(ItemEntity.StateSlave);
-                currentItem.setSlave(slaveItem);
+                currentItem.setSlave(slaveItem, shape);
 
                 // Go
                 currentItem.setState(ItemEntity.StateGenerating);
@@ -144,7 +155,7 @@ class PlayState extends GarbageState
     public function handleAftermathCleanup(?t:FlxTimer)
     {
         // Check and remove items
-        var matches : Array<ItemData> = grid.findMatches(lastPositionedCell);
+        var matches : Array<ItemData> = grid.findMatches( /*lastPositionedCell*/ );
         lastPositionedCell = null;
 
         /*trace("======= BEFORE MATCHES REMOVAL =========");
@@ -160,33 +171,26 @@ class PlayState extends GarbageState
         grid.dump();*/
 
         // Wait a bit if things are leaving, otherwise finish now
-        if (matches.length > 0)
-        {
-            aftermathTimer.start(ItemLeaveTime, function(t:FlxTimer) {
-                var somethingFell : Bool = false;
+        aftermathTimer.start(ItemLeaveTime, function(t:FlxTimer) {
+            var somethingFell : Bool = false;
 
-                // Make all items fall down
-                // grid.getAll shall return things from bottom to top
-                for (itemData in grid.getAll())
+            // Make all items fall down
+            // grid.getAll shall return things from bottom to top
+            for (itemData in grid.getAll())
+            {
+                if (itemData.entity != null)
                 {
-                    if (itemData.entity != null)
-                    {
-                        if (itemData.entity.fallToFreePosition())
-                            somethingFell = true;
-                    }
+                    if (itemData.entity.fallToFreePosition())
+                        somethingFell = true;
                 }
+            }
 
-                // If something fell, we need to recompute the matches
-                if (somethingFell)
-                    aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
-                else
-                    aftermathTimer.start(0.01, handleAftermathResult);
-            });
-        }
-        else
-        {
-            aftermathTimer.start(0.01, handleAftermathResult);
-        }
+            // If something fell, we need to recompute the matches
+            if (somethingFell)
+                aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
+            else
+                aftermathTimer.start(0.01, handleAftermathResult);
+        });
 
     }
 

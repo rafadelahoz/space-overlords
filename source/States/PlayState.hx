@@ -140,6 +140,7 @@ class PlayState extends GarbageState
     function finishGeneration()
     {
         currentItem = nextItem;
+        nextItem = null;
         switchState(StateWait);
     }
 
@@ -156,7 +157,7 @@ class PlayState extends GarbageState
                     finishGeneration();
             case PlayState.StateWait:
                 stateLabel.text = "Waiting";
-                if (!currentItem.inGenerationArea())
+                if (nextItem == null && !currentItem.inGenerationArea())
                 {
                     generateNextItem();
                 }

@@ -268,7 +268,7 @@ class GarbageGrid
 
     public function checkForItemsOnTopRows() : Bool
     {
-        for (row in 0...1)
+        for (row in 0...2)
         {
             for (col in 0...columns)
             {

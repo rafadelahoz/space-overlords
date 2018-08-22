@@ -56,17 +56,17 @@ class GridDebugger extends FlxSprite
             for (r in 0...grid.rows)
             {
                 pos = grid.getCellPosition(c, r);
-                var tileColor : Int = grid.get(c, r) == null ? Palette.Black : Palette.DarkBlue;
-                var borderColor : Int = (c == mouseCell.x && r == mouseCell.y) ? Palette.Yellow : Palette.DarkGray;
+                var tileColor : Int = grid.get(c, r) == null ? 0x00000000 : Palette.DarkBlue;
+                var borderColor : Int = (c == mouseCell.x && r == mouseCell.y) ? Palette.Yellow : 0x00000000;
 
                 FlxSpriteUtil.drawRect(this, pos.x, pos.y, Constants.TileSize, Constants.TileSize, tileColor, {color: borderColor});
             }
 
-        FlxSpriteUtil.drawRect(this, grid.x, grid.y, grid.columns * Constants.TileSize, grid.rows * Constants.TileSize, 0x00000000, {thickness: 2, color: Palette.White});
+        // FlxSpriteUtil.drawRect(this, grid.x, grid.y, grid.columns * Constants.TileSize, grid.rows * Constants.TileSize, 0x00000000, {thickness: 2, color: Palette.White});
 
         // Separator line?
         // FlxSpriteUtil.drawRect(this, grid.x, grid.y + 2 * Constants.TileSize, grid.columns * Constants.TileSize, 4, Palette.Green, {thickness: 2, color: Palette.Red});
-        FlxSpriteUtil.drawLine(this, grid.x, grid.y + 2*Constants.TileSize - 1, grid.x + grid.columns * Constants.TileSize, grid.y + 2*Constants.TileSize - 1, {thickness: 2, color: Palette.White});
+        // FlxSpriteUtil.drawLine(this, grid.x, grid.y + 2*Constants.TileSize - 1, grid.x + grid.columns * Constants.TileSize, grid.y + 2*Constants.TileSize - 1, {thickness: 2, color: Palette.White});
 
         super.draw();
 

@@ -14,8 +14,8 @@
 
 	<!--------------------------------WINDOW SETTINGS------------------------------->
 
-	<set name="work"/>
-	<haxedef name="work"/>
+	<!--<set name="work"/>
+	<haxedef name="work"/>-->
 
 	<!--These window settings apply to all targets-->
 	<window width="360" height="640" fps="60" background="#212121" hardware="true" vsync="true" />
@@ -40,7 +40,14 @@
 	<classpath name="source/States" />
 	<classpath name="source/Entities" />
 
-	<assets path="assets" />
+	<assets path="assets/backgrounds" />
+	<assets path="assets/fonts" />
+	<assets path="assets/icons" />
+	<assets path="assets/images" />
+	<assets path="assets/music" />
+	<assets path="assets/sounds" if="mobile"/>
+	<assets path="assets/sounds" if="desktop"/>
+	<assets path="assets/ui" />
 
 	<!--------------------------------LIBRARIES------------------------------------->
 

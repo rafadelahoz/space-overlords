@@ -44,7 +44,12 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
-        // add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
+        add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
+        var shader : flixel.FlxSprite = new flixel.FlxSprite(grid.x-2, grid.y-2);
+        shader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
+        shader.alpha = 0.6;
+        add(shader);
+        add(new flixel.FlxSprite(grid.x-4, grid.y-4, "assets/ui/grid-frame.png"));
 
         gridDebugger = new GridDebugger(grid);
         add(gridDebugger);
@@ -54,8 +59,13 @@ class PlayState extends GarbageState
 
         currentItem = null;
 
-        stateLabel = text.PixelText.New(0, 0, "", Palette.White);
+        // Add the top part
+		add(new flixel.FlxSprite(0, 0, "assets/ui/gameplay-ui-top.png"));
+
+        stateLabel = text.PixelText.New(20, 16, "", 0xFFFEE761);
         add(stateLabel);
+
+        add(text.PixelText.New(20, 24, "PRODUCTION IS OK", 0xFFFEE761));
 
         screenButtons = new ScreenButtons(0, 0, this, 240);
 		add(screenButtons);
@@ -197,7 +207,8 @@ class PlayState extends GarbageState
         for (itemData in matches)
         {
             grid.set(itemData.cellX, itemData.cellY, null);
-            itemData.entity.triggerLeave();
+            if (itemData.entity != null)
+                itemData.entity.triggerLeave();
         }
 
         /*trace("======= AFTER MATCHES REMOVAL =========");

@@ -33,6 +33,9 @@ class ScreenButtons extends FlxSpriteGroup
 		var halfWidth = Std.int(_width / 2);
 		var halfHeight = Std.int(_height / 2);
 
+		// Add the bg
+		add(new FlxSprite(0, BottomHeight, "assets/ui/buttons-bg.png"));
+
 		// Add the buttons
 		add(pauseButton = new FlxSprite(0, 0).loadGraphic("assets/ui/btnPause.png", true, 20, 16));
 		add(leftButton = new FlxSprite(0, BottomHeight + halfHeight).loadGraphic("assets/ui/btnLeft.png", true, 90, 40));

@@ -50,10 +50,6 @@ class GridDebugger extends FlxSprite
     override public function draw()
     {
         FlxSpriteUtil.fill(this, 0x00000000);
-        FlxSpriteUtil.drawRect(this, grid.x, grid.y, grid.columns * Constants.TileSize, grid.rows * Constants.TileSize, Palette.Black, {thickness: 2, color: Palette.LightGray});
-
-        // Separator line?
-        // FlxSpriteUtil.drawRect(this, grid.x, grid.y + 2 * Constants.TileSize, grid.columns * Constants.TileSize, 4, Palette.Green, {thickness: 2, color: Palette.Red});
 
         var pos : FlxPoint = null;
         for (c in 0...grid.columns)
@@ -65,6 +61,12 @@ class GridDebugger extends FlxSprite
 
                 FlxSpriteUtil.drawRect(this, pos.x, pos.y, Constants.TileSize, Constants.TileSize, tileColor, {color: borderColor});
             }
+
+        FlxSpriteUtil.drawRect(this, grid.x, grid.y, grid.columns * Constants.TileSize, grid.rows * Constants.TileSize, 0x00000000, {thickness: 2, color: Palette.White});
+
+        // Separator line?
+        // FlxSpriteUtil.drawRect(this, grid.x, grid.y + 2 * Constants.TileSize, grid.columns * Constants.TileSize, 4, Palette.Green, {thickness: 2, color: Palette.Red});
+        FlxSpriteUtil.drawLine(this, grid.x, grid.y + 2*Constants.TileSize - 1, grid.x + grid.columns * Constants.TileSize, grid.y + 2*Constants.TileSize - 1, {thickness: 2, color: Palette.White});
 
         super.draw();
 

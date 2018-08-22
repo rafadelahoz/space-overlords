@@ -42,8 +42,8 @@ class MenuState extends GarbageState
 
 		bgColor = 0xFF000000;
 
-		var titleText : String = "SPACE OVERLORDS";
-		var logo : FlxObject = PixelText.New(Constants.Width / 2 - (titleText.length/2)*8, -164, titleText);
+		var titleText : String = "SPACE OVERLORDS\n       ~       \n GALAXY PUZZLE";
+		var logo : FlxObject = PixelText.New(Constants.Width / 2 - (15/2)*8, -164, titleText);
 		add(logo);
 
 		var startText : String = "Touch to start";
@@ -52,7 +52,7 @@ class MenuState extends GarbageState
 		add(touchLabel);
 
 		var startDelay : Float = 0.35;
-		tween = FlxTween.tween(logo, {y : 64}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.elasticOut });
+		tween = FlxTween.tween(logo, {y : 64}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
 		FlxG.camera.scroll.set(0, 0);
 	}
 

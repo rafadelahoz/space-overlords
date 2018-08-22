@@ -40,7 +40,7 @@ class ScreenButtons extends FlxSpriteGroup
 		add(downButton = new FlxSprite(0, BottomHeight).loadGraphic("assets/ui/btnLeft.png", true, 90, 40));
 		add(shootButton = new FlxSprite(halfWidth, BottomHeight).loadGraphic("assets/ui/btnRight.png", true, 90, 40));
 
-		for (button in [leftButton, rightButton, shootButton, pauseButton])
+		for (button in [leftButton, rightButton, downButton, shootButton, pauseButton])
 		{
 			button.animation.add("idle", [0]);
 			button.animation.add("pressed", [1]);

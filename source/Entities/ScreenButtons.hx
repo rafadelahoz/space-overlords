@@ -37,8 +37,8 @@ class ScreenButtons extends FlxSpriteGroup
 		add(pauseButton = new FlxSprite(0, 0).loadGraphic("assets/ui/btnPause.png", true, 20, 16));
 		add(leftButton = new FlxSprite(0, BottomHeight + halfHeight).loadGraphic("assets/ui/btnLeft.png", true, 90, 40));
 		add(rightButton = new FlxSprite(halfWidth, BottomHeight + halfHeight).loadGraphic("assets/ui/btnRight.png", true, 90, 40));
-		add(downButton = new FlxSprite(0, BottomHeight).loadGraphic("assets/ui/btnLeft.png", true, 90, 40));
-		add(shootButton = new FlxSprite(halfWidth, BottomHeight).loadGraphic("assets/ui/btnRight.png", true, 90, 40));
+		add(downButton = new FlxSprite(0, BottomHeight).loadGraphic("assets/ui/btnDown.png", true, 90, 40));
+		add(shootButton = new FlxSprite(halfWidth, BottomHeight).loadGraphic("assets/ui/btnShoot.png", true, 90, 40));
 
 		for (button in [leftButton, rightButton, downButton, shootButton, pauseButton])
 		{

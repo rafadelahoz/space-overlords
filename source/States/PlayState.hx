@@ -58,7 +58,7 @@ class PlayState extends GarbageState
         shader.alpha = 0.6;
         add(shader);
 
-        add(new flixel.FlxSprite(grid.x-4, grid.y-4, "assets/ui/grid-frame.png"));
+        add(new flixel.FlxSprite(grid.x-8, grid.y-4, "assets/ui/grid-frame.png"));
 
         gridDebugger = new GridDebugger(grid);
         add(gridDebugger);

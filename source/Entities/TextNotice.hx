@@ -43,8 +43,8 @@ class TextNotice extends FlxSprite
 
         textDelta = FlxPoint.get(pxtext.x - x, pxtext.y - y);
 
-        alpha = 0;
-        FlxTween.tween(this, {alpha: 1}, 0.1, {ease: FlxEase.circOut, startDelay: 0, onComplete: onAppeared});
+        scale.y = 0;
+        FlxTween.tween(this.scale, {y: 1}, 0.1, {ease: FlxEase.circOut, startDelay: 0, onComplete: onAppeared});
 
         if (!seriousMode || Text.indexOf("\\") >= 0)
             doColor(null);
@@ -59,7 +59,7 @@ class TextNotice extends FlxSprite
         var delay : Float = 0;
         if (pxtext.color == originalColor)
         {
-            targetColor = 0xFF262b44;
+            targetColor = 0xFF2ce8f5;
             delay = 0.05;
         }
         else
@@ -83,7 +83,7 @@ class TextNotice extends FlxSprite
 
     function onAppeared(t:FlxTween)
     {
-        FlxTween.tween(this, {alpha: 0}, 0.1, {ease: FlxEase.circOut, startDelay: 1.15 + (serious ? 1 : 0), onComplete: onDisapeared});
+        FlxTween.tween(this.scale, {y: 0}, 0.1, {ease: FlxEase.circOut, startDelay: 1 + (serious ? 1 : 0), onComplete: onDisapeared});
     }
 
     function onDisapeared(t:FlxTween)
@@ -99,11 +99,13 @@ class TextNotice extends FlxSprite
         super.update(elapsed);
 
         pxtext.alpha = alpha;
+        pxtext.scale.set(scale.x, scale.y);
         pxtext.x = x + textDelta.x;
         pxtext.y = y + textDelta.y;
         pxtext.update(elapsed);
 
         background.alpha = alpha;
+        background.scale.set(scale.x, scale.y);
         background.x = pxtext.x - border/2;
         background.y = pxtext.y - border/2;
     }

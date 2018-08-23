@@ -15,6 +15,7 @@ class ScrollingLabel extends FlxSprite
     var buffer : Array<String>;
 
     var scrollTimer : FlxTimer;
+    var scrollHalfTimer : FlxTimer;
     var ScrollDelay : Float = 0.2;
 
     public function new(X : Float, Y : Float, Width : Int, ?Text : String = null, Color : Int)
@@ -42,7 +43,9 @@ class ScrollingLabel extends FlxSprite
         label = text.PixelText.New(X, Y, startText, Color);
 
         scrollTimer = new FlxTimer();
+        scrollHalfTimer = new FlxTimer();
         scrollTimer.start(ScrollDelay, onScrollTimer);
+        scrollHalfTimer.start(ScrollDelay/2, onScrollHalfTimer);
     }
 
     public function appendText(text : String)
@@ -67,8 +70,14 @@ class ScrollingLabel extends FlxSprite
         label.draw();
     }
 
+    function onScrollHalfTimer(t:FlxTimer)
+    {
+        label.x -= 4;
+    }
+
     function onScrollTimer(t:FlxTimer)
     {
+        label.x += 4;
         currentText = currentText.substring(1);
         if (currentText.length < scrollWidth-1)
         {
@@ -86,5 +95,6 @@ class ScrollingLabel extends FlxSprite
         label.text = currentText.substring(0, scrollWidth);
 
         scrollTimer.start(ScrollDelay, onScrollTimer);
+        scrollHalfTimer.start(ScrollDelay/2, onScrollHalfTimer);
     }
 }

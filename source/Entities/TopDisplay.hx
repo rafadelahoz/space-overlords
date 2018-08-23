@@ -10,11 +10,14 @@ import flixel.text.FlxBitmapText;
 
 class TopDisplay extends FlxGroup
 {
+    var world : PlayState;
+
     var background : FlxSprite;
     var belts : FlxGroup;
     var items : FlxGroup;
     var topFrame : FlxSprite;
 
+    var scoreLabel : FlxBitmapText;
     var bottomLabel : ScrollingLabel;
 
     var baseBeltY : Float;
@@ -30,6 +33,8 @@ class TopDisplay extends FlxGroup
     public function new(World : PlayState)
     {
         super();
+
+        world = World;
 
         var bgColor : Int = 0xFF3f2832;
         background = new FlxSprite(0, 0).makeGraphic(Constants.Width, 80, bgColor);
@@ -56,6 +61,10 @@ class TopDisplay extends FlxGroup
         beltShakeTimer = new FlxTimer();
         onBeltShakeTimer(beltShakeTimer);
 
+        add(new FlxSprite(24, 16, "assets/ui/rating-marker.png"));
+        scoreLabel = text.PixelText.New(48, 16, " 9999", 0xFFFFFFFF);
+        add(scoreLabel);
+
         bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
         add(bottomLabel);
 
@@ -75,6 +84,8 @@ class TopDisplay extends FlxGroup
             });
             items.add(next);
         }
+
+        scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
 
         // DEBUG: Bottom label queue density
         var itemsInBelt : Int = items.countLiving();

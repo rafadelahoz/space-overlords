@@ -1,0 +1,117 @@
+package;
+
+import flixel.FlxG;
+import flixel.FlxSprite;
+import flixel.math.FlxPoint;
+import flixel.text.FlxBitmapText;
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
+
+class TextNotice extends FlxSprite
+{
+    var textDelta : FlxPoint;
+
+    var originalColor : Int;
+    var border : Int;
+    var pxtext : FlxBitmapText;
+    var background : FlxSprite;
+    var colorTween : FlxTween;
+
+    var serious : Bool;
+
+    public function new(X : Float, Y : Float, Text : String, ?Color : Int = -1, ?seriousMode : Bool = false, ?borderless : Bool = false)
+    {
+        super(X, Y);
+
+        serious = seriousMode;
+
+        // Initial displacement
+        y += 0;
+
+        originalColor = Color;
+
+        pxtext = text.PixelText.New(X, Y, Text, Color);
+        pxtext.x = X;
+        pxtext.y = Y;
+
+        border = 0;
+        if (seriousMode)
+            border = 0;
+
+        background = new FlxSprite(pxtext.x - border/2, pxtext.y - border/2);
+        background.makeGraphic(Std.int(pxtext.width + border), Std.int(pxtext.height + border), (borderless ? 0x00000000 : 0xFF262b44));
+
+        textDelta = FlxPoint.get(pxtext.x - x, pxtext.y - y);
+
+        alpha = 0;
+        FlxTween.tween(this, {alpha: 1}, 0.1, {ease: FlxEase.circOut, startDelay: 0, onComplete: onAppeared});
+
+        if (!seriousMode || Text.indexOf("\\") >= 0)
+            doColor(null);
+    }
+
+    function doColor(t : FlxTween)
+    {
+        if (t != null)
+            t.destroy();
+
+        var targetColor : Int = 0;
+        var delay : Float = 0;
+        if (pxtext.color == originalColor)
+        {
+            targetColor = 0xFF262b44;
+            delay = 0.05;
+        }
+        else
+            targetColor = originalColor;
+
+        colorTween = FlxTween.color(pxtext, 0.075, pxtext.color, targetColor, {startDelay: delay, onComplete: doColor});
+    }
+
+    override public function destroy()
+    {
+        textDelta.put();
+        pxtext.destroy();
+        if (colorTween != null)
+        {
+            colorTween.cancel();
+            colorTween.destroy();
+        }
+
+        super.destroy();
+    }
+
+    function onAppeared(t:FlxTween)
+    {
+        FlxTween.tween(this, {alpha: 0}, 0.1, {ease: FlxEase.circOut, startDelay: 1.15 + (serious ? 1 : 0), onComplete: onDisapeared});
+    }
+
+    function onDisapeared(t:FlxTween)
+    {
+        if (t != null)
+            t.cancel();
+
+        destroy();
+    }
+
+    override public function update(elapsed : Float)
+    {
+        super.update(elapsed);
+
+        pxtext.alpha = alpha;
+        pxtext.x = x + textDelta.x;
+        pxtext.y = y + textDelta.y;
+        pxtext.update(elapsed);
+
+        background.alpha = alpha;
+        background.x = pxtext.x - border/2;
+        background.y = pxtext.y - border/2;
+    }
+
+    override public function draw()
+    {
+        // super.draw();
+        background.draw();
+        pxtext.draw();
+    }
+}

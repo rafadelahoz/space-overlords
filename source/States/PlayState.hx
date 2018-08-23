@@ -20,6 +20,8 @@ class PlayState extends GarbageState
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
 
+    public var session : PlaySessionData;
+
     public var state : Int;
 
     public var grid : GarbageGrid;
@@ -34,6 +36,8 @@ class PlayState extends GarbageState
 
     // var generationTimer : FlxTimer;
     var aftermathTimer : FlxTimer;
+    var aftermathScoreCounter : Int;
+    var aftermathCombo : Int;
 
     var topDisplay : TopDisplay;
 
@@ -43,6 +47,8 @@ class PlayState extends GarbageState
 
     override public function create()
     {
+        session = new PlaySessionData();
+
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
@@ -66,7 +72,7 @@ class PlayState extends GarbageState
         topDisplay = new TopDisplay(this);
 		add(topDisplay);
 
-        stateLabel = text.PixelText.New(20, 16, "", 0xFFFEE761);
+        stateLabel = text.PixelText.New(0, 0, "", 0xFFFEE761);
         add(stateLabel);
 
         screenButtons = new ScreenButtons(0, 0, this, 240);
@@ -116,6 +122,9 @@ class PlayState extends GarbageState
                 // Clear current item references
                 currentItem.slave = null;
                 currentItem = null;
+
+                aftermathScoreCounter = 0;
+                aftermathCombo = 0;
 
                 // Call cleanupo!
                 aftermathTimer.start(CleanUpDelay, handleAftermathCleanup);
@@ -181,6 +190,8 @@ class PlayState extends GarbageState
                 stateLabel.text = "Unknown state?";
         }
 
+        handleDebug();
+
         super.update(elapsed);
     }
 
@@ -228,6 +239,22 @@ class PlayState extends GarbageState
                 lastCharType = -1;
         }
 
+        if (matches.length > 0)
+        {
+            aftermathCombo += 1;
+
+            aftermathScoreCounter += aftermathCombo*10*matches.length;
+            if (aftermathCombo > 1)
+            {
+                var comboText : String = "COMBO";
+                for (i in 1...Std.int(Math.min(aftermathCombo, 3)))
+                    comboText += "!";
+                comboText = text.TextUtils.padWith(comboText, 9, " ");
+                add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
+            }
+            add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+        }
+
         /*trace("======= AFTER MATCHES REMOVAL =========");
         grid.dump();*/
 
@@ -257,6 +284,8 @@ class PlayState extends GarbageState
 
     public function handleAftermathResult(?t:FlxTimer)
     {
+        session.score += aftermathScoreCounter;
+
         // Lose game
         if (checkForLoseConditions(currentItem))
         {
@@ -279,5 +308,16 @@ class PlayState extends GarbageState
     {
         // TODO: input currentItem may not be required, check whole grid?
         return grid.checkForItemsOnTopRows();
+    }
+
+    /* DEBUG */
+
+    function handleDebug()
+    {
+        if (FlxG.keys.justPressed.TAB || GamePad.justPressed(GamePad.Pause))
+        {
+            stateLabel.visible = !stateLabel.visible;
+            gridDebugger.visible = stateLabel.visible;
+        }
     }
 }

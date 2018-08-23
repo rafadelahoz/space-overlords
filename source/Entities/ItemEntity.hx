@@ -66,6 +66,7 @@ class ItemEntity extends Entity
         animation.add("idle", [charType-1]);
         animation.play("idle");
         // TODO: Add small animations per type
+        // TODO: Extract this to be reusable
     }
 
     function handleGraphicBasic(?doMakeGraphic : Bool = true)

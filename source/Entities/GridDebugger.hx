@@ -20,7 +20,7 @@ class GridDebugger extends FlxSprite
         super(0, 0);
         grid = Grid;
 
-        infoLabel = text.PixelText.New(Constants.Width-56, 32, "");
+        infoLabel = text.PixelText.New(Constants.Width-56, 180, "");
 
         makeGraphic(Constants.Width, Constants.Height, 0x00000000);
     }

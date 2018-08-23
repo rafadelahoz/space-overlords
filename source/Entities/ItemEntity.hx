@@ -28,6 +28,8 @@ class ItemEntity extends Entity
     var grid : GarbageGrid;
 
     var charType : Int;
+    var charTypeA : Int;
+    var charTypeB : Int;
     var flipCharTypeTween : FlxTween;
 
     var state : Int;
@@ -46,11 +48,11 @@ class ItemEntity extends Entity
     var slaveOffset : FlxPoint;
     var slaveCellOffset : FlxPoint;
 
-    public function new(X : Float, Y : Float, CharType : Int, World : PlayState)
+    public function new(X : Float, Y : Float, CharType : Int, ?AltCharType : Int = -1, World : PlayState)
     {
         super(X, Y);
 
-        charType = CharType;
+        handlePairCharTypes(CharType, AltCharType);
 
         handleGraphic();
 
@@ -58,6 +60,17 @@ class ItemEntity extends Entity
 
         world = World;
         grid = world.grid;
+    }
+
+    function handlePairCharTypes(CharType : Int, AltCharType : Int)
+    {
+        charTypeA = CharType;
+        charTypeB = AltCharType;
+
+        if (charTypeB < 1)
+            charTypeB = (charTypeA & 1 == 1 ? charTypeA+1 : charTypeA-1);
+
+        charType = charTypeA;
     }
 
     function handleGraphic(?doMakeGraphic : Bool = true)
@@ -395,13 +408,13 @@ class ItemEntity extends Entity
         flipCharTypeTween = FlxTween.tween(this.scale, {x : 0}, FlipTime * 0.5, {onComplete: function(t : FlxTween) {
             t.destroy();
 
-            if (charType & 1 == 1)
+            if (charType == charTypeA)
             {
-                charType += 1;
+                charType = charTypeB;
             }
             else
             {
-                charType -= 1;
+                charType = charTypeA;
             }
 
             handleGraphic(false);

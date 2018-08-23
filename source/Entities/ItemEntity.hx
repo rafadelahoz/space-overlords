@@ -75,44 +75,33 @@ class ItemEntity extends Entity
 
     function handleGraphic(?doMakeGraphic : Bool = true)
     {
-        loadGraphic("assets/images/pieces.png", true, 16, 16);
-        animation.add("idle", [charType-1]);
-        animation.play("idle");
+        if (charType == 24)
+        {
+            // if (doMakeGraphic)
+            {
+                loadGraphic("assets/images/special-0.png", true, 18, 18);
+                animation.add("idle", [0]);
+            }
+
+            offset.set(1, 1);
+            animation.play("idle");
+        }
+        else
+        {
+            // if (doMakeGraphic)
+            {
+                loadGraphic("assets/images/pieces.png", true, 16, 16);
+                animation.add("idle", [charType-1]);
+            }
+            // else
+            //     animation.getByName("idle").frames = [charType-1];
+
+            offset.set(0, 0);
+            animation.play("idle");
+        }
+
         // TODO: Add small animations per type
         // TODO: Extract this to be reusable
-    }
-
-    function handleGraphicBasic(?doMakeGraphic : Bool = true)
-    {
-        if (doMakeGraphic)
-            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-        else
-            flixel.util.FlxSpriteUtil.fill(this, 0x00000000);
-
-        var lineStyle : Dynamic = {thickness: 1, color: Palette.White};
-
-        // TODO: Place specific graphics per charType, paired like 1-2, 3-4, 5-6
-        switch (charType)
-        {
-            case 1:
-                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Pink, lineStyle);
-            case 2:
-                flixel.util.FlxSpriteUtil.drawRoundRect(this, 1, 1, 14, 14, 5, 5, Palette.Peach, lineStyle);
-            case 3:
-                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, lineStyle);
-            case 4:
-                flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Blue, lineStyle);
-            case 5:
-                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, lineStyle);
-            case 6:
-                flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Orange, lineStyle);
-            case 7:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Indigo, lineStyle);
-            case 8:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red, lineStyle);
-            default:
-                flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.White);
-        }
     }
 
     override public function destroy()
@@ -214,8 +203,8 @@ class ItemEntity extends Entity
 
     function handleFallingState(elapsed : Float)
     {
-        var currentCell : FlxPoint = grid.getCellAt(x, y);
-        var nextFallingCell : FlxPoint = grid.getCellAt(x, y+height);
+        var currentCell : FlxPoint = getCurrentCell();
+        var nextFallingCell : FlxPoint = getFallToCell();
         var nextData : ItemData = grid.get(nextFallingCell.x, nextFallingCell.y);
 
         if (canMoveTo(nextFallingCell.x, nextFallingCell.y) && canMoveTo(nextFallingCell.x + (slave != null ? slaveCellOffset.x : 0), nextFallingCell.y)) {
@@ -262,7 +251,7 @@ class ItemEntity extends Entity
 
     function handleGraceState(elapsed : Float)
     {
-        var currentCell : FlxPoint = grid.getCellAt(x, y);
+        var currentCell : FlxPoint = getCurrentCell();
 
         scale.x = 1;
         if (slave != null)
@@ -292,7 +281,7 @@ class ItemEntity extends Entity
     function finishPositioning()
     {
         // The piece can stop
-        var currentCell : FlxPoint = grid.getCellAt(x, y);
+        var currentCell : FlxPoint = getCurrentCell();
         var targetPos : FlxPoint = grid.getCellPosition(currentCell.x, currentCell.y);
 
         x = targetPos.x;
@@ -373,7 +362,7 @@ class ItemEntity extends Entity
         if (finishPositioningAfterMovement)
         {
             // Check if we can still fall when the timer ends
-            var currentCell : FlxPoint = grid.getCellAt(x, y);
+            var currentCell : FlxPoint = getCurrentCell();
             if (canMoveTo(currentCell.x, currentCell.y+1))
             {
                 setState(StateFalling);
@@ -405,17 +394,17 @@ class ItemEntity extends Entity
 
     public function flipCharType()
     {
+        if (charType == charTypeA)
+        {
+            charType = charTypeB;
+        }
+        else
+        {
+            charType = charTypeA;
+        }
+        
         flipCharTypeTween = FlxTween.tween(this.scale, {x : 0}, FlipTime * 0.5, {onComplete: function(t : FlxTween) {
             t.destroy();
-
-            if (charType == charTypeA)
-            {
-                charType = charTypeB;
-            }
-            else
-            {
-                charType = charTypeA;
-            }
 
             handleGraphic(false);
 
@@ -431,7 +420,7 @@ class ItemEntity extends Entity
 
     public function fallToFreePosition() : Bool
     {
-        var currentCell : FlxPoint = grid.getCellAt(x, y);
+        var currentCell : FlxPoint = getCurrentCell();
         var targetCell : FlxPoint = grid.getLowerFreeCellFrom(currentCell.x, currentCell.y);
         var targetPos : FlxPoint = grid.getCellPosition(targetCell.x, targetCell.y);
 
@@ -464,6 +453,16 @@ class ItemEntity extends Entity
         }
 
         return inArea;
+    }
+
+    public function getCurrentCell() : FlxPoint
+    {
+        return grid.getCellAt(x + width/2, y + height/2);
+    }
+
+    public function getFallToCell() : FlxPoint
+    {
+        return grid.getCellAt(x + width/2, y + /*height/2 +*/ height);
     }
 }
 

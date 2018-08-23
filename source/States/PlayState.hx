@@ -92,6 +92,11 @@ class PlayState extends GarbageState
         return next;
     }
 
+    public function getSpecialCharType() : Int
+    {
+        return 24;
+    }
+
     public function getNextItemShape() : ItemEntity.CellPosition
     {
         return FlxG.random.getObject([ItemEntity.CellPosition.Right, ItemEntity.CellPosition.Top]);
@@ -146,10 +151,14 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        nextItem = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
+        var special : Int = FlxG.random.getObject([-1, 0, 1], [3, 94, 3]);
+
+        nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
+                                getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);
 
         // Generate the pair item on top of that
-        var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y, getNextCharType(), this);
+        var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y,
+                                                    getNextCharType(), (special == 1 ? getSpecialCharType() : null), this);
         slaveItem.setState(ItemEntity.StateSlave);
         nextItem.setSlave(slaveItem, shape);
 

@@ -127,7 +127,7 @@ class PlayState extends GarbageState
                 aftermathCombo = 0;
 
                 // Call cleanupo!
-                aftermathTimer.start(CleanUpDelay, handleAftermathCleanup);
+                aftermathTimer.start(CleanUpDelay, handleAftermathFalling);
             case PlayState.StateLost:
                 trace("Game over!");
                 FlxG.camera.flash(Palette.Red, function() {
@@ -208,14 +208,33 @@ class PlayState extends GarbageState
         switchState(StateAftermath);
     }
 
+    function handleAftermathFalling(?t:FlxTimer)
+    {
+        var somethingFell : Bool = false;
+
+        // Make all items fall down
+        // grid.getAll shall return things from bottom to top
+        for (itemData in grid.getAll())
+        {
+            if (itemData.entity != null)
+            {
+                if (itemData.entity.fallToFreePosition())
+                    somethingFell = true;
+            }
+        }
+
+        // If something fell, we need to recompute the matches
+        if (somethingFell)
+            aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
+        else
+            aftermathTimer.start(0.01, handleAftermathCleanup);
+    }
+
     public function handleAftermathCleanup(?t:FlxTimer)
     {
         // Check and remove items
         var matches : Array<ItemData> = grid.findMatches( /*lastPositionedCell*/ );
         lastPositionedCell = null;
-
-        /*trace("======= BEFORE MATCHES REMOVAL =========");
-        grid.dump();*/
 
         var lastCharType : Int = -1;
         for (itemData in matches)
@@ -255,31 +274,15 @@ class PlayState extends GarbageState
             add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
         }
 
-        /*trace("======= AFTER MATCHES REMOVAL =========");
-        grid.dump();*/
-
         // Wait a bit if things are leaving, otherwise finish now
-        aftermathTimer.start(ItemLeaveTime, function(t:FlxTimer) {
-            var somethingFell : Bool = false;
-
-            // Make all items fall down
-            // grid.getAll shall return things from bottom to top
-            for (itemData in grid.getAll())
-            {
-                if (itemData.entity != null)
-                {
-                    if (itemData.entity.fallToFreePosition())
-                        somethingFell = true;
-                }
-            }
-
-            // If something fell, we need to recompute the matches
-            if (somethingFell)
-                aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
-            else
-                aftermathTimer.start(0.01, handleAftermathResult);
-        });
-
+        if (matches.length > 0)
+        {
+            aftermathTimer.start(ItemLeaveTime, handleAftermathFalling);
+        }
+        else
+        {
+            aftermathTimer.start(0.01, handleAftermathResult);
+        }
     }
 
     public function handleAftermathResult(?t:FlxTimer)

@@ -19,6 +19,7 @@ class PlayState extends GarbageState
     var CleanUpDelay : Float = 0.1;
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
+    var GameoverLightsoutDelay : Float = 0.75;
 
     public var session : PlaySessionData;
 
@@ -34,14 +35,18 @@ class PlayState extends GarbageState
 
     var lastPositionedCell : FlxPoint;
 
-    // var generationTimer : FlxTimer;
     var aftermathTimer : FlxTimer;
     var aftermathScoreCounter : Int;
     var aftermathCombo : Int;
 
+    // GameOver
+    var gameoverTimer : FlxTimer;
+    var gameoverLightsout : Bool;
+
     var topDisplay : TopDisplay;
 
     // Debug
+    var debugEnabled : Bool;
     var stateLabel : FlxBitmapText;
     var gridDebugger : GridDebugger;
 
@@ -79,9 +84,13 @@ class PlayState extends GarbageState
 		add(screenButtons);
 
         aftermathTimer = new FlxTimer();
-        // generationTimer = new FlxTimer();
+        gameoverTimer = new FlxTimer();
 
         switchState(StateIntro);
+
+        debugEnabled = false;
+        gridDebugger.visible = false;
+        stateLabel.visible = false;
 
         super.create();
     }
@@ -119,7 +128,6 @@ class PlayState extends GarbageState
                 }
             case PlayState.StateWait:
                 currentItem.setState(ItemEntity.StateFalling);
-                // generationTimer.start(GenerationDelay, generateNextItem);
             case PlayState.StateAftermath:
                 items.add(currentItem);
                 items.add(currentItem.slave);
@@ -135,8 +143,12 @@ class PlayState extends GarbageState
                 aftermathTimer.start(CleanUpDelay, handleAftermathFalling);
             case PlayState.StateLost:
                 trace("Game over!");
+
+                showGameOverNotification();
+                topDisplay.bottomLabel.resetText("PRODUCTION TERMINATED!", Palette.Red);
                 FlxG.camera.flash(Palette.Red, function() {
-                    GameController.GameOver(Constants.ModeEndless, {});
+                    gameoverLightsout = false;
+                    gameoverTimer.start(GameoverLightsoutDelay*2, onGameoverTimer);
                 });
         }
     }
@@ -322,14 +334,45 @@ class PlayState extends GarbageState
         return grid.checkForItemsOnTopRows();
     }
 
+    function onGameoverTimer(t:FlxTimer)
+    {
+        if (!gameoverLightsout)
+        {
+            gameoverLightsout = true;
+            for (item in grid.getAll())
+            {
+                if (item.entity != null)
+                {
+                    item.entity.color = 0xFF262b44;
+                }
+            }
+
+            gameoverTimer.start(GameoverLightsoutDelay, onGameoverTimer);
+        }
+        else
+        {
+            gameoverTimer.start(GameoverLightsoutDelay, function(t:FlxTimer) {
+                FlxG.camera.fade(0xFF000000, GameoverLightsoutDelay * 2, false, function() {
+                    GameController.GameOver(Constants.ModeEndless, session);
+                });
+            });
+        }
+    }
+
+    function showGameOverNotification()
+    {
+        topDisplay.notifications.add(new TextNotice(96, 16, "!ERROR!", Palette.Red, showGameOverNotification));
+    }
+
     /* DEBUG */
 
     function handleDebug()
     {
         if (FlxG.keys.justPressed.TAB || GamePad.justPressed(GamePad.Pause))
         {
-            stateLabel.visible = !stateLabel.visible;
-            gridDebugger.visible = stateLabel.visible;
+            debugEnabled = !debugEnabled;
+            stateLabel.visible = debugEnabled;
+            gridDebugger.visible = debugEnabled;
         }
     }
 }

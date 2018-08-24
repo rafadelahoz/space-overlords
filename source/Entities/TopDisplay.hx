@@ -22,7 +22,7 @@ class TopDisplay extends FlxGroup
     var scanlines : FlxEffectSprite;
 
     var scoreLabel : FlxBitmapText;
-    var bottomLabel : ScrollingLabel;
+    public var bottomLabel : ScrollingLabel;
     public var notifications : FlxGroup;
 
     var baseBeltY : Float;
@@ -120,27 +120,40 @@ class TopDisplay extends FlxGroup
 
     override public function update(elapsed : Float)
     {
-        if (processingQueue.length > 0 && thereIsRoomForNewItem())
+        if (world.state != PlayState.StateLost)
         {
-            var next : ProcessingItem = processingQueue.shift();
-            next.startMoving(BeltSpeed, function(item : ProcessingItem) {
-                items.remove(item);
-            });
-            items.add(next);
+            if (processingQueue.length > 0 && thereIsRoomForNewItem())
+            {
+                var next : ProcessingItem = processingQueue.shift();
+                next.startMoving(BeltSpeed, function(item : ProcessingItem) {
+                    items.remove(item);
+                });
+                items.add(next);
+            }
+
+            scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
+
+            // DEBUG: Bottom label queue density
+            var itemsInBelt : Int = items.countLiving();
+            if (itemsInBelt >= 10)
+                bottomLabel.setText("PRODUCTION IS AS EXPECTED");
+            else if (itemsInBelt >= 6)
+                bottomLabel.setText("PRODUCTION IS AVERAGE");
+            else if (itemsInBelt >= 4)
+                bottomLabel.setText("PRODUCTION IS LOW");
+            else
+                bottomLabel.setText("PRODUCTION IS UNACCEPTABLE");
         }
-
-        scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
-
-        // DEBUG: Bottom label queue density
-        var itemsInBelt : Int = items.countLiving();
-        if (itemsInBelt >= 10)
-            bottomLabel.setText("PRODUCTION IS AS EXPECTED");
-        else if (itemsInBelt >= 6)
-            bottomLabel.setText("PRODUCTION IS AVERAGE");
-        else if (itemsInBelt >= 4)
-            bottomLabel.setText("PRODUCTION IS LOW");
         else
-            bottomLabel.setText("PRODUCTION IS UNACCEPTABLE");
+        {
+            belts.forEachAlive(function(basic : FlxBasic) {
+                cast(basic, FlxSprite).animation.paused = true;
+            });
+
+            items.forEachAlive(function(basic : FlxBasic) {
+                cast(basic, FlxSprite).velocity.set(0, 0);
+            });
+        }
 
         super.update(elapsed);
     }

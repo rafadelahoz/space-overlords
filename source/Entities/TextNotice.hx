@@ -19,7 +19,9 @@ class TextNotice extends FlxSprite
 
     var serious : Bool;
 
-    public function new(X : Float, Y : Float, Text : String, ?Color : Int = -1, ?seriousMode : Bool = false, ?borderless : Bool = false)
+    var callback : Void -> Void;
+
+    public function new(X : Float, Y : Float, Text : String, ?Color : Int = -1, ?seriousMode : Bool = false, ?borderless : Bool = false, ?Callback : Void -> Void = null)
     {
         super(X, Y);
 
@@ -29,6 +31,7 @@ class TextNotice extends FlxSprite
         y += 0;
 
         originalColor = Color;
+        callback = Callback;
 
         pxtext = text.PixelText.New(X, Y, Text, Color);
         pxtext.x = X;
@@ -88,6 +91,9 @@ class TextNotice extends FlxSprite
 
     function onDisapeared(t:FlxTween)
     {
+        if (callback != null)
+            callback();
+
         if (t != null)
             t.cancel();
 

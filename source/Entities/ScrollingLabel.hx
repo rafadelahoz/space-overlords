@@ -58,6 +58,15 @@ class ScrollingLabel extends FlxSprite
         baseText = text;
     }
 
+    public function resetText(text : String, Color : Int)
+    {
+        baseText = text;
+        currentText = text;
+        buffer = [];
+
+        label.color = Color;
+    }
+
     override public function update(elapsed : Float)
     {
         super.update(elapsed);

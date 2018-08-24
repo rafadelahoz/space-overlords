@@ -7,6 +7,8 @@ class GarbageState extends FlxTransitionableState
     override public function create()
     {
         GamePad.init();
+
+        super.create();
     }
 
     override public function update(elapsed : Float)

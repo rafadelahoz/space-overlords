@@ -19,12 +19,14 @@ class MenuState extends GarbageState
 	var touchLabel : FlxBitmapText;
 	var yearsLabel : FlxBitmapText;
 	var creditsLabel : FlxBitmapText;
-	var background : FlxBackdrop;
+	var background : FlxSprite;
 	var backgroundShader : FlxSprite;
 
 	var startTouchZone : FlxObject;
 
 	var interactable : Bool;
+
+	var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
 
 	override public function create():Void
 	{
@@ -40,24 +42,40 @@ class MenuState extends GarbageState
 
 		interactable = false;
 
+		FlxG.camera.fade(0xFF000000, 1, true);
+
 		bgColor = 0xFF000000;
 
-		var stars : flixel.addons.display.FlxStarField.FlxStarField2D =
-			new flixel.addons.display.FlxStarField.FlxStarField2D();
-		stars.starVelocityOffset.set(0, 0.0125);
+		stars = new flixel.addons.display.FlxStarField.FlxStarField2D(32, 184, 23, 22, 4);
+		stars.starVelocityOffset.set(0.0125, 0);
 		add(stars);
 
-		var titleText : String = "SPACE OVERLORDS\n       ~       \n GALAXY PUZZLE";
-		var logo : FlxObject = PixelText.New(Constants.Width / 2 - (15/2)*8, -164, titleText);
+		background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
+		add(background);
+
+		var slaveNumberBg : FlxSprite = new FlxSprite(57, 33).makeGraphic(117, 14, 0xFF9e2835);
+		add(slaveNumberBg);
+
+		var logo : FlxSprite = new FlxSprite(0, 0, "assets/ui/title.png");
 		add(logo);
+
+		var bottom : FlxSprite = new FlxSprite(0, Constants.Height-42, "assets/ui/title-bottom.png");
+		add(bottom);
+
+		var slaveNumber : FlxBitmapText = text.VcrText.New(111, 34, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
+		add(slaveNumber);
 
 		var startText : String = "Touch to start";
 		touchLabel = PixelText.New(Constants.Width / 2 - (startText.length/2)*8, Std.int(Constants.Height - Constants.Height/4), startText);
 		touchLabel.alpha = 0;
 		add(touchLabel);
 
+		var vcrOverlay : FlxSprite = new FlxSprite(0, 0, "assets/ui/vcr-overlay.png");
+		vcrOverlay.alpha = 0.184;
+		add(vcrOverlay);
+
 		var startDelay : Float = 0.35;
-		tween = FlxTween.tween(logo, {y : 64}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
+		tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
 		FlxG.camera.scroll.set(0, 0);
 	}
 
@@ -166,6 +184,8 @@ class MenuState extends GarbageState
 
 	public function onArcadeButtonPressed() : Void
 	{
-		GameController.StartEndless();
+		FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+			GameController.StartEndless();
+		});
 	}
 }

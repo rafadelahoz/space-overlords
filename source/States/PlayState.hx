@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
@@ -39,11 +40,15 @@ class PlayState extends GarbageState
     var aftermathScoreCounter : Int;
     var aftermathCombo : Int;
 
+    // Display
+    var background : FlxSprite;
+    var gridShader : FlxSprite;
+    var gridFrame : FlxSprite;
+    var topDisplay : TopDisplay;
+
     // GameOver
     var gameoverTimer : FlxTimer;
     var gameoverLightsout : Bool;
-
-    var topDisplay : TopDisplay;
 
     // Debug
     var debugEnabled : Bool;
@@ -57,13 +62,14 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
-        add(new flixel.FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
-        var shader : flixel.FlxSprite = new flixel.FlxSprite(grid.x-2, grid.y-2);
-        shader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
-        shader.alpha = 0.6;
-        add(shader);
+        add(background = new FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
 
-        add(new flixel.FlxSprite(grid.x-8, grid.y-4, "assets/ui/grid-frame.png"));
+        gridShader = new FlxSprite(grid.x-2, grid.y-2);
+        gridShader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
+        gridShader.alpha = 0.6;
+        add(gridShader);
+
+        add(gridFrame = new FlxSprite(grid.x-8, grid.y-4, "assets/ui/grid-frame.png"));
 
         gridDebugger = new GridDebugger(grid);
         add(gridDebugger);
@@ -346,6 +352,8 @@ class PlayState extends GarbageState
                     item.entity.color = 0xFF262b44;
                 }
             }
+
+            gridShader.alpha = 0.8;
 
             gameoverTimer.start(GameoverLightsoutDelay, onGameoverTimer);
         }

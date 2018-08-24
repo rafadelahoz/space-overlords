@@ -23,6 +23,7 @@ class TopDisplay extends FlxGroup
 
     var scoreLabel : FlxBitmapText;
     var bottomLabel : ScrollingLabel;
+    public var notifications : FlxGroup;
 
     var baseBeltY : Float;
 
@@ -76,11 +77,15 @@ class TopDisplay extends FlxGroup
         bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
         add(bottomLabel);
 
+        notifications = new FlxGroup();
+        add(notifications);
+
         topFrame = new FlxSprite(0, 0, "assets/ui/gameplay-ui-top.png");
         add(topFrame);
 
         // Add scanlines
         var _scanlines : FlxSprite = new FlxSprite(10, 10, "assets/ui/gameplay-ui-top-scanlines.png");
+        _scanlines.color = Palette.Green;
         _scanlines.alpha = 0.184;
 
         scanlines = new FlxEffectSprite(_scanlines);

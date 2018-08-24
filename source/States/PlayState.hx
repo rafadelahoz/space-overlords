@@ -270,17 +270,17 @@ class PlayState extends GarbageState
         if (matches.length > 0)
         {
             aftermathCombo += 1;
+            aftermathScoreCounter += 2*aftermathCombo*10*matches.length;
 
-            aftermathScoreCounter += aftermathCombo*10*matches.length;
             if (aftermathCombo > 1)
             {
                 var comboText : String = "COMBO";
                 for (i in 1...Std.int(Math.min(aftermathCombo, 3)))
                     comboText += "!";
                 comboText = text.TextUtils.padWith(comboText, 9, " ");
-                add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
+                topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
             }
-            add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+            topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
         }
 
         // Wait a bit if things are leaving, otherwise finish now

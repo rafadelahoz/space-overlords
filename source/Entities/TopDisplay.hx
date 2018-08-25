@@ -8,9 +8,6 @@ import flixel.group.FlxGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxBitmapText;
 
-import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxGlitchEffect;
-
 class TopDisplay extends FlxGroup
 {
     var world : PlayState;
@@ -19,7 +16,6 @@ class TopDisplay extends FlxGroup
     var belts : FlxGroup;
     var items : FlxGroup;
     var topFrame : FlxSprite;
-    var scanlines : FlxEffectSprite;
 
     var scoreLabel : FlxBitmapText;
     public var bottomLabel : ScrollingLabel;
@@ -34,10 +30,6 @@ class TopDisplay extends FlxGroup
     var processingQueue : Array<ProcessingItem>;
 
     var BeltSpeed : Float = 6;
-
-    var ScanlinesGlitchDelay : Float = 5;
-    var ScanlinesGlitchVariation : Float = 0.2;
-    var scanlinesGlitchTimer : FlxTimer;
 
     public function new(World : PlayState)
     {
@@ -84,38 +76,9 @@ class TopDisplay extends FlxGroup
         add(topFrame);
 
         // Add scanlines
-        var _scanlines : FlxSprite = new FlxSprite(10, 10, "assets/ui/gameplay-ui-top-scanlines.png");
-        _scanlines.color = Palette.Green;
-        _scanlines.alpha = 0.184;
-
-        scanlines = new FlxEffectSprite(_scanlines);
-        scanlines.setPosition(10, 10);
-
-        var _glitch : FlxGlitchEffect = null;
-        scanlines.effects = [_glitch = new FlxGlitchEffect(1, 1, 0.1)];
-        _glitch.direction = FlxGlitchDirection.VERTICAL;
-        scanlines.effectsEnabled = false;
-
-        add(scanlines);
-
-        scanlinesGlitchTimer = new FlxTimer();
-        scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
+        add(new Scanlines(10, 10, "assets/ui/gameplay-ui-top-scanlines.png", Palette.Green));
 
         processingQueue = [];
-    }
-
-    function onScanlinesGlitchTimer(t:FlxTimer)
-    {
-        if (scanlines.effectsEnabled)
-        {
-            scanlines.effectsEnabled = false;
-            scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
-        }
-        else
-        {
-            scanlines.effectsEnabled = true;
-            scanlinesGlitchTimer.start(FlxG.random.float(0.1, 0.5), onScanlinesGlitchTimer);
-        }
     }
 
     override public function update(elapsed : Float)

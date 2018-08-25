@@ -11,9 +11,6 @@ import flixel.tweens.FlxEase;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.transition.FlxTransitionableState;
 
-import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxGlitchEffect;
-
 import text.PixelText;
 
 class MenuState extends GarbageState
@@ -32,11 +29,6 @@ class MenuState extends GarbageState
 
 	var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
 
-    var scanlines : FlxEffectSprite;
-	var ScanlinesGlitchDelay : Float = 5;
-    var ScanlinesGlitchVariation : Float = 0.2;
-    var scanlinesGlitchTimer : FlxTimer;
-
 	var startLabelBackground : FlxSprite;
 
 	override public function create():Void
@@ -44,16 +36,11 @@ class MenuState extends GarbageState
 		super.create();
 
 		// Missing a preloader
+		GameController.Init();
 		BgmEngine.init();
 		SfxEngine.init();
 
-		GameController.Init();
-
-		// Set scale mode?
-
 		interactable = false;
-
-		FlxG.camera.fade(0xFF000000, 1, true);
 
 		bgColor = 0xFF000000;
 
@@ -85,20 +72,7 @@ class MenuState extends GarbageState
 		add(touchLabel);
 
 		// VCR effect
-			var _vcrOverlay : FlxSprite = new FlxSprite(0, 0, "assets/ui/vcr-overlay.png");
-			_vcrOverlay.alpha = 0.184;
-
-			scanlines = new FlxEffectSprite(_vcrOverlay);
-
-			var _glitch : FlxGlitchEffect = null;
-	        scanlines.effects = [_glitch = new FlxGlitchEffect(1, 1, 0.1)];
-	        _glitch.direction = FlxGlitchDirection.VERTICAL;
-	        scanlines.effectsEnabled = false;
-
-	        add(scanlines);
-
-			scanlinesGlitchTimer = new FlxTimer();
-	        scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
+		add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
 		var startDelay : Float = 0.35;
 		tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
@@ -218,18 +192,4 @@ class MenuState extends GarbageState
 			GameController.StartEndless();
 		});
 	}
-
-	function onScanlinesGlitchTimer(t:FlxTimer)
-    {
-        if (scanlines.effectsEnabled)
-        {
-            scanlines.effectsEnabled = false;
-            scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
-        }
-        else
-        {
-            scanlines.effectsEnabled = true;
-            scanlinesGlitchTimer.start(FlxG.random.float(0.1, 0.5), onScanlinesGlitchTimer);
-        }
-    }
 }

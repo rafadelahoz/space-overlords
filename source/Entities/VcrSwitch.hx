@@ -12,6 +12,8 @@ class VcrSwitch extends FlxSprite
     var highlightCallback : Void -> Void;
     var callback : Bool -> Void;
 
+    var allowReleaseOutside : Bool;
+
     public function new(X : Float, Y : Float, On : Bool, HighlightCallback : Void -> Void, Callback : Bool -> Void)
     {
         super(X, Y);
@@ -28,6 +30,8 @@ class VcrSwitch extends FlxSprite
 
         highlightCallback = HighlightCallback;
         callback = Callback;
+
+        allowReleaseOutside = false;
     }
 
     override public function update(elapsed : Float)

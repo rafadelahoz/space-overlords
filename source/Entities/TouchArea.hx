@@ -7,6 +7,7 @@ class TouchArea extends FlxObject
 {
     var pressed : Bool;
     var callback : Void -> Void;
+    var allowReleaseOutside : Bool;
 
     public function new(X : Float, Y : Float, Width : Float, Height : Float, Callback : Void -> Void)
     {
@@ -15,6 +16,8 @@ class TouchArea extends FlxObject
         setSize(Width, Height);
 
         callback = Callback;
+
+        allowReleaseOutside = false;
     }
 
     override public function update(elapsed : Float)

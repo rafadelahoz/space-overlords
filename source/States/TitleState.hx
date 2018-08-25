@@ -33,7 +33,9 @@ class TitleState extends GarbageState
     var screen : FlxGroup;
 
     /* Logo */
-    var LogoDelay : Float = 0.5;
+    var LogoDelay : Float = 2;
+    var logoTimer : FlxTimer;
+    var logoTouch : TouchArea;
 
     /* Main */
     var cursor : FlxSprite;
@@ -74,38 +76,76 @@ class TitleState extends GarbageState
         var flashTime : Float = 0.15;
         FlxG.camera.flash(Blue, flashTime);
 
-        state = Next;
+        new FlxTimer().start(0.01, function(t:FlxTimer) {
+            t.destroy();
 
-        switch (Next)
-        {
-            case TitleState.StateLogo:
-                clearGroup(screen);
-                screen.add(new FlxSprite(0, baseY, "assets/ui/title-splash.png"));
-                new FlxTimer().start(1 + flashTime + LogoDelay, function(t:FlxTimer) {
-                    t.destroy();
-                    switchState(StateMain);
-                });
-            case TitleState.StateMain:
-                clearGroup(screen);
-                screen.add(new FlxSprite(0, baseY, "assets/ui/title-menu-main.png"));
+            state = Next;
 
-                playButton = new VcrButton(26, 119, onPlayHighlighted, onPlayPressed);
-                playButton.loadSpritesheet("assets/ui/title-menu-cellfeed.png", 83, 14);
-                screen.add(playButton);
+            switch (Next)
+            {
+                case TitleState.StateLogo:
+                    clearGroup(screen);
+                    screen.add(new FlxSprite(0, baseY, "assets/ui/title-splash.png"));
+                    logoTimer = new FlxTimer();
+                    logoTimer.start(1 + flashTime + LogoDelay, function(t:FlxTimer) {
+                        logoTimer.destroy();
+                        logoTimer = null;
+                        switchState(StateMain);
+                    });
 
-                settingsButton = new VcrButton(26, baseY + 107, onSettingsHighlighted, onSettingsPressed);
-                settingsButton.loadSpritesheet("assets/ui/title-menu-settings.png", 83, 14);
-                screen.add(settingsButton);
+                case TitleState.StateMain:
+                    clearGroup(screen);
+                    screen.add(new FlxSprite(0, baseY, "assets/ui/title-menu-main.png"));
 
-                creditsButton = new VcrButton(26, baseY + 131, onCreditsHighlighted, onCreditsPressed);
-                creditsButton.loadSpritesheet("assets/ui/title-menu-credits.png", 83, 14);
-                screen.add(creditsButton);
+                    playButton = new VcrButton(26, 119, onPlayHighlighted, onPlayPressed);
+                    playButton.loadSpritesheet("assets/ui/title-menu-cellfeed.png", 83, 14);
+                    screen.add(playButton);
 
-                cursor = new FlxSprite(9, playButton.y+1, "assets/ui/title-menu-cursor.png");
-                screen.add(cursor);
-        }
+                    settingsButton = new VcrButton(26, baseY + 107, onSettingsHighlighted, onSettingsPressed);
+                    settingsButton.loadSpritesheet("assets/ui/title-menu-settings.png", 83, 14);
+                    screen.add(settingsButton);
+
+                    creditsButton = new VcrButton(26, baseY + 131, onCreditsHighlighted, onCreditsPressed);
+                    creditsButton.loadSpritesheet("assets/ui/title-menu-credits.png", 83, 14);
+                    screen.add(creditsButton);
+
+                    cursor = new FlxSprite(9, playButton.y+1, "assets/ui/title-menu-cursor.png");
+                    screen.add(cursor);
+
+                case TitleState.StateSettings:
+                    clearGroup(screen);
+                    screen.add(new FlxSprite(0, baseY, "assets/ui/title-settings-main.png"));
+
+                    var backButton : VcrButton = new VcrButton(8, baseY + 47, null, onBackPressed);
+                    backButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
+                    screen.add(backButton);
+
+                    var musicSwitch : VcrSwitch = new VcrSwitch(98, baseY + 107, BgmEngine.Enabled, function() {
+                        backButton.clearHighlight();
+                    }, function(Enabled : Bool) {
+                        BgmEngine.Enabled = Enabled;
+                    });
+                    screen.add(musicSwitch);
+
+                    var sfxSwitch : VcrSwitch = new VcrSwitch(98, baseY + 131, SfxEngine.Enabled, function() {
+                        backButton.clearHighlight();
+                    }, function(Enabled : Bool) {
+                        SfxEngine.Enabled = Enabled;
+                    });
+                    screen.add(sfxSwitch);
+
+                case TitleState.StateCredits:
+                    clearGroup(screen);
+                    screen.add(new FlxSprite(0, baseY, "assets/ui/title-credits-main.png"));
+
+                    var backButton : VcrButton = new VcrButton(8, baseY + 47, null, onBackPressed);
+                    backButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
+                    screen.add(backButton);
+            }
+        });
     }
 
+    /* Button handlers */
     function onPlayPressed()
     {
         GameController.ToMenu();
@@ -113,12 +153,12 @@ class TitleState extends GarbageState
 
     function onSettingsPressed()
     {
-
+        switchState(StateSettings);
     }
 
     function onCreditsPressed()
     {
-
+        switchState(StateCredits);
     }
 
     function onPlayHighlighted()
@@ -143,6 +183,12 @@ class TitleState extends GarbageState
         settingsButton.clearHighlight();
 
         cursor.y = creditsButton.y+1;
+    }
+
+    // Settings
+
+    function onBackPressed() {
+        switchState(StateMain);
     }
 
     override public function update(elapsed : Float)

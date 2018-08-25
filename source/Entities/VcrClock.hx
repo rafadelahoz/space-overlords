@@ -20,7 +20,9 @@ class VcrClock extends FlxSprite
     override public function update(elapsed : Float)
     {
         var now : Date = Date.now();
-        label.text = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+        label.text = text.TextUtils.padWith("" + now.getHours(), 2, "0") + ":" +
+                     text.TextUtils.padWith("" + now.getMinutes(), 2, "0") + ":" +
+                     text.TextUtils.padWith("" + now.getSeconds(), 2, "0");
 
         super.update(elapsed);
         // background.update(elapsed);

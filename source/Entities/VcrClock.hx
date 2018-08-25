@@ -13,7 +13,7 @@ class VcrClock extends FlxSprite
         super(103, 302-4);
         makeGraphic(1, 1, 0x00000000);
 
-        background = new FlxSprite(x-1, y-1).makeGraphic(72, 12, 0xFF0000FF);
+        // background = new FlxSprite(x-1, y-1).makeGraphic(72, 12, 0xFF0000FF);
         label = text.VcrText.New(x, y, "", 0xFFFFFFFF);
     }
 
@@ -23,14 +23,14 @@ class VcrClock extends FlxSprite
         label.text = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
 
         super.update(elapsed);
-        background.update(elapsed);
+        // background.update(elapsed);
         label.update(elapsed);
     }
 
     override public function draw()
     {
         super.draw();
-        background.draw();
+        // background.draw();
         label.draw();
     }
 }

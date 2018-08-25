@@ -36,9 +36,6 @@ class MenuState extends GarbageState
 		super.create();
 
 		// Missing a preloader
-		GameController.Init();
-		BgmEngine.init();
-		SfxEngine.init();
 
 		interactable = false;
 
@@ -57,8 +54,9 @@ class MenuState extends GarbageState
 		var logo : FlxSprite = new FlxSprite(0, 0, "assets/ui/title.png");
 		add(logo);
 
-		var bottom : FlxSprite = new FlxSprite(0, Constants.Height-42, "assets/ui/title-bottom.png");
-		add(bottom);
+		var footer : FlxSprite = new FlxSprite(0, 276, "assets/ui/title-menu-footer.png");
+        add(footer);
+        add(new VcrClock());
 
 		var slaveNumber : FlxBitmapText = text.VcrText.New(111, 34, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
 		add(slaveNumber);

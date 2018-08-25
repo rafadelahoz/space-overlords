@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.text.FlxBitmapText;
 import flixel.tweens.FlxTween;
@@ -10,13 +11,16 @@ import flixel.tweens.FlxEase;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.transition.FlxTransitionableState;
 
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxGlitchEffect;
+
 import text.PixelText;
 
 class MenuState extends GarbageState
 {
 	public var tween : FlxTween;
 
-	var touchLabel : FlxBitmapText;
+	var touchLabel : FlxSprite;
 	var yearsLabel : FlxBitmapText;
 	var creditsLabel : FlxBitmapText;
 	var background : FlxSprite;
@@ -27,6 +31,13 @@ class MenuState extends GarbageState
 	var interactable : Bool;
 
 	var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
+
+    var scanlines : FlxEffectSprite;
+	var ScanlinesGlitchDelay : Float = 5;
+    var ScanlinesGlitchVariation : Float = 0.2;
+    var scanlinesGlitchTimer : FlxTimer;
+
+	var startLabelBackground : FlxSprite;
 
 	override public function create():Void
 	{
@@ -65,14 +76,29 @@ class MenuState extends GarbageState
 		var slaveNumber : FlxBitmapText = text.VcrText.New(111, 34, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
 		add(slaveNumber);
 
-		var startText : String = "Touch to start";
-		touchLabel = PixelText.New(Constants.Width / 2 - (startText.length/2)*8, Std.int(Constants.Height - Constants.Height/4), startText);
+		startLabelBackground = new FlxSprite(27, 88).makeGraphic(141, 16, 0xFF9e2835);
+		startLabelBackground.visible = false;
+		add(startLabelBackground);
+
+		touchLabel = new FlxSprite(0, 72, "assets/ui/tmp-start-label.png");
 		touchLabel.alpha = 0;
 		add(touchLabel);
 
-		var vcrOverlay : FlxSprite = new FlxSprite(0, 0, "assets/ui/vcr-overlay.png");
-		vcrOverlay.alpha = 0.184;
-		add(vcrOverlay);
+		// VCR effect
+			var _vcrOverlay : FlxSprite = new FlxSprite(0, 0, "assets/ui/vcr-overlay.png");
+			_vcrOverlay.alpha = 0.184;
+
+			scanlines = new FlxEffectSprite(_vcrOverlay);
+
+			var _glitch : FlxGlitchEffect = null;
+	        scanlines.effects = [_glitch = new FlxGlitchEffect(1, 1, 0.1)];
+	        _glitch.direction = FlxGlitchDirection.VERTICAL;
+	        scanlines.effectsEnabled = false;
+
+	        add(scanlines);
+
+			scanlinesGlitchTimer = new FlxTimer();
+	        scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
 
 		var startDelay : Float = 0.35;
 		tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
@@ -83,11 +109,11 @@ class MenuState extends GarbageState
 	{
 		interactable = true;
 
-		startTouchZone = new FlxObject(0, 160, Constants.Width, 120);
+		startTouchZone = new FlxObject(0, 72, Constants.Width, 32);
 		add(startTouchZone);
 
-		FlxTween.tween(touchLabel, {alpha : 1}, 1, {ease : FlxEase.cubeInOut});
-		startTouchBuzz(null);
+		FlxTween.tween(touchLabel, {alpha : 1}, 0.2, {ease : FlxEase.bounceInOut});
+		// startTouchBuzz(null);
 	}
 
 	function startTouchBuzz(_t:FlxTween)
@@ -161,25 +187,29 @@ class MenuState extends GarbageState
 	function onTouchLabelPressed()
 	{
 		// animation.play("pressed");
-		if (touchLabel.color != 0xFFFFEC27)
+		/*if (touchLabel.color != 0xFFFFEC27)
 		{
 			touchLabel.color = 0xFFFFEC27;
 			touchLabel.x += 2;
 			touchLabel.y += 2;
 			// Testing screenshots on mobile
 			// Screenshot.take();
-		}
+		}*/
+
+		startLabelBackground.visible = true;
 	}
 
 	function onTouchLabelReleased()
 	{
 		// animation.play("idle");
-		if (touchLabel.color != 0xFFFFFFFF)
+		/*if (touchLabel.color != 0xFFFFFFFF)
 		{
 			touchLabel.color = 0xFFFFFFFF;
 			touchLabel.x -= 2;
 			touchLabel.y -= 2;
-		}
+		}*/
+
+		startLabelBackground.visible = false;
 	}
 
 	public function onArcadeButtonPressed() : Void
@@ -188,4 +218,18 @@ class MenuState extends GarbageState
 			GameController.StartEndless();
 		});
 	}
+
+	function onScanlinesGlitchTimer(t:FlxTimer)
+    {
+        if (scanlines.effectsEnabled)
+        {
+            scanlines.effectsEnabled = false;
+            scanlinesGlitchTimer.start(ScanlinesGlitchDelay*(1+FlxG.random.float(-ScanlinesGlitchVariation, ScanlinesGlitchVariation)), onScanlinesGlitchTimer);
+        }
+        else
+        {
+            scanlines.effectsEnabled = true;
+            scanlinesGlitchTimer.start(FlxG.random.float(0.1, 0.5), onScanlinesGlitchTimer);
+        }
+    }
 }

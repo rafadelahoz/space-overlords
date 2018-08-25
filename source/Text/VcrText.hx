@@ -18,7 +18,7 @@ class VcrText
 		// if (!initialized)
 		{
 			// Monospace
-			var monospaceLetters = "0123456789";
+			var monospaceLetters = "0123456789:";
 			font = FlxBitmapFont.fromMonospace("assets/fonts/vcr-numbers.png", monospaceLetters, FlxPoint.get(9, 12));
 
 			initialized = true;

@@ -15,6 +15,7 @@ class ItemEntity extends Entity
     public static var StatePositioned   : Int = 3;
     public static var StateSlave        : Int = 4;
     public static var StateLeaving      : Int = 5;
+    public static var StateDissolving   : Int = 6;
 
     var GenerationTime : Float = 0.2;
     var FlipTime : Float = 0.1;
@@ -24,6 +25,9 @@ class ItemEntity extends Entity
     var ForcedFallTime : Float = 0.1;
     var SpeedUpFactor : Float = 5;
 
+    var DissolveGrowTime : Float = 0.2;
+    var DissolveExitTime : Float = 0.4;
+
     var world : PlayState;
     var grid : GarbageGrid;
 
@@ -32,7 +36,8 @@ class ItemEntity extends Entity
     var charTypeB : Int;
     var flipCharTypeTween : FlxTween;
 
-    var state : Int;
+    public var state : Int;
+    
     var scaleTween : FlxTween;
     var movementTween : FlxTween;
 
@@ -124,40 +129,45 @@ class ItemEntity extends Entity
         super.destroy();
     }
 
-    public function setState(Next : Int)
+    public function setState(Next : Int, ?initialize : Bool = true)
     {
         state = Next;
         // Extra actions?
-        switch (Next)
+        if (initialize)
         {
-            case ItemEntity.StateGenerating:
-                if (scaleTween != null)
-                {
-                    scaleTween.destroy();
-                }
+            switch (Next)
+            {
+                case ItemEntity.StateGenerating:
+                    if (scaleTween != null)
+                    {
+                        scaleTween.destroy();
+                    }
 
-                scale.set(0, 0);
-                scaleTween = FlxTween.tween(this.scale, {x : 1, y: 1}, GenerationTime, {onComplete: onGenerationFinished});
-                // Apply the same for the slave, if any
-                if (slave != null)
-                {
-                    slave.scale.set(0, 0);
-                    FlxTween.tween(slave.scale, {x : 1, y: 1}, GenerationTime);
-                }
-            case ItemEntity.StateFalling:
-            case ItemEntity.StateGrace:
-                finishPositioningAfterMovement = false;
-                graceTimer.start(GraceTime, onGraceEnd);
-            case ItemEntity.StateLeaving:
-                scaleTween = FlxTween.tween(this.scale, {x: 0, y: 0}, LeaveTime, {ease: FlxEase.quadOut, onComplete: function(t:FlxTween) {
-                    world.items.remove(this);
-                    kill();
-                    destroy();
+                    scale.set(0, 0);
+                    scaleTween = FlxTween.tween(this.scale, {x : 1, y: 1}, GenerationTime, {onComplete: onGenerationFinished});
+                    // Apply the same for the slave, if any
+                    if (slave != null)
+                    {
+                        slave.scale.set(0, 0);
+                        FlxTween.tween(slave.scale, {x : 1, y: 1}, GenerationTime);
+                    }
+                case ItemEntity.StateFalling:
+                case ItemEntity.StateGrace:
+                    finishPositioningAfterMovement = false;
+                    graceTimer.start(GraceTime, onGraceEnd);
+                case ItemEntity.StateLeaving:
+                    scaleTween = FlxTween.tween(this.scale, {x: 0, y: 0}, LeaveTime, {ease: FlxEase.quadOut, onComplete: function(t:FlxTween) {
+                        world.items.remove(this);
+                        kill();
+                        destroy();
 
-                    if (leaveCallback != null)
-                        leaveCallback();
-                }});
-            default:
+                        if (leaveCallback != null)
+                            leaveCallback();
+                    }});
+                case ItemEntity.StateDissolving:
+
+                default:
+            }
         }
     }
 
@@ -483,8 +493,28 @@ class ItemEntity extends Entity
 
     public function triggerTriggerAnimation()
     {
-        flixel.util.FlxSpriteUtil.flicker(this, 2);
-        // FlxTween.color(this, 0.2, Palette.Red, 0xFFFFFFFF, {ease: FlxEase.cubeOut, type: FlxTween.LOOPING, loopDelay: 0.05});
+        flixel.util.FlxSpriteUtil.flicker(this, 1, true, true);
+    }
+
+    public function triggerDissolve(?leaveCallback : Void -> Void = null)
+    {
+        setState(StateDissolving);
+
+        flixel.util.FlxSpriteUtil.flicker(this, 0.01, 0.001, true, true);
+
+        FlxTween.color(this, DissolveGrowTime, 0xFFFFFFFF, 0xFF000000, {startDelay: 0.1, ease : FlxEase.expoIn, onComplete: function(t:FlxTween) {
+            t.destroy();
+            FlxTween.tween(this, {alpha : 0}, DissolveExitTime, {startDelay: 0.2, ease : FlxEase.expoIn, onComplete: function(tt:FlxTween) {
+                tt.destroy();
+
+                world.items.remove(this);
+                kill();
+                destroy();
+
+                if (leaveCallback != null)
+                    leaveCallback();
+            }});
+        }});
     }
 }
 

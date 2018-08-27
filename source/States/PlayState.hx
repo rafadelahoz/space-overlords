@@ -325,12 +325,12 @@ class PlayState extends GarbageState
                     // Handle triggering
                     if (item.type == ItemData.SpecialChemdust)
                     {
-                        item.entity.triggerLeave();
+                        item.entity.triggerDissolve();
                         somethingTriggered = true;
                     }
                     else if (item.type == ItemData.SpecialBomb)
                     {
-                        item.entity.triggerLeave();
+                        item.entity.triggerDissolve();
 
                         // Also remove the rest of the row
                         handleBombRowRemoval(item);
@@ -493,6 +493,10 @@ class PlayState extends GarbageState
         {
             if (Std.is(a, ItemEntity) && Std.is(b, ItemEntity))
             {
+                if (cast(a, ItemEntity).state == ItemEntity.StateDissolving)
+                    return -1;
+                else if (cast(b, ItemEntity).state == ItemEntity.StateDissolving)
+                    return 1;
                 if (ItemData.IsCharTypeSpecial(cast(a, ItemEntity).charType))
                     return 1;
                 else if (ItemData.IsCharTypeSpecial(cast(b, ItemEntity).charType))

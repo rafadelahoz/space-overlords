@@ -280,6 +280,8 @@ class PlayState extends GarbageState
         // Play trigger animation
         var triggers : Array<TriggerData> = grid.checkTriggers();
 
+        var chemdustCounter : Int = 0;
+
         if (triggers.length > 0)
         {
             aftermathTriggers = triggers;
@@ -293,7 +295,15 @@ class PlayState extends GarbageState
                 for (item in trigger.getTriggeredEntities())
                 {
                     if (item.entity != null)
+                    {
                         item.entity.triggerTriggerAnimation();
+                        if (item.type == ItemData.SpecialChemdust)
+                        {
+                            // Score: 2 x (chemdust number) x 50
+                            chemdustCounter += 1;
+                            aftermathScoreCounter += 2*chemdustCounter*50;
+                        }
+                    }
                     if (item.type == ItemData.SpecialBomb)
                     {
                         bombsTriggered = true;
@@ -309,6 +319,19 @@ class PlayState extends GarbageState
                     // HEY: Adding directly to playstate for effect to be on top
                     /*items.*/add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
                 }
+            }
+
+            if (bombsTriggered)
+            {
+                aftermathScoreCounter += 200;
+            }
+
+            if (chemdustCounter > 0 || bombsTriggered)
+            {
+                var comboText = "SPECIAL!";
+                topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
+                topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+
             }
 
             aftermathTimer.start((bombsTriggered ? TriggerBombsAnimationTime : TriggerAnimationTime), handleAftermathTriggersCleanup);

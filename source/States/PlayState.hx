@@ -111,7 +111,15 @@ class PlayState extends GarbageState
 
     public function getSpecialCharType() : Int
     {
-        return FlxG.random.getObject([24, 25, 26]);
+        var triggerProbability : Int = 0;
+        if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
+            triggerProbability = 30;
+
+        var bombProbability : Int = 50;
+        if (grid.contains(ItemData.SpecialBomb))
+            bombProbability = 5;
+
+        return FlxG.random.getObject([ItemData.SpecialBomb, ItemData.SpecialTrigger, ItemData.SpecialChemdust], [bombProbability, triggerProbability, 60]);
     }
 
     public function getNextItemShape() : ItemEntity.CellPosition
@@ -171,8 +179,8 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        // var special : Int = FlxG.random.getObject([-1, 0, 1], [3, 94, 3]);
-        var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
+        var special : Int = FlxG.random.getObject([-1, 0, 1], [3, 94, 3]);
+        // var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
 
         nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
                                 getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);

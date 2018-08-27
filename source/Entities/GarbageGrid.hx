@@ -106,7 +106,7 @@ class GarbageGrid
                         mergeArrays(matches, floodMatch(match, matches));
                     }
                 }
-                
+
                 triggerData = new TriggerData(trigger.cellX, trigger.cellY, trigger.type, trigger.entity);
                 triggerData.setTriggeredEntities(matches);
                 list.push(triggerData);
@@ -376,6 +376,20 @@ class GarbageGrid
             for (col in 0...columns)
             {
                 if (get(col, row) != null)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function contains(type : Int) : Bool
+    {
+        for (row in 0...rows)
+        {
+            for (col in 0...columns)
+            {
+                if (get(col, row) != null && get(col, row).type == type)
                     return true;
             }
         }

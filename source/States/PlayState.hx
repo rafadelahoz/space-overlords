@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxBasic;
 import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
@@ -16,7 +17,8 @@ class PlayState extends GarbageState
     public static var StateAftermath   : Int = 4;
     public static var StateLost        : Int = 5;
 
-    var TriggerAnimationTime : Float = 1.5;
+    var TriggerAnimationTime : Float = 1;
+    var TriggerBombsAnimationTime : Float = 2;
     var CleanUpDelay : Float = 0.1;
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
@@ -221,6 +223,8 @@ class PlayState extends GarbageState
         handleDebug();
 
         super.update(elapsed);
+
+        items.sort(itemsSorter);
     }
 
     public function onNextItemGenerated()
@@ -259,7 +263,7 @@ class PlayState extends GarbageState
 
     public function handleAftermathTriggers(?t:FlxTimer)
     {
-        var somethingTriggered : Bool = false;
+        var bombsTriggered : Bool = false;
 
         // Play trigger animation
         var triggers : Array<TriggerData> = grid.checkTriggers();
@@ -280,6 +284,7 @@ class PlayState extends GarbageState
                         item.entity.triggerTriggerAnimation();
                     if (item.type == ItemData.SpecialBomb)
                     {
+                        bombsTriggered = true;
                         if (clearRows.indexOf(item.cellY) < 0)
                             clearRows.push(item.cellY);
                         if (clearRows.indexOf(trigger.cellY) < 0)
@@ -289,11 +294,12 @@ class PlayState extends GarbageState
 
                 for (row in clearRows)
                 {
-                    items.add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
+                    // HEY: Adding directly to playstate for effect to be on top
+                    /*items.*/add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
                 }
             }
 
-            aftermathTimer.start(TriggerAnimationTime, handleAftermathTriggersCleanup);
+            aftermathTimer.start((bombsTriggered ? TriggerBombsAnimationTime : TriggerAnimationTime), handleAftermathTriggersCleanup);
         }
         else
         {
@@ -470,6 +476,32 @@ class PlayState extends GarbageState
     function showGameOverNotification()
     {
         topDisplay.notifications.add(new TextNotice(96, 16, "!ERROR!", Palette.Red, showGameOverNotification));
+    }
+
+    function itemsSorter(order : Int, a : FlxBasic, b : FlxBasic) : Int
+    {
+        if (a == null)
+            return -1;
+        if (b == null)
+            return 1;
+
+        if (Std.is(a, BombRowEffect))
+            return 1;
+        else if (Std.is(b, BombRowEffect))
+            return -1;
+        else
+        {
+            if (Std.is(a, ItemEntity) && Std.is(b, ItemEntity))
+            {
+                if (ItemData.IsCharTypeSpecial(cast(a, ItemEntity).charType))
+                    return 1;
+                else if (ItemData.IsCharTypeSpecial(cast(b, ItemEntity).charType))
+                    return -1;
+                else return 0;
+            }
+        }
+
+        return 0;
     }
 
     /* DEBUG */

@@ -27,7 +27,7 @@ class ItemEntity extends Entity
     var world : PlayState;
     var grid : GarbageGrid;
 
-    var charType : Int;
+    public var charType : Int;
     var charTypeA : Int;
     var charTypeB : Int;
     var flipCharTypeTween : FlxTween;
@@ -478,13 +478,13 @@ class ItemEntity extends Entity
 
     public function getFallToCell() : FlxPoint
     {
-        return grid.getCellAt(x + width/2, y + /*height/2 +*/ height);
+        return grid.getCellAt(x + width/2, y + height);
     }
 
     public function triggerTriggerAnimation()
     {
-        // flixel.util.FlxSpriteUtil.flicker(this, 1);
-        FlxTween.color(this, 0.1, Palette.Red, 0xFFFFFFFF, {ease: FlxEase.cubeOut, type: FlxTween.LOOPING, loopDelay: 0.05});
+        flixel.util.FlxSpriteUtil.flicker(this, 2);
+        // FlxTween.color(this, 0.2, Palette.Red, 0xFFFFFFFF, {ease: FlxEase.cubeOut, type: FlxTween.LOOPING, loopDelay: 0.05});
     }
 }
 

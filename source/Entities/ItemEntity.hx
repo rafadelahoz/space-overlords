@@ -480,6 +480,12 @@ class ItemEntity extends Entity
     {
         return grid.getCellAt(x + width/2, y + /*height/2 +*/ height);
     }
+
+    public function triggerTriggerAnimation()
+    {
+        // flixel.util.FlxSpriteUtil.flicker(this, 1);
+        FlxTween.color(this, 0.1, Palette.Red, 0xFFFFFFFF, {ease: FlxEase.cubeOut, type: FlxTween.LOOPING, loopDelay: 0.05});
+    }
 }
 
 enum CellPosition {Top; Right;}

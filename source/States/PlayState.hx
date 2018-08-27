@@ -16,7 +16,7 @@ class PlayState extends GarbageState
     public static var StateAftermath   : Int = 4;
     public static var StateLost        : Int = 5;
 
-    // var GenerationDelay : Float = 1;
+    var TriggerAnimationTime : Float = 1.5;
     var CleanUpDelay : Float = 0.1;
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
@@ -34,11 +34,11 @@ class PlayState extends GarbageState
 
     var screenButtons : ScreenButtons;
 
-    var lastPositionedCell : FlxPoint;
-
     var aftermathTimer : FlxTimer;
     var aftermathScoreCounter : Int;
     var aftermathCombo : Int;
+
+    var aftermathTriggers : Array<TriggerData>;
 
     // Display
     var background : FlxSprite;
@@ -232,7 +232,6 @@ class PlayState extends GarbageState
 
     public function onCurrentItemPositioned(cell : FlxPoint)
     {
-        lastPositionedCell = cell;
         switchState(StateAftermath);
     }
 
@@ -261,8 +260,54 @@ class PlayState extends GarbageState
     public function handleAftermathTriggers(?t:FlxTimer)
     {
         var somethingTriggered : Bool = false;
-        // Check and remove items
+
+        // Play trigger animation
         var triggers : Array<TriggerData> = grid.checkTriggers();
+
+        if (triggers.length > 0)
+        {
+            aftermathTriggers = triggers;
+            var clearRows : Array<Int> = [];
+            for (trigger in triggers)
+            {
+                // Handle trigger effects
+                if (trigger.entity != null)
+                    trigger.entity.triggerTriggerAnimation();
+                // Also bombs and chemdust effects
+                for (item in trigger.getTriggeredEntities())
+                {
+                    if (item.entity != null)
+                        item.entity.triggerTriggerAnimation();
+                    if (item.type == ItemData.SpecialBomb)
+                    {
+                        if (clearRows.indexOf(item.cellY) < 0)
+                            clearRows.push(item.cellY);
+                        if (clearRows.indexOf(trigger.cellY) < 0)
+                            clearRows.push(trigger.cellY);
+                    }
+                }
+
+                for (row in clearRows)
+                {
+                    items.add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
+                }
+            }
+
+            aftermathTimer.start(TriggerAnimationTime, handleAftermathTriggersCleanup);
+        }
+        else
+        {
+            aftermathTimer.start(0.01, handleAftermathCleanup);
+        }
+    }
+
+    function handleAftermathTriggersCleanup(t:FlxTimer)
+    {
+        var triggers : Array<TriggerData> = aftermathTriggers;
+        aftermathTriggers = [];
+
+        var somethingTriggered : Bool = false;
+
         // Remove resolved triggers and their related entities to avoid matching with them
         for (trigger in triggers)
         {
@@ -280,7 +325,7 @@ class PlayState extends GarbageState
                     else if (item.type == ItemData.SpecialBomb)
                     {
                         item.entity.triggerLeave();
-                        
+
                         // Also remove the rest of the row
                         handleBombRowRemoval(item);
                         // And the rest of the trigger row
@@ -316,8 +361,7 @@ class PlayState extends GarbageState
 
     public function handleAftermathCleanup(?t:FlxTimer)
     {
-        var matches : Array<ItemData> = grid.findMatches( /*lastPositionedCell*/ );
-        lastPositionedCell = null;
+        var matches : Array<ItemData> = grid.findMatches();
 
         var lastCharType : Int = -1;
         for (itemData in matches)

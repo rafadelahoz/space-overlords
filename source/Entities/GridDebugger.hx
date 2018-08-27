@@ -83,7 +83,6 @@ class GridDebugger extends FlxGroup
 
         var type : Int = Type;
         var touchArea : TouchArea = new TouchArea(X, Y, Constants.TileSize, Constants.TileSize, function() {
-            trace(type);
             currentType = type;
         });
         add(touchArea);
@@ -111,10 +110,8 @@ class GridDebugger extends FlxGroup
 
     function spawn(cell : FlxPoint, type : Int)
     {
-        trace("spawn", cell, type);
         if (grid.get(cell.x, cell.y) != null)
         {
-            trace("Removing previous tenant of cell", cell);
             type = -1;
             if (grid.get(cell.x, cell.y).entity != null)
             {
@@ -126,7 +123,6 @@ class GridDebugger extends FlxGroup
         }
         else
         {
-            trace("Creating new item at cell", cell);
             var entity : ItemEntity = null;
             if (type > 0)
             {

@@ -75,7 +75,7 @@ class ItemEntity extends Entity
 
     function handleGraphic(?doMakeGraphic : Bool = true)
     {
-        if (charType == 24)
+        if (charType ==  ItemData.SpecialChemdust)
         {
             // if (doMakeGraphic)
             {
@@ -85,6 +85,16 @@ class ItemEntity extends Entity
 
             offset.set(1, 1);
             animation.play("idle");
+        }
+        else if (charType == ItemData.SpecialTrigger)
+        {
+            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+            flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, {thickness: 1, color: Palette.White});
+        }
+        else if (charType == ItemData.SpecialBomb)
+        {
+            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
+            flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, {thickness: 1, color: Palette.White});
         }
         else
         {
@@ -222,6 +232,12 @@ class ItemEntity extends Entity
                 scale.x = flixel.math.FlxMath.lerp(scale.x, 1, 0.4);
                 if (slave != null)
                     slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 1, 0.4);
+            }
+
+            // DEBUG!
+            if (world.debugEnabled)
+            {
+                velocity.set(0, 0);
             }
 
             if (movementTween == null)
@@ -402,7 +418,7 @@ class ItemEntity extends Entity
         {
             charType = charTypeA;
         }
-        
+
         flipCharTypeTween = FlxTween.tween(this.scale, {x : 0}, FlipTime * 0.5, {onComplete: function(t : FlxTween) {
             t.destroy();
 

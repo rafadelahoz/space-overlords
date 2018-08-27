@@ -51,7 +51,7 @@ class PlayState extends GarbageState
     var gameoverLightsout : Bool;
 
     // Debug
-    var debugEnabled : Bool;
+    public var debugEnabled : Bool;
     var stateLabel : FlxBitmapText;
     var gridDebugger : GridDebugger;
 
@@ -71,7 +71,7 @@ class PlayState extends GarbageState
 
         add(gridFrame = new FlxSprite(grid.x-8, grid.y-4, "assets/ui/grid-frame.png"));
 
-        gridDebugger = new GridDebugger(grid);
+        gridDebugger = new GridDebugger(this);
         add(gridDebugger);
 
         items = new FlxGroup();
@@ -109,7 +109,7 @@ class PlayState extends GarbageState
 
     public function getSpecialCharType() : Int
     {
-        return 24;
+        return FlxG.random.getObject([24, 25, 26]);
     }
 
     public function getNextItemShape() : ItemEntity.CellPosition
@@ -169,7 +169,8 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        var special : Int = FlxG.random.getObject([-1, 0, 1], [3, 94, 3]);
+        // var special : Int = FlxG.random.getObject([-1, 0, 1], [3, 94, 3]);
+        var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
 
         nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
                                 getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);
@@ -252,14 +253,69 @@ class PlayState extends GarbageState
 
         // If something fell, we need to recompute the matches
         if (somethingFell)
-            aftermathTimer.start(ItemFallTime, handleAftermathCleanup);
+            aftermathTimer.start(ItemFallTime, handleAftermathTriggers);
+        else
+            aftermathTimer.start(0.01, handleAftermathTriggers);
+    }
+
+    public function handleAftermathTriggers(?t:FlxTimer)
+    {
+        var somethingTriggered : Bool = false;
+        // Check and remove items
+        var triggers : Array<TriggerData> = grid.checkTriggers();
+        // Remove resolved triggers and their related entities to avoid matching with them
+        for (trigger in triggers)
+        {
+            if (trigger.getTriggeredEntities().length > 0)
+            {
+                for (item in trigger.getTriggeredEntities())
+                {
+                    grid.set(item.cellX, item.cellY, null);
+                    // Handle triggering
+                    if (item.type == ItemData.SpecialChemdust)
+                    {
+                        item.entity.triggerLeave();
+                        somethingTriggered = true;
+                    }
+                    else if (item.type == ItemData.SpecialBomb)
+                    {
+                        item.entity.triggerLeave();
+                        
+                        // Also remove the rest of the row
+                        handleBombRowRemoval(item);
+                        // And the rest of the trigger row
+                        handleBombRowRemoval(trigger);
+
+                        somethingTriggered = true;
+                    }
+                }
+
+                grid.set(trigger.cellX, trigger.cellY, null);
+                trigger.entity.triggerLeave();
+            }
+        }
+
+        if (somethingTriggered)
+            aftermathTimer.start(ItemLeaveTime, handleAftermathFalling);
         else
             aftermathTimer.start(0.01, handleAftermathCleanup);
     }
 
+    function handleBombRowRemoval(bombItem : ItemData)
+    {
+        for (col in 0...grid.columns)
+        {
+            var condemned : ItemData = grid.get(col, bombItem.cellY);
+            if (condemned != null && condemned.entity != null)
+            {
+                grid.set(col, bombItem.cellY, null);
+                condemned.entity.triggerLeave();
+            }
+        }
+    }
+
     public function handleAftermathCleanup(?t:FlxTimer)
     {
-        // Check and remove items
         var matches : Array<ItemData> = grid.findMatches( /*lastPositionedCell*/ );
         lastPositionedCell = null;
 

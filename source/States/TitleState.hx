@@ -52,6 +52,9 @@ class TitleState extends GarbageState
 
 		// Missing a preloader
         GameController.Init();
+        #if work
+        GameController.StartEndless();
+        #end
 
 		bgColor = Blue;
 

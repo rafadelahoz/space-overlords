@@ -87,6 +87,66 @@ class GarbageGrid
         return point;
     }
 
+    public function checkTriggers() : Array<TriggerData>
+    {
+        var list : Array<TriggerData> = [];
+
+        var triggers : Array<ItemData> = getAll(ItemData.IsTriggerFilter);
+        var triggerData : TriggerData = null;
+        for (trigger in triggers)
+        {
+            var matches : Array<ItemData> = findMatchesFromCell(trigger.cellX, trigger.cellY, triggerMatch);
+            if (matches.length > 0)
+            {
+                // Flood for chemdusts
+                for (match in matches)
+                {
+                    if (match.type == ItemData.SpecialChemdust)
+                    {
+                        mergeArrays(matches, floodMatch(match, matches));
+                    }
+                }
+                
+                triggerData = new TriggerData(trigger.cellX, trigger.cellY, trigger.type, trigger.entity);
+                triggerData.setTriggeredEntities(matches);
+                list.push(triggerData);
+            }
+        }
+
+        return list;
+    }
+
+    function mergeArrays(aa : Array<ItemData>, bb : Array<ItemData>)
+    {
+        for (b in bb)
+        {
+            if (aa.indexOf(b) < 0)
+                aa.push(b);
+        }
+    }
+
+    function floodMatch(item : ItemData, flooded : Array<ItemData>) : Array<ItemData>
+    {
+        if (flooded == null)
+            flooded = [];
+
+        // Check all sides and flood
+        var other : ItemData = null;
+
+        var others = [get(item.cellX-1, item.cellY), get(item.cellX+1, item.cellY),
+                      get(item.cellX, item.cellY-1), get(item.cellX, item.cellY+1)];
+        for (other in others)
+        {
+            if (other != null && flooded.indexOf(other) < 0 && other.type == item.type)
+            {
+                flooded.push(other);
+                mergeArrays(flooded, floodMatch(other, flooded));
+            }
+        }
+
+        return flooded;
+    }
+
     public function findMatches(?baseCell : FlxPoint = null) : Array<ItemData>
     {
         var matches : Array<ItemData> = [];
@@ -145,9 +205,12 @@ class GarbageGrid
         return matches;
     }
 
-    function findMatchesFromCell(col : Float, row : Float) : Array<ItemData>
+    function findMatchesFromCell(col : Float, row : Float, ?matcher : ItemData -> ItemData -> Bool = null) : Array<ItemData>
     {
         var matches : Array<ItemData> = [];
+
+        if (matcher == null)
+            matcher = cellsMatch;
 
         var baseCol : Int = Std.int(col);
         var baseRow : Int = Std.int(row);
@@ -157,7 +220,7 @@ class GarbageGrid
             throw "Nothing found at " + baseCol + ", " + baseRow;
         }
 
-        var target : Int = get(baseCol, baseRow).type;
+        var target : ItemData = get(baseCol, baseRow);
 
         var cell : ItemData = null;
 
@@ -166,7 +229,7 @@ class GarbageGrid
         while (col < columns)
         {
             cell = get(col, baseRow);
-            if (cell != null && cell.type == target)
+            if (matcher(cell, target))
             {
                 matches.push(get(col, baseRow));
                 col += 1;
@@ -180,7 +243,7 @@ class GarbageGrid
         while (col >= 0)
         {
             cell = get(col, baseRow);
-            if (cell != null && cell.type == target)
+            if (matcher(cell, target))
             {
                 matches.push(get(col, baseRow));
                 col -= 1;
@@ -194,7 +257,7 @@ class GarbageGrid
         while (row < rows)
         {
             cell = get(baseCol, row);
-            if (cell != null && cell.type == target)
+            if (matcher(cell, target))
             {
                 matches.push(get(baseCol, row));
                 row += 1;
@@ -208,7 +271,7 @@ class GarbageGrid
         while (row >= 2)
         {
             cell = get(baseCol, row);
-            if (cell != null && cell.type == target)
+            if (matcher(cell, target))
             {
                 matches.push(get(baseCol, row));
                 row -= 1;
@@ -217,13 +280,50 @@ class GarbageGrid
                 break;
         }
 
-        // If there have been matches, add the current cell
-        if (matches.length > 0)
+        // For the default match method,
+        // if there have been matches, add the current cell
+        if (matches.length > 0 && matcher == cellsMatch)
         {
             matches.push(get(baseCol, baseRow));
         }
 
         return matches;
+    }
+
+    function cellsMatch(cellA : ItemData, cellB : ItemData) : Bool
+    {
+        var match : Bool = false;
+        if (cellA != null && cellB != null)
+        {
+            if (!ItemData.IsCharTypeSpecial(cellA.type) && !ItemData.IsCharTypeSpecial(cellB.type)) {
+                match = cellA.type == cellB.type;
+            }
+            else
+            {
+                // Special items cases
+                if (cellA.type == cellB.type && (cellA.type == ItemData.SpecialTrigger || cellA.type == ItemData.SpecialBomb))
+                {
+                    match = true;
+                }
+            }
+        }
+
+        return match;
+    }
+
+    function triggerMatch(cellA : ItemData, trigger : ItemData) : Bool
+    {
+        var match : Bool = false;
+
+        if (trigger != null && cellA != null)
+        {
+            if (cellA.type == ItemData.SpecialChemdust || cellA.type == ItemData.SpecialBomb)
+            {
+                match = true;
+            }
+        }
+
+        return match;
     }
 
     public function getLowerFreeCellFrom(cellX : Float, cellY : Float) : FlxPoint
@@ -244,7 +344,7 @@ class GarbageGrid
         return new FlxPoint(col, row);
     }
 
-    public function getAll() : Array<ItemData>
+    public function getAll(?filter : ItemData -> Bool = null) : Array<ItemData>
     {
         var all : Array<ItemData> = [];
 
@@ -256,7 +356,10 @@ class GarbageGrid
             while (col < columns)
             {
                 if (get(col, row) != null)
-                    all.push(get(col, row));
+                {
+                    if (filter == null || (filter(get(col, row))))
+                        all.push(get(col, row));
+                }
                 col += 1;
             }
 

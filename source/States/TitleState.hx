@@ -52,8 +52,6 @@ class TitleState extends GarbageState
 
 		// Missing a preloader
         GameController.Init();
-		BgmEngine.init();
-		SfxEngine.init();
 
 		bgColor = Blue;
 

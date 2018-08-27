@@ -11,6 +11,8 @@ class GameController
 		currentState = Loading;
 
 		// Init subsystems
+		BgmEngine.init();
+		SfxEngine.init();
 
 		// FlxG.autoPause = false;
 		#if (!mobile)

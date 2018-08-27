@@ -234,8 +234,9 @@ class ItemEntity extends Entity
             if (GamePad.checkButton(GamePad.Down))
             {
                 velocity.set(0, vspeed * SpeedUpFactor);
-                scale.x = flixel.math.FlxMath.lerp(scale.x, 0.8, 0.2);
-                if (slave != null)
+                if (canSquish())
+                    scale.x = flixel.math.FlxMath.lerp(scale.x, 0.8, 0.2);
+                if (slave != null && slave.canSquish())
                     slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 0.8, 0.2);
             }
             else
@@ -519,6 +520,11 @@ class ItemEntity extends Entity
                     leaveCallback();
             }});
         }});
+    }
+
+    public function canSquish() : Bool
+    {
+        return charType != ItemData.SpecialBomb && charType != ItemData.SpecialTrigger;
     }
 }
 

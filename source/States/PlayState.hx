@@ -19,6 +19,7 @@ class PlayState extends GarbageState
 
     var TriggerAnimationTime : Float = 1;
     var TriggerBombsAnimationTime : Float = 2;
+    var TriggerCleanupDelay : Float = 1;
     var CleanUpDelay : Float = 0.1;
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
@@ -179,8 +180,11 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        var special : Int = FlxG.random.getObject([-1, 0, 1], [5, 90, 5]);
-        // var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
+        #if work
+            var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
+        #else
+            var special : Int = FlxG.random.getObject([-1, 0, 1], [5, 90, 5]);
+        #end
 
         nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
                                 getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);
@@ -350,12 +354,12 @@ class PlayState extends GarbageState
                 }
 
                 grid.set(trigger.cellX, trigger.cellY, null);
-                trigger.entity.triggerLeave();
+                trigger.entity.triggerDissolve();
             }
         }
 
         if (somethingTriggered)
-            aftermathTimer.start(ItemLeaveTime, handleAftermathFalling);
+            aftermathTimer.start(TriggerCleanupDelay, handleAftermathFalling);
         else
             aftermathTimer.start(0.01, handleAftermathCleanup);
     }

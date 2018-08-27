@@ -37,7 +37,7 @@ class ItemEntity extends Entity
     var flipCharTypeTween : FlxTween;
 
     public var state : Int;
-    
+
     var scaleTween : FlxTween;
     var movementTween : FlxTween;
 
@@ -93,13 +93,15 @@ class ItemEntity extends Entity
         }
         else if (charType == ItemData.SpecialTrigger)
         {
-            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-            flixel.util.FlxSpriteUtil.drawTriangle(this, 0, 0, 16, Palette.Yellow, {thickness: 1, color: Palette.White});
+            loadGraphic("assets/images/trigger.png");
+            offset.set(1, 1);
         }
         else if (charType == ItemData.SpecialBomb)
         {
-            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-            flixel.util.FlxSpriteUtil.drawCircle(this, 8, 8, 6, Palette.Green, {thickness: 1, color: Palette.White});
+            loadGraphic("assets/images/bomb-sheet.png", true, 16, 16);
+            animation.add("idle", [0]);
+            animation.add("open", [0, 1, 2], 6, false);
+            animation.play("idle");
         }
         else
         {
@@ -494,6 +496,8 @@ class ItemEntity extends Entity
     public function triggerTriggerAnimation()
     {
         flixel.util.FlxSpriteUtil.flicker(this, 1, true, true);
+        if (charType == ItemData.SpecialBomb)
+            animation.play("open");
     }
 
     public function triggerDissolve(?leaveCallback : Void -> Void = null)

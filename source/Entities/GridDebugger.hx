@@ -70,13 +70,14 @@ class GridDebugger extends FlxGroup
         }
         else if (Type == ItemData.SpecialTrigger)
         {
-            image.makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-            flixel.util.FlxSpriteUtil.drawTriangle(image, 0, 0, 16, Palette.Yellow, {thickness: 1, color: Palette.White});
+            image.loadGraphic("assets/images/trigger.png");
+            image.offset.set(1, 1);
         }
         else if (Type == ItemData.SpecialBomb)
         {
-            image.makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000, true);
-            flixel.util.FlxSpriteUtil.drawCircle(image, 8, 8, 6, Palette.Green, {thickness: 1, color: Palette.White});
+            image.loadGraphic("assets/images/bomb-sheet.png", true, 16, 16);
+            image.animation.add("idle", [0]);
+            image.animation.play("idle");
         }
 
         add(image);

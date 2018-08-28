@@ -64,7 +64,8 @@ class Scanlines extends FlxObject
 
     public function on()
     {
-        flixel.tweens.FlxTween.tween(background, {alpha: 0}, 0.5, {startDelay: 0.5, ease: flixel.tweens.FlxEase.elasticInOut});
+        flixel.effects.FlxFlicker.flicker(background);
+        flixel.tweens.FlxTween.tween(background, {alpha: 0}, 1, {startDelay: 0.5, ease: flixel.tweens.FlxEase.elasticInOut});
         scanlinesGlitchTimer.active = true;
     }
 

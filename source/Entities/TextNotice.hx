@@ -17,15 +17,15 @@ class TextNotice extends FlxSprite
     var background : FlxSprite;
     var colorTween : FlxTween;
 
-    var serious : Bool;
+    var longer : Bool;
 
     var callback : Void -> Void;
 
-    public function new(X : Float, Y : Float, Text : String, ?Color : Int = -1, ?seriousMode : Bool = false, ?borderless : Bool = false, ?Callback : Void -> Void = null)
+    public function new(X : Float, Y : Float, Text : String, ?Color : Int = -1, ?Longer : Bool = false, ?borderless : Bool = false, ?Callback : Void -> Void = null)
     {
         super(X, Y);
 
-        serious = seriousMode;
+        longer = Longer;
 
         // Initial displacement
         y += 0;
@@ -38,8 +38,6 @@ class TextNotice extends FlxSprite
         pxtext.y = Y;
 
         border = 0;
-        if (seriousMode)
-            border = 0;
 
         background = new FlxSprite(pxtext.x - border/2, pxtext.y - border/2);
         background.makeGraphic(Std.int(pxtext.width + border), Std.int(pxtext.height + border), (borderless ? 0x00000000 : 0xFF262b44));
@@ -49,8 +47,7 @@ class TextNotice extends FlxSprite
         scale.y = 0;
         FlxTween.tween(this.scale, {y: 1}, 0.1, {ease: FlxEase.circOut, startDelay: 0, onComplete: onAppeared});
 
-        if (!seriousMode || Text.indexOf("\\") >= 0)
-            doColor(null);
+        doColor(null);
     }
 
     function doColor(t : FlxTween)
@@ -86,7 +83,7 @@ class TextNotice extends FlxSprite
 
     function onAppeared(t:FlxTween)
     {
-        FlxTween.tween(this.scale, {y: 0}, 0.1, {ease: FlxEase.circOut, startDelay: 1 + (serious ? 1 : 0), onComplete: onDisapeared});
+        FlxTween.tween(this.scale, {y: 0}, 0.1, {ease: FlxEase.circOut, startDelay: 1 + (longer ? 1 : 0), onComplete: onDisapeared});
     }
 
     function onDisapeared(t:FlxTween)

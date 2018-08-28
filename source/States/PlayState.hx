@@ -143,9 +143,10 @@ class PlayState extends GarbageState
         {
             case PlayState.StateIntro:
                 background.alpha = 0;
-                gridShader.alpha = 0;
                 gridFrame.x = -gridFrame.width;
-                // screenButtons.color = Palette.DarkBlue;
+                gridShader.x = gridFrame.x + 6;
+                // screenButtons.color = 0xFF124e89;
+                // screenButtons.alpha = 0.8;
 
                 var delay : Float = 1;
                 var duration : Float = 0;
@@ -156,13 +157,15 @@ class PlayState extends GarbageState
                 delay += 0.5;
 
                 duration = 0.75;
-                FlxTween.tween(gridFrame, {x : grid.x-8}, duration, {startDelay: delay});
+                FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay});
+                FlxTween.tween(gridShader, {x : grid.x-2}, duration, {startDelay: delay});
                 delay += duration;
+                
+                var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG});
+                new FlxTimer().start(delay+0.075*3, function(t:FlxTimer) {
+                    shakeTween.cancel();
+                });
                 delay += 0.5;
-
-                duration = 0.75;
-                FlxTween.tween(gridShader, {alpha : 0.6}, duration, {startDelay: delay, ease: FlxEase.sineInOut});
-                delay += duration;
 
                 delay += 0.5;
                 new FlxTimer().start(delay, function(t:FlxTimer) {
@@ -172,10 +175,12 @@ class PlayState extends GarbageState
 
                 /*duration = 0.5;
                 FlxTween.color(screenButtons, duration, Palette.DarkBlue, 0xFFFFFFFF, {startDelay: delay, ease: FlxEase.bounceInOut});
-                delay += duration;*/
-                delay += 0.5;
+                delay += duration;
+                delay += 0.5;*/
+
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     generateNextItem();
+                    topDisplay.notifications.add(new TextNotice(24, 16, "!WORK  STARTING!", Palette.Green, true));
                 });
 
                 delay += 2;

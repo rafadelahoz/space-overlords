@@ -43,7 +43,7 @@ class ItemEntity extends Entity
 
     var graceTimer : FlxTimer;
 
-    var vspeed : Float = 16;
+    var vspeed : Float;
 
     var finishPositioningAfterMovement : Bool;
 
@@ -154,6 +154,7 @@ class ItemEntity extends Entity
                         FlxTween.tween(slave.scale, {x : 1, y: 1}, GenerationTime);
                     }
                 case ItemEntity.StateFalling:
+                    vspeed = world.getFallSpeed();
                 case ItemEntity.StateGrace:
                     finishPositioningAfterMovement = false;
                     graceTimer.start(GraceTime, onGraceEnd);

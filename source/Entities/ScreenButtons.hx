@@ -37,7 +37,7 @@ class ScreenButtons extends FlxSpriteGroup
 		add(new FlxSprite(0, BottomHeight, "assets/ui/buttons-bg.png"));
 
 		// Add the buttons
-		add(pauseButton = new FlxSprite(0, 0).loadGraphic("assets/ui/btnPause.png", true, 20, 16));
+		add(pauseButton = new FlxSprite(Constants.Width-20, 0).loadGraphic("assets/ui/btnPause.png", true, 20, 16));
 		add(leftButton = new FlxSprite(0, BottomHeight + halfHeight).loadGraphic("assets/ui/btnLeft.png", true, 90, 40));
 		add(rightButton = new FlxSprite(halfWidth, BottomHeight + halfHeight).loadGraphic("assets/ui/btnRight.png", true, 90, 40));
 		add(downButton = new FlxSprite(0, BottomHeight).loadGraphic("assets/ui/btnDown.png", true, 90, 40));
@@ -50,8 +50,8 @@ class ScreenButtons extends FlxSpriteGroup
 			button.animation.play("idle");
 		}
 
-		pauseButton.setSize(_width, Constants.Height/2);
-		pauseButton.offset.set(-(width-20), 0);
+		// pauseButton.setSize(_width, Constants.Height/2);
+		// pauseButton.offset.set(-(width-20), 0);
 	}
 
 	override public function update(elapsed:Float)

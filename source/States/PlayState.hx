@@ -95,6 +95,9 @@ class PlayState extends GarbageState
         aftermathTimer = new FlxTimer();
         gameoverTimer = new FlxTimer();
 
+        // Setup gameplay
+        session.fallSpeed = 16;
+
         switchState(StateIntro);
 
         debugEnabled = false;
@@ -299,6 +302,8 @@ class PlayState extends GarbageState
                         item.entity.triggerTriggerAnimation();
                         if (item.type == ItemData.SpecialChemdust)
                         {
+                            session.items += 1;
+
                             // Score: 2 x (chemdust number) x 50
                             chemdustCounter += 1;
                             aftermathScoreCounter += 2*chemdustCounter*50;
@@ -407,6 +412,9 @@ class PlayState extends GarbageState
         var lastCharType : Int = -1;
         for (itemData in matches)
         {
+            // New item!
+            session.items += 1;
+
             // Clear the cell occupied by the item
             grid.set(itemData.cellX, itemData.cellY, null);
             // Make the entity leave
@@ -465,6 +473,16 @@ class PlayState extends GarbageState
         }
         else
         {
+            // Increase speed?
+            if ((session.items - session.lastItemsSpeedIncrease) >= 10)
+            {
+                session.fallSpeed += 1;
+                session.lastItemsSpeedIncrease = session.items;
+
+                topDisplay.notifications.add(new TextNotice(88, 16, "!Speed Up!", Palette.Yellow));
+            }
+            // Do other things like change graphic set?
+
             // Go on
             switchState(StateGenerate);
         }
@@ -477,7 +495,6 @@ class PlayState extends GarbageState
 
     function checkForLoseConditions(currentItem : ItemEntity) : Bool
     {
-        // TODO: input currentItem may not be required, check whole grid?
         return grid.checkForItemsOnTopRows();
     }
 
@@ -541,6 +558,11 @@ class PlayState extends GarbageState
         }
 
         return 0;
+    }
+
+    public function getFallSpeed() : Float
+    {
+        return session.fallSpeed;
     }
 
     /* DEBUG */

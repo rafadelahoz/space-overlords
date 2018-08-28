@@ -50,11 +50,13 @@ class MenuState extends GarbageState
         background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
         add(background);
 
+        add(new SlaveCharacter(74, 223, this));
+
         // Generic header
         add(new FlxSprite(0, 0, "assets/ui/title-menu-header.png"));
 
         var baseY : Float = 36;
-        
+
         var logo : FlxSprite = new FlxSprite(0, baseY, "assets/ui/cell-menu-main.png");
         add(logo);
 

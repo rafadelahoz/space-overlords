@@ -15,6 +15,7 @@ class TopDisplay extends FlxGroup
     var background : FlxSprite;
     var belts : FlxGroup;
     var items : FlxGroup;
+    var scanlines : Scanlines;
     var topFrame : FlxSprite;
 
     var scoreLabel : FlxBitmapText;
@@ -57,6 +58,7 @@ class TopDisplay extends FlxGroup
             belt.loadGraphic("assets/images/belt-sheet.png", true, 80, 8);
             belt.animation.add("go", [0, 1, 2], 4, true);
             belt.animation.play("go");
+            belt.animation.paused = true;
             belts.add(belt);
         }
         beltShakeTimer = new FlxTimer();
@@ -64,9 +66,11 @@ class TopDisplay extends FlxGroup
 
         add(new FlxSprite(24, 16, "assets/ui/rating-marker.png"));
         scoreLabel = text.PixelText.New(48, 16, " 9999", 0xFFFFFFFF);
+        scoreLabel.visible = false;
         add(scoreLabel);
 
         bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
+        bottomLabel.visible = false;
         add(bottomLabel);
 
         notifications = new FlxGroup();
@@ -76,9 +80,23 @@ class TopDisplay extends FlxGroup
         add(topFrame);
 
         // Add scanlines
-        add(new Scanlines(10, 10, "assets/ui/gameplay-ui-top-scanlines.png", Palette.Green));
+        add(scanlines = new Scanlines(10, 10, "assets/ui/gameplay-ui-top-scanlines.png", Palette.Green));
+        scanlines.off();
 
         processingQueue = [];
+    }
+
+    public function start()
+    {
+        belts.forEachAlive(function(beltBasic : FlxBasic) {
+            var belt : FlxSprite = cast(beltBasic, FlxSprite);
+            belt.animation.paused = false;
+        });
+
+        scoreLabel.visible = true;
+        bottomLabel.visible = true;
+
+        scanlines.on();
     }
 
     override public function update(elapsed : Float)

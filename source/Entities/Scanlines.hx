@@ -10,7 +10,9 @@ import flixel.addons.effects.chainable.FlxGlitchEffect;
 
 class Scanlines extends FlxObject
 {
+    var background : FlxSprite;
     var scanlines : FlxEffectSprite;
+    var vcrOverlay : FlxSprite;
 	var ScanlinesGlitchDelay : Float = 5;
     var ScanlinesGlitchVariation : Float = 0.2;
     var scanlinesGlitchTimer : FlxTimer;
@@ -19,11 +21,14 @@ class Scanlines extends FlxObject
     {
         super(0, 0);
 
-        var _vcrOverlay : FlxSprite = new FlxSprite(X, Y, Graphic);
-        _vcrOverlay.alpha = 0.184;
-        _vcrOverlay.color = Color;
+        vcrOverlay = new FlxSprite(X, Y, Graphic);
+        vcrOverlay.alpha = 0.184;
+        vcrOverlay.color = Color;
 
-        scanlines = new FlxEffectSprite(_vcrOverlay);
+        background = new FlxSprite(X, Y).makeGraphic(Std.int(vcrOverlay.width), Std.int(vcrOverlay.height), Palette.DarkBlue);
+        background.visible = false;
+
+        scanlines = new FlxEffectSprite(vcrOverlay);
         scanlines.setPosition(X, Y);
 
         var _glitch : FlxGlitchEffect = null;
@@ -49,6 +54,20 @@ class Scanlines extends FlxObject
         }
     }
 
+    public function off()
+    {
+        background.visible = true;
+        background.alpha = 1;
+        scanlines.effectsEnabled = false;
+        scanlinesGlitchTimer.active = false;
+    }
+
+    public function on()
+    {
+        flixel.tweens.FlxTween.tween(background, {alpha: 0}, 0.5, {startDelay: 0.5, ease: flixel.tweens.FlxEase.elasticInOut});
+        scanlinesGlitchTimer.active = true;
+    }
+
     override public function update(elapsed : Float)
     {
         scanlines.update(elapsed);
@@ -57,6 +76,8 @@ class Scanlines extends FlxObject
 
     override public function draw()
     {
+        if (background.visible)
+            background.draw();
         scanlines.draw();
         super.draw();
     }

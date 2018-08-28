@@ -7,6 +7,8 @@ import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
 import flixel.text.FlxBitmapText;
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
 import flixel.addons.transition.FlxTransitionableState;
 
 class PlayState extends GarbageState
@@ -61,6 +63,8 @@ class PlayState extends GarbageState
     override public function create()
     {
         session = new PlaySessionData();
+
+        FlxG.camera.bgColor = 0xFF000000;
 
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
@@ -137,6 +141,47 @@ class PlayState extends GarbageState
 
         switch (state)
         {
+            case PlayState.StateIntro:
+                background.alpha = 0;
+                gridShader.alpha = 0;
+                gridFrame.x = -gridFrame.width;
+                // screenButtons.color = Palette.DarkBlue;
+
+                var delay : Float = 1;
+                var duration : Float = 0;
+
+                duration = 0.75;
+                FlxTween.tween(background, {alpha : 1}, duration, {startDelay: delay, ease: FlxEase.circIn});
+                delay += duration;
+                delay += 0.5;
+
+                duration = 0.75;
+                FlxTween.tween(gridFrame, {x : grid.x-8}, duration, {startDelay: delay});
+                delay += duration;
+                delay += 0.5;
+
+                duration = 0.75;
+                FlxTween.tween(gridShader, {alpha : 0.6}, duration, {startDelay: delay, ease: FlxEase.sineInOut});
+                delay += duration;
+
+                delay += 0.5;
+                new FlxTimer().start(delay, function(t:FlxTimer) {
+                    topDisplay.start();
+                });
+                // delay += 1;
+
+                /*duration = 0.5;
+                FlxTween.color(screenButtons, duration, Palette.DarkBlue, 0xFFFFFFFF, {startDelay: delay, ease: FlxEase.bounceInOut});
+                delay += duration;*/
+                delay += 0.5;
+                new FlxTimer().start(delay, function(t:FlxTimer) {
+                    generateNextItem();
+                });
+
+                delay += 2;
+                new FlxTimer().start(delay, function(t:FlxTimer) {
+                    switchState(StateGenerate);
+                });
             case PlayState.StateGenerate:
                 if (nextItem == null)
                 {
@@ -216,7 +261,6 @@ class PlayState extends GarbageState
         {
             case PlayState.StateIntro:
                 stateLabel.text = "Intro";
-                switchState(StateGenerate);
             case PlayState.StateGenerate:
                 stateLabel.text = "Generating";
                 if (nextItem != null)

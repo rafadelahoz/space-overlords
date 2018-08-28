@@ -160,7 +160,7 @@ class PlayState extends GarbageState
                 FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay});
                 FlxTween.tween(gridShader, {x : grid.x-2}, duration, {startDelay: delay});
                 delay += duration;
-                
+
                 var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG});
                 new FlxTimer().start(delay+0.075*3, function(t:FlxTimer) {
                     shakeTween.cancel();
@@ -180,12 +180,13 @@ class PlayState extends GarbageState
 
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     generateNextItem();
-                    topDisplay.notifications.add(new TextNotice(24, 16, "!WORK  STARTING!", Palette.Green, true));
                 });
 
                 delay += 2;
                 new FlxTimer().start(delay, function(t:FlxTimer) {
+                    topDisplay.startScroller();
                     switchState(StateGenerate);
+                    topDisplay.notifications.add(new TextNotice(24, 16, "!WORK  STARTING!", Palette.Green, true));
                 });
             case PlayState.StateGenerate:
                 if (nextItem == null)

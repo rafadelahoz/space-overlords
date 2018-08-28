@@ -71,6 +71,7 @@ class TopDisplay extends FlxGroup
 
         bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
         bottomLabel.visible = false;
+        bottomLabel.pause();
         add(bottomLabel);
 
         notifications = new FlxGroup();
@@ -94,7 +95,6 @@ class TopDisplay extends FlxGroup
         });
 
         scoreLabel.visible = true;
-        bottomLabel.visible = true;
 
         scanlines.on();
     }
@@ -183,5 +183,11 @@ class TopDisplay extends FlxGroup
 
         var time : Float = BeltShakeTime * 1+(FlxG.random.float(-BeltShakeVariation, BeltShakeVariation));
         beltShakeTimer.start(time, onBeltShakeTimer);
+    }
+
+    public function startScroller()
+    {
+        bottomLabel.visible = true;
+        bottomLabel.resume();
     }
 }

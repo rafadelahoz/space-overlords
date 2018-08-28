@@ -79,6 +79,18 @@ class ScrollingLabel extends FlxSprite
         label.draw();
     }
 
+    public function pause()
+    {
+        scrollTimer.active = false;
+        scrollHalfTimer.active = false;
+    }
+
+    public function resume()
+    {
+        scrollTimer.active = true;
+        scrollHalfTimer.active = true;
+    }
+
     function onScrollHalfTimer(t:FlxTimer)
     {
         label.x -= 4;

@@ -15,179 +15,170 @@ import text.PixelText;
 
 class MenuState extends GarbageState
 {
-	public var tween : FlxTween;
+    public var tween : FlxTween;
 
-	var touchLabel : FlxSprite;
-	var yearsLabel : FlxBitmapText;
-	var creditsLabel : FlxBitmapText;
-	var background : FlxSprite;
-	var backgroundShader : FlxSprite;
+    var touchLabel : FlxSprite;
+    var yearsLabel : FlxBitmapText;
+    var creditsLabel : FlxBitmapText;
+    var background : FlxSprite;
+    var backgroundShader : FlxSprite;
 
-	var startTouchZone : FlxObject;
+    var startTouchZone : FlxObject;
 
-	var interactable : Bool;
+    var interactable : Bool;
 
-	var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
+    var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
 
-	var startLabelBackground : FlxSprite;
+    var startLabelBackground : FlxSprite;
 
-	override public function create():Void
-	{
-		super.create();
+    override public function create():Void
+    {
+        super.create();
 
-		// Missing a preloader
+        // Missing a preloader
 
-		interactable = false;
+        interactable = false;
 
-		bgColor = 0xFF000000;
+        bgColor = 0xFF000000;
 
-		stars = new flixel.addons.display.FlxStarField.FlxStarField2D(32, 184, 23, 22, 4);
-		stars.starVelocityOffset.set(0.0125, 0);
-		add(stars);
+        stars = new flixel.addons.display.FlxStarField.FlxStarField2D(32, 184, 23, 22, 4);
+        stars.starVelocityOffset.set(0.0125, 0);
+        add(stars);
 
-		background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
-		add(background);
+        background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
+        add(background);
 
-		var slaveNumberBg : FlxSprite = new FlxSprite(57, 33).makeGraphic(117, 14, 0xFF9e2835);
-		add(slaveNumberBg);
+        var slaveNumberBg : FlxSprite = new FlxSprite(57, 33).makeGraphic(117, 14, 0xFF9e2835);
+        add(slaveNumberBg);
 
-		var logo : FlxSprite = new FlxSprite(0, 0, "assets/ui/title.png");
-		add(logo);
+        var logo : FlxSprite = new FlxSprite(0, 0, "assets/ui/title.png");
+        add(logo);
 
-		var footer : FlxSprite = new FlxSprite(0, 276, "assets/ui/title-menu-footer.png");
+        var footer : FlxSprite = new FlxSprite(0, 276, "assets/ui/title-menu-footer.png");
         add(footer);
         add(new VcrClock());
 
-		var slaveNumber : FlxBitmapText = text.VcrText.New(111, 34, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
-		add(slaveNumber);
+        var slaveNumber : FlxBitmapText = text.VcrText.New(111, 34, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
+        add(slaveNumber);
 
-		startLabelBackground = new FlxSprite(27, 88).makeGraphic(141, 16, 0xFF9e2835);
-		startLabelBackground.visible = false;
-		add(startLabelBackground);
+        var backButton : VcrButton = new VcrButton(8, logo.height + 12, null, onBackPressed);
+        backButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
+        add(backButton);
 
-		touchLabel = new FlxSprite(0, 72, "assets/ui/tmp-start-label.png");
-		touchLabel.alpha = 0;
-		add(touchLabel);
+        startLabelBackground = new FlxSprite(27, 88+32).makeGraphic(141, 16, 0xFF9e2835);
+        startLabelBackground.visible = false;
+        add(startLabelBackground);
 
-		// VCR effect
-		add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
+        touchLabel = new FlxSprite(0, 72+32, "assets/ui/tmp-start-label.png");
+        touchLabel.alpha = 0;
+        add(touchLabel);
 
-		var startDelay : Float = 0.35;
-		tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
-		FlxG.camera.scroll.set(0, 0);
-	}
+        // VCR effect
+        add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
-	public function onLogoPositioned(_t:FlxTween):Void
-	{
-		interactable = true;
+        var startDelay : Float = 0.35;
+        tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
+        FlxG.camera.scroll.set(0, 0);
+    }
 
-		startTouchZone = new FlxObject(0, 72, Constants.Width, 32);
-		add(startTouchZone);
+    public function onLogoPositioned(_t:FlxTween):Void
+    {
+        interactable = true;
 
-		FlxTween.tween(touchLabel, {alpha : 1}, 0.2, {ease : FlxEase.bounceInOut});
-		// startTouchBuzz(null);
-	}
+        startTouchZone = new FlxObject(0, 72+32, Constants.Width, 32);
+        add(startTouchZone);
 
-	function startTouchBuzz(_t:FlxTween)
-	{
-		var touchLabelBaseY = touchLabel.y;
-		FlxTween.tween(touchLabel, {y : touchLabelBaseY-4}, 0.2, {ease: FlxEase.circOut, startDelay: 2, onComplete: continueTouchBuzz});
-	}
+        FlxTween.tween(touchLabel, {alpha : 1}, 0.2, {ease : FlxEase.bounceInOut});
+        // startTouchBuzz(null);
+    }
 
-	function continueTouchBuzz(_t:FlxTween)
-	{
-		var touchLabelBaseY = touchLabel.y;
-		FlxTween.tween(touchLabel, {y : touchLabelBaseY+4}, 0.5, {ease: FlxEase.elasticOut, onComplete: startTouchBuzz});
-	}
+    function startTouchBuzz(_t:FlxTween)
+    {
+        var touchLabelBaseY = touchLabel.y;
+        FlxTween.tween(touchLabel, {y : touchLabelBaseY-4}, 0.2, {ease: FlxEase.circOut, startDelay: 2, onComplete: continueTouchBuzz});
+    }
 
-	override public function destroy():Void
-	{
-		super.destroy();
-	}
+    function continueTouchBuzz(_t:FlxTween)
+    {
+        var touchLabelBaseY = touchLabel.y;
+        FlxTween.tween(touchLabel, {y : touchLabelBaseY+4}, 0.5, {ease: FlxEase.elasticOut, onComplete: startTouchBuzz});
+    }
 
-	override public function update(elapsed:Float):Void
-	{
-		if (FlxG.keys.justPressed.O)
-			Screenshot.take();
+    override public function destroy():Void
+    {
+        super.destroy();
+    }
 
-		if (interactable)
-		{
-			#if (!mobile)
-			if (startTouchZone.getHitbox().containsPoint(FlxG.mouse.getPosition()))
-			{
-		        if (FlxG.mouse.pressed)
-		        {
-					onTouchLabelPressed();
-		        }
-		        else if (FlxG.mouse.justReleased)
-		        {
-		            onTouchLabelReleased();
-					onArcadeButtonPressed();
-		        }
-			}
-	        #else
-	        for (touch in FlxG.touches.list)
-			{
-	            if (touch.overlaps(startTouchZone))
-	            {
-	    			if (touch.pressed)
-	    			{
-	    				onTouchLabelPressed();
-	                }
-	                else if (touch.justReleased)
-	                {
-	                    onTouchLabelReleased();
-	                    onArcadeButtonPressed();
-	                    break ;
-	                }
-	            }
-				else if (touchLabel.color != 0xFFFFFFFF)
-				{
-					if (touch.justReleased)
-	                {
-						onTouchLabelReleased();
-	                    break ;
-	                }
-				}
-	        }
-	        #end
-		}
+    override public function update(elapsed:Float):Void
+    {
+        if (FlxG.keys.justPressed.O)
+            Screenshot.take();
 
-		super.update(elapsed);
-	}
+        if (interactable)
+        {
+            #if (!mobile)
+            if (startTouchZone.getHitbox().containsPoint(FlxG.mouse.getPosition()))
+            {
+                if (FlxG.mouse.pressed)
+                {
+                    onTouchLabelPressed();
+                }
+                else if (FlxG.mouse.justReleased)
+                {
+                    onTouchLabelReleased();
+                    onArcadeButtonPressed();
+                }
+            }
+            #else
+            for (touch in FlxG.touches.list)
+            {
+                if (touch.overlaps(startTouchZone))
+                {
+                    if (touch.pressed)
+                    {
+                        onTouchLabelPressed();
+                    }
+                    else if (touch.justReleased)
+                    {
+                        onTouchLabelReleased();
+                        onArcadeButtonPressed();
+                        break ;
+                    }
+                }
+                else if (touchLabel.color != 0xFFFFFFFF)
+                {
+                    if (touch.justReleased)
+                    {
+                        onTouchLabelReleased();
+                        break ;
+                    }
+                }
+            }
+            #end
+        }
 
-	function onTouchLabelPressed()
-	{
-		// animation.play("pressed");
-		/*if (touchLabel.color != 0xFFFFEC27)
-		{
-			touchLabel.color = 0xFFFFEC27;
-			touchLabel.x += 2;
-			touchLabel.y += 2;
-			// Testing screenshots on mobile
-			// Screenshot.take();
-		}*/
+        super.update(elapsed);
+    }
 
-		startLabelBackground.visible = true;
-	}
+    function onTouchLabelPressed()
+    {
+        startLabelBackground.visible = true;
+    }
 
-	function onTouchLabelReleased()
-	{
-		// animation.play("idle");
-		/*if (touchLabel.color != 0xFFFFFFFF)
-		{
-			touchLabel.color = 0xFFFFFFFF;
-			touchLabel.x -= 2;
-			touchLabel.y -= 2;
-		}*/
+    function onTouchLabelReleased()
+    {
+        startLabelBackground.visible = false;
+    }
 
-		startLabelBackground.visible = false;
-	}
+    public function onArcadeButtonPressed() : Void
+    {
+        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            GameController.StartEndless();
+        });
+    }
 
-	public function onArcadeButtonPressed() : Void
-	{
-		FlxG.camera.fade(0xFF000000, 0.5, false, function() {
-			GameController.StartEndless();
-		});
-	}
+    public function onBackPressed()
+    {
+        GameController.ToTitle(true);
+    }
 }

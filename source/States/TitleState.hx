@@ -25,6 +25,8 @@ class TitleState extends GarbageState
     static var StateSettings : Int = 3;
     static var StateCredits : Int = 4;
 
+    public var avoidLogo : Bool = false;
+
     var state : Int;
 
     var header : FlxSprite;
@@ -69,7 +71,7 @@ class TitleState extends GarbageState
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
         FlxG.camera.fade(Blue, 1, true);
-        switchState(StateLogo);
+        switchState(avoidLogo ? StateMain : StateLogo);
     }
 
     function switchState(Next : Int)
@@ -93,6 +95,11 @@ class TitleState extends GarbageState
                         logoTimer = null;
                         switchState(StateMain);
                     });
+                    var touchArea : TouchArea = new TouchArea(0, 0, Constants.Width, Constants.Height, function() {
+                        logoTimer.cancel();
+                        switchState(StateMain);
+                    });
+                    screen.add(touchArea);
 
                 case TitleState.StateMain:
                     clearGroup(screen);

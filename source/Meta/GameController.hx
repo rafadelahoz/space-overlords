@@ -28,6 +28,13 @@ class GameController
 		#end
 	}
 
+	public static function ToTitle(?avoidLogo : Bool = false)
+	{
+		var titleState : TitleState = new TitleState();
+		titleState.avoidLogo = true;
+		FlxG.switchState(titleState);
+	}
+
 	public static function ToMenu()
 	{
 		currentState = Title;

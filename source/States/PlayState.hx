@@ -479,7 +479,7 @@ class PlayState extends GarbageState
                 session.fallSpeed += 1;
                 session.lastItemsSpeedIncrease = session.items;
 
-                topDisplay.notifications.add(new TextNotice(88, 16, "!Speed Up!", Palette.Yellow));
+                topDisplay.notifications.add(new TextNotice(80, 16, "!Speed Up!", Palette.Yellow));
             }
             // Do other things like change graphic set?
 

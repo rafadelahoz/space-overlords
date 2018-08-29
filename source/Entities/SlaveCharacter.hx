@@ -37,7 +37,10 @@ class SlaveCharacter extends FlxSprite
 
         timer = new FlxTimer();
 
-        switchState(StateIdle);
+        if (FlxG.random.bool(50))
+            switchState(StateIdle);
+        else
+            switchState(StateWalk);
     }
 
     function handleGraphic()
@@ -49,21 +52,21 @@ class SlaveCharacter extends FlxSprite
         animation.add("walk", [0, 1, 2, 3], animSpeed, true);
         animation.play("walk");
 
-        var headType : Int = FlxG.random.int(0, 1);
+        var headType : Int = ProgressData.data.slave_head;
         head = new FlxSprite(x, y);
         head.loadGraphic("assets/images/slave-head-sheet.png", true, 32, 40);
         head.animation.add("idle", [headType*4+0]);
         head.animation.add("walk", [headType*4+0, headType*4+1, headType*4+2, headType*4+3], animSpeed, true);
         head.animation.play("walk");
 
-        var detailType : Int = FlxG.random.int(0, 2);
+        var detailType : Int = ProgressData.data.slave_detail;
         detail = new FlxSprite(x, y);
         detail.loadGraphic("assets/images/slave-detail-sheet.png", true, 32, 40);
         detail.animation.add("idle", [detailType*4+0]);
         detail.animation.add("walk", [detailType*4+0, detailType*4+1, detailType*4+2, detailType*4+3], animSpeed, true);
         detail.animation.play("walk");
 
-        var tintColor : Int = FlxG.random.getObject([0xFFFFFFFF, Palette.Red, Palette.Green, Palette.Blue]);
+        var tintColor : Int = ProgressData.data.slave_color;
         color = tintColor;
         head.color = tintColor;
         // detail.color = tintColor;
@@ -103,7 +106,8 @@ class SlaveCharacter extends FlxSprite
 
     function isPositionValid(pos : FlxPoint) : Bool
     {
-        return (pos.x > 32 && pos.x < Constants.Width - 32 && pos.y > 320*0.7 && pos.y < Constants.Height - 32);
+        return (pos.x > 32 && pos.x < Constants.Width - width - 32 &&
+                pos.y > Constants.Height*0.7 && pos.y < Constants.Height - 16 - height);
     }
 
     override public function update(elapsed : Float)

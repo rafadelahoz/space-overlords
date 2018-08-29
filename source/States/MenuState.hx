@@ -50,7 +50,9 @@ class MenuState extends GarbageState
         background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
         add(background);
 
-        add(new SlaveCharacter(74, 223, this));
+        add(new SlaveCharacter(FlxG.random.int(32, Constants.Width-32),
+                               FlxG.random.int(Std.int(Constants.Height*0.7), Constants.Height - 16),
+                               this));
 
         // Generic header
         add(new FlxSprite(0, 0, "assets/ui/title-menu-header.png"));
@@ -64,7 +66,7 @@ class MenuState extends GarbageState
         add(footer);
         add(new VcrClock());
 
-        var slaveNumber : FlxBitmapText = text.VcrText.New(107, baseY+24, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
+        var slaveNumber : FlxBitmapText = text.VcrText.New(107, baseY+24, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
         add(slaveNumber);
 
         backButton = new VcrButton(8, 83, onBackHighlighted, onBackPressed);

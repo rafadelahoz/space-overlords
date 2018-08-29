@@ -42,7 +42,7 @@ class SlaveCharacter extends FlxSprite
 
     function handleGraphic()
     {
-        var animSpeed : Int = 6;
+        var animSpeed : Int = 5;
 
         loadGraphic("assets/images/slave-body-sheet.png", true, 32, 40);
         animation.add("idle", [0]);

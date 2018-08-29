@@ -5,16 +5,7 @@ import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.util.FlxTimer;
-import flixel.math.FlxPoint;
-import flixel.text.FlxBitmapText;
 import flixel.group.FlxGroup;
-import flixel.tweens.FlxTween;
-import flixel.tweens.FlxEase;
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.transition.FlxTransitionableState;
-
-import flixel.addons.effects.chainable.FlxEffectSprite;
-import flixel.addons.effects.chainable.FlxGlitchEffect;
 
 import text.PixelText;
 
@@ -55,7 +46,7 @@ class TitleState extends GarbageState
 		// Missing a preloader
         GameController.Init();
         #if work
-        GameController.StartEndless();
+        // GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(0, 999)));
         #end
 
 		bgColor = Blue;
@@ -131,14 +122,20 @@ class TitleState extends GarbageState
                     var musicSwitch : VcrSwitch = new VcrSwitch(98, baseY + 107, BgmEngine.Enabled, function() {
                         backButton.clearHighlight();
                     }, function(Enabled : Bool) {
-                        BgmEngine.Enabled = Enabled;
+                        if (Enabled)
+                            BgmEngine.enable();
+                        else
+                            BgmEngine.disable();
                     });
                     screen.add(musicSwitch);
 
                     var sfxSwitch : VcrSwitch = new VcrSwitch(98, baseY + 131, SfxEngine.Enabled, function() {
                         backButton.clearHighlight();
                     }, function(Enabled : Bool) {
-                        SfxEngine.Enabled = Enabled;
+                        if (Enabled)
+                            SfxEngine.enable();
+                        else
+                            SfxEngine.disable();
                     });
                     screen.add(sfxSwitch);
 

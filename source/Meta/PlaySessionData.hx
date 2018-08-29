@@ -8,10 +8,10 @@ class PlaySessionData
     public var fallSpeed : Float;
     public var lastItemsSpeedIncrease : Int;
 
-    public function new()
+    public function new(?Score : Int = 0, ?Items : Int = 0)
     {
-        score = 0;
-        items = 0;
+        score = Score;
+        items = Items;
 
         fallSpeed = 0;
         lastItemsSpeedIncrease = 0;

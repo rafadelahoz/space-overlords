@@ -4,15 +4,13 @@ import flixel.FlxG;
 
 class GameController
 {
-	public static var currentState : GameState;
-
 	public static function Init()
 	{
-		currentState = Loading;
-
 		// Init subsystems
 		BgmEngine.init();
 		SfxEngine.init();
+
+		ProgressData.Init();
 
 		// FlxG.autoPause = false;
 		#if (!mobile)
@@ -37,9 +35,14 @@ class GameController
 
 	public static function ToMenu()
 	{
-		currentState = Title;
+		var menuStatus : Int = -1;
+		if (ProgressData.data.slave_id < 0)
+		{
+			ProgressData.StartNewGame();
+			menuStatus = MenuState.StatusNewSlave;
+		}
 
-		FlxG.switchState(new MenuState());
+		FlxG.switchState(new MenuState(menuStatus));
 	}
 
 	public static function StartEndless(?DontLoad : Bool = false)
@@ -55,10 +58,10 @@ class GameController
 		ToMenu();
 	}
 
-	public static function GameOver(mode : Int, data : Dynamic)
+	public static function GameOver(mode : Int, data : PlaySessionData)
 	{
 		// Handle GameOver, store data, go to results screen?
-		ToMenu();
+		FlxG.switchState(new GameoverState(data));
 	}
 }
 

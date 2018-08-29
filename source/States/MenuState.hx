@@ -15,6 +15,10 @@ import text.PixelText;
 
 class MenuState extends GarbageState
 {
+    public static var StatusNone : Int = -1;
+    public static var StatusNewSlave : Int = 0;
+    public static var StatusFromGameover : Int = 1;
+
     public var tween : FlxTween;
 
     var touchLabel : FlxSprite;
@@ -35,6 +39,15 @@ class MenuState extends GarbageState
 
     var startLabelBackground : FlxSprite;
 
+    var status : Int;
+
+    public function new(?InitialStatus: Int = -1)
+    {
+        super();
+
+        status = InitialStatus;
+    }
+
     override public function create():Void
     {
         super.create();
@@ -50,7 +63,7 @@ class MenuState extends GarbageState
         background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
         add(background);
 
-        add(new SlaveCharacter(74, 223, this));
+        initSlave();
 
         // Generic header
         add(new FlxSprite(0, 0, "assets/ui/title-menu-header.png"));
@@ -64,7 +77,7 @@ class MenuState extends GarbageState
         add(footer);
         add(new VcrClock());
 
-        var slaveNumber : FlxBitmapText = text.VcrText.New(107, baseY+24, text.TextUtils.padWith("" + FlxG.random.int(1, 9999999), 7, "0"));
+        var slaveNumber : FlxBitmapText = text.VcrText.New(107, baseY+24, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
         add(slaveNumber);
 
         backButton = new VcrButton(8, 83, onBackHighlighted, onBackPressed);
@@ -85,13 +98,12 @@ class MenuState extends GarbageState
         // VCR effect
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
-        // var startDelay : Float = 0.35;
-        // tween = FlxTween.tween(logo, {y : 0}, 0.75, {startDelay: startDelay, onComplete: onLogoPositioned, ease : FlxEase.quartOut });
-        onLogoPositioned();
+        allowInteraction();
+
         FlxG.camera.scroll.set(0, 0);
     }
 
-    public function onLogoPositioned(?_t:FlxTween = null):Void
+    public function allowInteraction(?_):Void
     {
         interactable = true;
     }
@@ -138,5 +150,21 @@ class MenuState extends GarbageState
     public function onBackPressed()
     {
         GameController.ToTitle(true);
+    }
+
+    function initSlave()
+    {
+        if (status == StatusNone || status == StatusFromGameover)
+        {
+            // Normally add a slave randomly
+            add(new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
+                                   Constants.Height*0.7 + FlxG.random.int(0, 24),
+                                   this));
+        }
+        else if (status == StatusNewSlave)
+        {
+            // New slaves fall from top
+            add(new SlaveCharacter(Constants.Width/2 - 16, -40, this, true));
+        }
     }
 }

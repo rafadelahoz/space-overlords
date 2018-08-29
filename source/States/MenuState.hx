@@ -137,8 +137,8 @@ class MenuState extends GarbageState
 
     public function onArcadeButtonPressed() : Void
     {
-        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
-            GameController.StartEndless();
+        FlxG.camera.fade(0xFF000000, 0.25, false, function() {
+            GameController.ToGameConfiguration();
         });
     }
 
@@ -164,7 +164,7 @@ class MenuState extends GarbageState
         else if (status == StatusNewSlave)
         {
             // New slaves fall from top
-            add(new SlaveCharacter(Constants.Width/2 - 16, -40, this, true));
+            add(new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
         }
     }
 }

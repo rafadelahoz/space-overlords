@@ -34,6 +34,15 @@ class VcrSwitch extends FlxSprite
         allowReleaseOutside = false;
     }
 
+    public function setupGraphic(graphic : String, width : Int, height : Int)
+    {
+        loadGraphic(graphic, true, width, height);
+
+        animation.add("on", [0]);
+        animation.add("off", [1]);
+        animation.play(status ? "on" : "off");
+    }
+
     override public function update(elapsed : Float)
     {
         var wasPressed : Bool = pressed;

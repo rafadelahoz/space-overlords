@@ -20,6 +20,7 @@ class Palette
     public static var Pink          : Int = 0xFFFF77A8;
     public static var Peach         : Int = 0xFFFFCCAA;
 
+    public static var AlmostBlack   : Int = 0xFF181425;
     public static var DarkBlue      : Int = 0xFF262b44;
     public static var Red           : Int = 0xFFff0044;
 }

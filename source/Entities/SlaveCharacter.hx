@@ -12,6 +12,8 @@ class SlaveCharacter extends FlxSprite
     public static var StateFall : Int = 0;
     public static var StateIdle : Int = 1;
     public static var StateWalk : Int = 2;
+    public static var StateRight : Int = 3;
+    public static var StateLeft : Int = 4;
 
     var IdleDelayTime : Float = 5;
     var IdleDelayVariation : Float = 0.6;
@@ -19,7 +21,10 @@ class SlaveCharacter extends FlxSprite
     var WalkTime : Float = 1.5;
     var WalkTimeVariation : Float = 0.5;
 
-    var world : MenuState;
+    var TraverseTime : Float = 15;
+    var TraverseVariation : Float = 0.15;
+
+    var world : GarbageState;
 
     var shadow : FlxSprite;
 
@@ -29,7 +34,7 @@ class SlaveCharacter extends FlxSprite
     var state : Int;
     var timer : FlxTimer;
 
-    public function new(X : Float, Y : Float, World : MenuState, ?Falling : Bool = false)
+    public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -1)
     {
         super(X, Y);
 
@@ -39,7 +44,7 @@ class SlaveCharacter extends FlxSprite
 
         timer = new FlxTimer();
 
-        if (!Falling)
+        if (state < 0)
         {
             if (FlxG.random.bool(50))
                 switchState(StateIdle);
@@ -48,7 +53,7 @@ class SlaveCharacter extends FlxSprite
         }
         else
         {
-            switchState(StateFall);
+            switchState(State);
         }
     }
 
@@ -58,8 +63,8 @@ class SlaveCharacter extends FlxSprite
 
         loadGraphic("assets/images/slave-body-sheet.png", true, 32, 40);
         animation.add("idle", [0]);
-        animation.add("walk", [0, 1, 2, 3], animSpeed, true);
-        animation.add("fall", [0, 2], 4, true);
+        animation.add("walk", [1, 2, 3, 4], animSpeed, true);
+        animation.add("fall", [1, 3], 2, true);
         animation.play("walk");
 
         var headType : Int = ProgressData.data.slave_head;
@@ -85,7 +90,7 @@ class SlaveCharacter extends FlxSprite
 
         shadow = new FlxSprite(x, y);
         shadow.makeGraphic(Std.int(width), 8, 0x00000000);
-        flixel.util.FlxSpriteUtil.drawEllipse(shadow, 4, 0, width-8, 6, Palette.DarkBlue);
+        flixel.util.FlxSpriteUtil.drawEllipse(shadow, 4, 0, width-8, 6, Palette.AlmostBlack);
     }
 
     public function switchState(Next : Int)
@@ -114,6 +119,14 @@ class SlaveCharacter extends FlxSprite
                 }});
 
                 nextPos.put();
+            case SlaveCharacter.StateRight:
+                setFlipX(false);
+                FlxTween.linearMotion(this, x, y, Constants.Width, y, fuzzyValue(TraverseTime, TraverseVariation), true, {ease : FlxEase.sineInOut});
+                state = StateWalk;
+            case SlaveCharacter.StateLeft:
+                setFlipX(true);
+                FlxTween.linearMotion(this, x, y, -width, y, fuzzyValue(TraverseTime, TraverseVariation), true, {ease : FlxEase.sineInOut});
+                state = StateWalk;
         }
     }
 
@@ -142,7 +155,7 @@ class SlaveCharacter extends FlxSprite
                 // playAnim("fall");
             case SlaveCharacter.StateIdle:
                 playAnim("idle");
-            case SlaveCharacter.StateWalk:
+            case SlaveCharacter.StateWalk, SlaveCharacter.StateRight, SlaveCharacter.StateLeft:
                 playAnim("walk");
         }
 
@@ -199,37 +212,21 @@ class SlaveCharacter extends FlxSprite
 
     function playAnim(name : String)
     {
+        angle = 0;
+        head.angle = 0;
+        detail.angle = 0;
+
+        animation.play(name);
+        head.animation.play(name);
+        detail.animation.play(name);
+
         if (name == "fall")
         {
-            animation.play(name);
-            head.animation.play(name);
-            detail.animation.play(name);
-
             pauseAnim(false);
 
             angle = -90;
             head.angle = -90;
             detail.angle = -90;
-        }
-        else if (name == "walk")
-        {
-            animation.play(name);
-            head.animation.play(name);
-            detail.animation.play(name);
-
-            pauseAnim(false);
-
-            angle = 0;
-            head.angle = 0;
-            detail.angle = 0;
-        }
-        else if (name == "idle")
-        {
-            pauseAnim(true);
-
-            angle = 0;
-            head.angle = 0;
-            detail.angle = 0;
         }
     }
 

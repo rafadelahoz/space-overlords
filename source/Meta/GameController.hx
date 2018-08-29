@@ -36,6 +36,7 @@ class GameController
 	public static function ToMenu()
 	{
 		var menuStatus : Int = -1;
+		ProgressData.data.slave_id = -1;
 		if (ProgressData.data.slave_id < 0)
 		{
 			ProgressData.StartNewGame();
@@ -43,6 +44,11 @@ class GameController
 		}
 
 		FlxG.switchState(new MenuState(menuStatus));
+	}
+
+	public static function ToGameConfiguration()
+	{
+		FlxG.switchState(new GamePreState());
 	}
 
 	public static function StartEndless(?DontLoad : Bool = false)

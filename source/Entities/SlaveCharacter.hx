@@ -21,13 +21,15 @@ class SlaveCharacter extends FlxSprite
 
     var world : MenuState;
 
+    var shadow : FlxSprite;
+
     var head : FlxSprite;
     var detail : FlxSprite;
 
     var state : Int;
     var timer : FlxTimer;
 
-    public function new(X : Float, Y : Float, World : MenuState)
+    public function new(X : Float, Y : Float, World : MenuState, ?Falling : Bool = false)
     {
         super(X, Y);
 
@@ -37,10 +39,17 @@ class SlaveCharacter extends FlxSprite
 
         timer = new FlxTimer();
 
-        if (FlxG.random.bool(50))
-            switchState(StateIdle);
+        if (!Falling)
+        {
+            if (FlxG.random.bool(50))
+                switchState(StateIdle);
+            else
+                switchState(StateWalk);
+        }
         else
-            switchState(StateWalk);
+        {
+            switchState(StateFall);
+        }
     }
 
     function handleGraphic()
@@ -50,6 +59,7 @@ class SlaveCharacter extends FlxSprite
         loadGraphic("assets/images/slave-body-sheet.png", true, 32, 40);
         animation.add("idle", [0]);
         animation.add("walk", [0, 1, 2, 3], animSpeed, true);
+        animation.add("fall", [0, 2], 4, true);
         animation.play("walk");
 
         var headType : Int = ProgressData.data.slave_head;
@@ -57,6 +67,7 @@ class SlaveCharacter extends FlxSprite
         head.loadGraphic("assets/images/slave-head-sheet.png", true, 32, 40);
         head.animation.add("idle", [headType*4+0]);
         head.animation.add("walk", [headType*4+0, headType*4+1, headType*4+2, headType*4+3], animSpeed, true);
+        head.animation.add("fall", [headType*4+0, headType*4+2], 4, true);
         head.animation.play("walk");
 
         var detailType : Int = ProgressData.data.slave_detail;
@@ -64,12 +75,17 @@ class SlaveCharacter extends FlxSprite
         detail.loadGraphic("assets/images/slave-detail-sheet.png", true, 32, 40);
         detail.animation.add("idle", [detailType*4+0]);
         detail.animation.add("walk", [detailType*4+0, detailType*4+1, detailType*4+2, detailType*4+3], animSpeed, true);
+        detail.animation.add("fall", [detailType*4+0, detailType*4+2], 4, true);
         detail.animation.play("walk");
 
         var tintColor : Int = ProgressData.data.slave_color;
         color = tintColor;
         head.color = tintColor;
         // detail.color = tintColor;
+
+        shadow = new FlxSprite(x, y);
+        shadow.makeGraphic(Std.int(width), 8, 0x00000000);
+        flixel.util.FlxSpriteUtil.drawEllipse(shadow, 4, 0, width-8, 6, Palette.DarkBlue);
     }
 
     public function switchState(Next : Int)
@@ -77,6 +93,14 @@ class SlaveCharacter extends FlxSprite
         state = Next;
         switch(state)
         {
+            case SlaveCharacter.StateFall:
+                playAnim("fall");
+                FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
+                    pauseAnim(true);
+                    timer.start(0.5, function(_) {
+                        switchState(StateIdle);
+                    });
+                }});
             case SlaveCharacter.StateIdle:
                 timer.start(fuzzyValue(IdleDelayTime, IdleDelayVariation), function(_) {
                     switchState(StateWalk);
@@ -114,6 +138,8 @@ class SlaveCharacter extends FlxSprite
     {
         switch (state)
         {
+            case SlaveCharacter.StateFall:
+                // playAnim("fall");
             case SlaveCharacter.StateIdle:
                 playAnim("idle");
             case SlaveCharacter.StateWalk:
@@ -121,37 +147,84 @@ class SlaveCharacter extends FlxSprite
         }
 
         super.update(elapsed);
+        shadow.update(elapsed);
         head.update(elapsed);
         detail.update(elapsed);
 
         head.setPosition(x, y);
         detail.setPosition(x, y);
+
+        switch (state)
+        {
+            case SlaveCharacter.StateFall:
+                shadow.setPosition(x, Constants.Height*0.7+height-4);
+            case SlaveCharacter.StateIdle, SlaveCharacter.StateWalk:
+                shadow.setPosition(x, y+height-4);
+        }
     }
 
     override public function draw()
     {
+        shadow.draw();
+        if (state == StateFall)
+        {
+            y += 4;
+            head.y += 4;
+            detail.y += 4;
+        }
+        
         super.draw();
         head.draw();
         detail.draw();
+
+        if (state == StateFall)
+        {
+            y -= 4;
+            head.y -= 4;
+            detail.y -= 4;
+        }
+    }
+
+    function pauseAnim(paused : Bool)
+    {
+        animation.paused = paused;
+        head.animation.paused = paused;
+        detail.animation.paused = paused;
     }
 
     function playAnim(name : String)
     {
-        if (name == "walk")
+        if (name == "fall")
         {
             animation.play(name);
             head.animation.play(name);
             detail.animation.play(name);
 
-            animation.paused = false;
-            head.animation.paused = false;
-            detail.animation.paused = false;
+            pauseAnim(false);
+
+            angle = 90;
+            head.angle = 90;
+            detail.angle = 90;
         }
-        else
+        else if (name == "walk")
         {
-            animation.paused = true;
-            head.animation.paused = true;
-            detail.animation.paused = true;
+            animation.play(name);
+            head.animation.play(name);
+            detail.animation.play(name);
+
+            pauseAnim(false);
+
+            angle = 0;
+            head.angle = 0;
+            detail.angle = 0;
+        }
+        else if (name == "idle")
+        {
+            pauseAnim(true);
+
+            angle = 0;
+            head.angle = 0;
+            detail.angle = 0;
         }
     }
 

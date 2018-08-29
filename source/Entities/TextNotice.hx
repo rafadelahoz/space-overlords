@@ -40,7 +40,7 @@ class TextNotice extends FlxSprite
         border = 0;
 
         background = new FlxSprite(pxtext.x - border/2, pxtext.y - border/2);
-        background.makeGraphic(Std.int(pxtext.width + border), Std.int(pxtext.height + border), (borderless ? 0x00000000 : 0xFF262b44));
+        background.makeGraphic(Std.int(pxtext.width + border), Std.int(pxtext.height + border), (borderless ? 0x00000000 : Palette.DarkBlue));
 
         textDelta = FlxPoint.get(pxtext.x - x, pxtext.y - y);
 

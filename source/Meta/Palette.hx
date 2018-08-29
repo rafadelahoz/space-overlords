@@ -4,7 +4,7 @@ class Palette
 {
     /* Pico8 */
     public static var Black         : Int = 0xFF000000;
-    public static var DarkBlue      : Int = 0xFF1D2B53;
+    public static var P8DarkBlue    : Int = 0xFF1D2B53;
     public static var DarkPurple    : Int = 0xFF7E2553;
     public static var DarkGreen     : Int = 0xFF008751;
     public static var Brown         : Int = 0xFFAB5236;
@@ -20,5 +20,6 @@ class Palette
     public static var Pink          : Int = 0xFFFF77A8;
     public static var Peach         : Int = 0xFFFFCCAA;
 
+    public static var DarkBlue      : Int = 0xFF262b44;
     public static var Red           : Int = 0xFFff0044;
 }

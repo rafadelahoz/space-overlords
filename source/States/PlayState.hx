@@ -557,7 +557,7 @@ class PlayState extends GarbageState
             {
                 if (item.entity != null)
                 {
-                    item.entity.color = 0xFF262b44;
+                    item.entity.color = Palette.DarkBlue;
                 }
             }
 

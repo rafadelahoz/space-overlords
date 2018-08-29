@@ -164,7 +164,7 @@ class MenuState extends GarbageState
         else if (status == StatusNewSlave)
         {
             // New slaves fall from top
-            add(new SlaveCharacter(Constants.Width/2 - 16, -40,this, true));
+            add(new SlaveCharacter(Constants.Width/2 - 16, -40, this, true));
         }
     }
 }

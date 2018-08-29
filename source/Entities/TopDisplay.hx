@@ -43,7 +43,7 @@ class TopDisplay extends FlxGroup
         add(background);
 
         // Screen Background
-        add(new FlxSprite(16, 10).makeGraphic(148, 30, 0xFF262b44));
+        add(new FlxSprite(16, 10).makeGraphic(148, 30, Palette.DarkBlue));
 
         belts = new FlxGroup();
         add(belts);

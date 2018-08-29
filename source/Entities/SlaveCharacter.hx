@@ -95,7 +95,7 @@ class SlaveCharacter extends FlxSprite
         {
             case SlaveCharacter.StateFall:
                 playAnim("fall");
-                FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
+                FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7+8, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
                     pauseAnim(true);
                     timer.start(0.5, function(_) {
                         switchState(StateIdle);
@@ -157,9 +157,14 @@ class SlaveCharacter extends FlxSprite
         switch (state)
         {
             case SlaveCharacter.StateFall:
-                shadow.setPosition(x, Constants.Height*0.7+height-4);
+                var targetY : Float = Constants.Height*0.7+8;
+                shadow.setPosition(x, targetY+height-6);
+
+                var scaleX : Float = Math.max(0.75, y / targetY);
+                var scaleY : Float = Math.max(0.4, y / targetY);
+                shadow.scale.set(scaleX, scaleY);
             case SlaveCharacter.StateIdle, SlaveCharacter.StateWalk:
-                shadow.setPosition(x, y+height-4);
+                shadow.setPosition(x, y+height-6);
         }
     }
 
@@ -168,20 +173,20 @@ class SlaveCharacter extends FlxSprite
         shadow.draw();
         if (state == StateFall)
         {
-            y += 4;
-            head.y += 4;
-            detail.y += 4;
+            y += 6;
+            head.y += 6;
+            detail.y += 6;
         }
-        
+
         super.draw();
         head.draw();
         detail.draw();
 
         if (state == StateFall)
         {
-            y -= 4;
-            head.y -= 4;
-            detail.y -= 4;
+            y -= 6;
+            head.y -= 6;
+            detail.y -= 6;
         }
     }
 
@@ -202,9 +207,9 @@ class SlaveCharacter extends FlxSprite
 
             pauseAnim(false);
 
-            angle = 90;
-            head.angle = 90;
-            detail.angle = 90;
+            angle = -90;
+            head.angle = -90;
+            detail.angle = -90;
         }
         else if (name == "walk")
         {

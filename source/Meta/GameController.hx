@@ -36,7 +36,7 @@ class GameController
 	public static function ToMenu()
 	{
 		var menuStatus : Int = -1;
-		ProgressData.data.slave_id = -1;
+		// ProgressData.data.slave_id = -1;
 		if (ProgressData.data.slave_id < 0)
 		{
 			ProgressData.StartNewGame();

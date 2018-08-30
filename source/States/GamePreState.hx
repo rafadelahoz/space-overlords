@@ -120,9 +120,9 @@ class GamePreState extends GarbageState
         playButton.clearHighlight();
         backButton.clearHighlight();
 
-        GameSettings.data.intensity -= 20;
-        if (GameSettings.data.intensity < 20)
-            GameSettings.data.intensity = 20;
+        GameSettings.data.intensity -= 25;
+        if (GameSettings.data.intensity < 25)
+            GameSettings.data.intensity = 25;
 
         GameSettings.Save();
     }
@@ -132,7 +132,7 @@ class GamePreState extends GarbageState
         playButton.clearHighlight();
         backButton.clearHighlight();
 
-        GameSettings.data.intensity += 20;
+        GameSettings.data.intensity += 25;
         if (GameSettings.data.intensity > 100)
             GameSettings.data.intensity = 100;
 

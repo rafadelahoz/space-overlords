@@ -100,7 +100,7 @@ class PlayState extends GarbageState
         gameoverTimer = new FlxTimer();
 
         // Setup gameplay
-        session.fallSpeed = 16;
+        setupGameplay();
 
         switchState(StateIntro);
 
@@ -111,10 +111,24 @@ class PlayState extends GarbageState
         super.create();
     }
 
+    function setupGameplay()
+    {
+        // Intensity 1-4
+        var intensity : Int = Std.int(GameSettings.data.intensity / 25);
+        session.fallSpeed = 16 + (intensity-1);
+        setupInitialGrid(intensity);
+    }
+
     public function getNextCharType() : Int
     {
         var next : Int = FlxG.random.int(1, 8);
         return next;
+    }
+
+    function getInitialCharType() : Int
+    {
+        // TODO: Handle mode, generate specials
+        return getNextCharType();
     }
 
     public function getSpecialCharType() : Int
@@ -159,6 +173,14 @@ class PlayState extends GarbageState
                 duration = 0.75;
                 FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay});
                 FlxTween.tween(gridShader, {x : grid.x-2}, duration, {startDelay: delay});
+                for (itemData in grid.getAll()) {
+                    if (itemData != null && itemData.entity != null)
+                    {
+                        itemData.entity.color = Palette.DarkBlue;
+                        itemData.entity.x = gridFrame.x + 8 + itemData.cellX * Constants.TileSize;
+                        FlxTween.tween(itemData.entity, {x : grid.x + itemData.cellX * Constants.TileSize}, duration, {startDelay: delay});
+                    }
+                }
                 delay += duration;
 
                 var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG});
@@ -170,6 +192,15 @@ class PlayState extends GarbageState
                 delay += 0.5;
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     topDisplay.start();
+
+                    for (itemData in grid.getAll()) {
+                        if (itemData != null && itemData.entity != null)
+                        {
+                            // itemData.entity.color = 0xFFFFFFFF;
+                            flixel.effects.FlxFlicker.flicker(itemData.entity, 0.5, true);
+                            FlxTween.color(itemData.entity, 0.5, Palette.DarkBlue, 0xFFFFFFFF, {ease: FlxEase.elasticInOut});
+                        }
+                    }
                 });
                 // delay += 1;
 
@@ -613,6 +644,37 @@ class PlayState extends GarbageState
     public function getFallSpeed() : Float
     {
         return session.fallSpeed;
+    }
+
+    function setupInitialGrid(intensity : Int)
+    {
+        // Intensity 1-4
+        var rows : Int = Std.int(Math.abs(1 - intensity));
+        for (i in 0...rows)
+        {
+            generateRow(grid.rows-1-i);
+        }
+    }
+
+    function generateRow(row : Int)
+    {
+        var surrounding : Array<Int> = [];
+        for (col in 0...grid.columns)
+        {
+            var entity : ItemEntity = null;
+            var type : Int = -1;
+            surrounding = grid.getSurroundingTypes(col, row);
+            while (type == -1 || surrounding.indexOf(type) >= 0)
+            {
+                 type = getInitialCharType();
+            }
+
+            var pos : FlxPoint = grid.getCellPosition(col, row);
+            entity = new ItemEntity(pos.x, pos.y, type, this);
+            items.add(entity);
+
+            grid.set(col, row, new ItemData(col, row, type, entity));
+        }
     }
 
     /* DEBUG */

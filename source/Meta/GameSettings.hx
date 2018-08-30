@@ -19,7 +19,7 @@ class GameSettings
             {
                 data = {
                     mode : Constants.ModeEndless,
-                    intensity : 20
+                    intensity : 25
                 };
             }
         }

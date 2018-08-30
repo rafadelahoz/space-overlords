@@ -122,7 +122,7 @@ class SlaveCharacter extends FlxSprite
 
                 nextPos.put();
             case SlaveCharacter.StateRight, SlaveCharacter.StateLeft:
-                setFlipX(true);
+                setFlipX(state == StateLeft);
                 cancelTween(motionTween);
                 var speed : Float = (Special ? 6 : 1) * fuzzyValue(TraverseSpeed, TraverseVariation);
                 motionTween = FlxTween.linearMotion(this, x, y, (state == StateRight ? Constants.Width : -width), y, speed, false);

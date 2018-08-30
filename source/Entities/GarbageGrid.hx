@@ -397,6 +397,22 @@ class GarbageGrid
         return false;
     }
 
+    public function getSurroundingTypes(col : Int, row : Int) : Array<Int>
+    {
+        var surrounding : Array<Int> = [];
+
+        if (get(col-1, row) != null)
+            surrounding.push(get(col-1, row).type);
+        if (get(col, row-1) != null)
+            surrounding.push(get(col, row-1).type);
+        if (get(col+1, row) != null)
+            surrounding.push(get(col+1, row).type);
+        if (get(col, row+1) != null)
+            surrounding.push(get(col, row+1).type);
+
+        return surrounding;
+    }
+
     /* DEBUG */
     public function dump()
     {

@@ -44,12 +44,9 @@ class SlaveCharacter extends FlxSprite
 
         timer = new FlxTimer();
 
-        if (state < 0)
+        if (State < 0)
         {
-            if (FlxG.random.bool(50))
-                switchState(StateIdle);
-            else
-                switchState(StateWalk);
+            switchState(StateWalk);
         }
         else
         {

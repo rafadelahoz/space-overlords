@@ -11,6 +11,7 @@ class GameController
 		SfxEngine.init();
 
 		ProgressData.Init();
+		GameSettings.Init();
 
 		// FlxG.autoPause = false;
 		#if (!mobile)

@@ -119,9 +119,9 @@ class PlayState extends GarbageState
 
     public function getSpecialCharType() : Int
     {
-        var triggerProbability : Int = 0;
+        var triggerProbability : Int = 20;
         if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
-            triggerProbability = 30;
+            triggerProbability = 50;
 
         var bombProbability : Int = 50;
         if (grid.contains(ItemData.SpecialBomb))

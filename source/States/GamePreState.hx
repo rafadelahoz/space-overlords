@@ -24,7 +24,7 @@ class GamePreState extends GarbageState
     var moreButton : VcrButton;
     var intensityBar : FlxSprite;
 
-    var intensity : Int;
+    var slave : SlaveCharacter;
 
     override public function create():Void
     {
@@ -41,12 +41,10 @@ class GamePreState extends GarbageState
         backButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
         add(backButton);
 
-        var modeSwitch : VcrSwitch = new VcrSwitch(0, 108, true, function() {
+        var modeSwitch : VcrSwitch = new VcrSwitch(0, 108, GameSettings.data.mode == Constants.ModeEndless, function() {
             playButton.clearHighlight();
             backButton.clearHighlight();
-        }, function(on : Bool) {
-            // If on: mode = endless
-        });
+        }, handleModeSwitch);
         modeSwitch.setupGraphic("assets/ui/gameconfig-mode-switch.png", 180, 36);
         add(modeSwitch);
 
@@ -86,8 +84,11 @@ class GamePreState extends GarbageState
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
         FlxG.camera.scroll.set(0, 0);
+    }
 
-        intensity = 40;
+    function initSlave()
+    {
+        add(slave = new SlaveCharacter(-32, 235, this, SlaveCharacter.StateRight));
     }
 
     override public function destroy():Void
@@ -98,11 +99,58 @@ class GamePreState extends GarbageState
     override public function update(elapsed : Float)
     {
         // Update intensity bar
-        intensity = Std.int(flixel.math.FlxMath.bound(intensity, 0, 100));
+        var intensity : Int = GameSettings.data.intensity;
         FlxSpriteUtil.fill(intensityBar, 0x00000000);
         FlxSpriteUtil.drawRect(intensityBar, 0, 0, (intensity / 100) * intensityBar.width, 12, 0xFFFFFFFF);
 
         super.update(elapsed);
+    }
+
+    function handleModeSwitch(modeEndless : Bool) {
+        if (modeEndless)
+            GameSettings.data.mode = Constants.ModeEndless;
+        else
+            GameSettings.data.mode = Constants.ModeTreasure;
+
+        GameSettings.Save();
+    }
+
+    function onLessPressed()
+    {
+        playButton.clearHighlight();
+        backButton.clearHighlight();
+
+        GameSettings.data.intensity -= 20;
+        if (GameSettings.data.intensity < 20)
+            GameSettings.data.intensity = 20;
+
+        GameSettings.Save();
+    }
+
+    function onMorePressed()
+    {
+        playButton.clearHighlight();
+        backButton.clearHighlight();
+
+        GameSettings.data.intensity += 20;
+        if (GameSettings.data.intensity > 100)
+            GameSettings.data.intensity = 100;
+
+        GameSettings.Save();
+    }
+
+    public function onArcadeButtonPressed() : Void
+    {
+        slave.switchState(SlaveCharacter.StateRight, true);
+        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            GameController.StartEndless();
+        });
+    }
+
+    public function onBackPressed()
+    {
+        slave.switchState(SlaveCharacter.StateLeft, true);
+        GameController.ToMenu();
     }
 
     function onBackHighlighted()
@@ -110,6 +158,8 @@ class GamePreState extends GarbageState
         playButton.clearHighlight();
         lessButton.clearHighlight();
         moreButton.clearHighlight();
+
+        slave.switchState(SlaveCharacter.StateLeft);
     }
 
     function onPlayHighlighted()
@@ -117,6 +167,8 @@ class GamePreState extends GarbageState
         backButton.clearHighlight();
         lessButton.clearHighlight();
         moreButton.clearHighlight();
+
+        slave.switchState(SlaveCharacter.StateRight);
     }
 
     function onLessHighlighted()
@@ -131,38 +183,5 @@ class GamePreState extends GarbageState
         backButton.clearHighlight();
         playButton.clearHighlight();
         lessButton.clearHighlight();
-    }
-
-    function onLessPressed()
-    {
-        playButton.clearHighlight();
-        backButton.clearHighlight();
-
-        intensity -= 20;
-    }
-
-    function onMorePressed()
-    {
-        playButton.clearHighlight();
-        backButton.clearHighlight();
-
-        intensity += 20;
-    }
-
-    public function onArcadeButtonPressed() : Void
-    {
-        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
-            GameController.StartEndless();
-        });
-    }
-
-    public function onBackPressed()
-    {
-        GameController.ToMenu();
-    }
-
-    function initSlave()
-    {
-        add(new SlaveCharacter(-32, 235, this, SlaveCharacter.StateRight));
     }
 }

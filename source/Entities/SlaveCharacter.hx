@@ -21,7 +21,7 @@ class SlaveCharacter extends FlxSprite
     var WalkTime : Float = 1.5;
     var WalkTimeVariation : Float = 0.5;
 
-    var TraverseTime : Float = 15;
+    var TraverseSpeed : Float = 15;
     var TraverseVariation : Float = 0.15;
 
     var world : GarbageState;
@@ -34,6 +34,8 @@ class SlaveCharacter extends FlxSprite
     var state : Int;
     var timer : FlxTimer;
 
+    var motionTween : FlxTween;
+
     public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -1)
     {
         super(X, Y);
@@ -43,6 +45,7 @@ class SlaveCharacter extends FlxSprite
         handleGraphic();
 
         timer = new FlxTimer();
+        motionTween = null;
 
         if (State < 0)
         {
@@ -90,14 +93,15 @@ class SlaveCharacter extends FlxSprite
         flixel.util.FlxSpriteUtil.drawEllipse(shadow, 4, 0, width-8, 6, Palette.AlmostBlack);
     }
 
-    public function switchState(Next : Int)
+    public function switchState(Next : Int, ?Special : Bool = false)
     {
         state = Next;
         switch(state)
         {
             case SlaveCharacter.StateFall:
                 playAnim("fall");
-                FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7+8, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
+                cancelTween(motionTween);
+                motionTween = FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7+8, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
                     pauseAnim(true);
                     timer.start(0.5, function(_) {
                         switchState(StateIdle);
@@ -111,18 +115,17 @@ class SlaveCharacter extends FlxSprite
                 var nextPos : FlxPoint = findNextPosition();
 
                 setFlipX(nextPos.x < x);
-                FlxTween.linearMotion(this, x, y, nextPos.x, nextPos.y, fuzzyValue(WalkTime, WalkTimeVariation), true, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
+                cancelTween(motionTween);
+                motionTween = FlxTween.linearMotion(this, x, y, nextPos.x, nextPos.y, fuzzyValue(WalkTime, WalkTimeVariation), true, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
                     switchState(StateIdle);
                 }});
 
                 nextPos.put();
-            case SlaveCharacter.StateRight:
-                setFlipX(false);
-                FlxTween.linearMotion(this, x, y, Constants.Width, y, fuzzyValue(TraverseTime, TraverseVariation), true, {ease : FlxEase.sineInOut});
-                state = StateWalk;
-            case SlaveCharacter.StateLeft:
+            case SlaveCharacter.StateRight, SlaveCharacter.StateLeft:
                 setFlipX(true);
-                FlxTween.linearMotion(this, x, y, -width, y, fuzzyValue(TraverseTime, TraverseVariation), true, {ease : FlxEase.sineInOut});
+                cancelTween(motionTween);
+                var speed : Float = (Special ? 6 : 1) * fuzzyValue(TraverseSpeed, TraverseVariation);
+                motionTween = FlxTween.linearMotion(this, x, y, (state == StateRight ? Constants.Width : -width), y, speed, false);
                 state = StateWalk;
         }
     }
@@ -242,5 +245,13 @@ class SlaveCharacter extends FlxSprite
     function fuzzyRange(from : Float, radius : Float) : Float
     {
         return FlxG.random.float(from - radius, from + radius);
+    }
+
+    function cancelTween(tween : FlxTween)
+    {
+        if (tween != null && tween.active)
+        {
+            tween.cancel();
+        }
     }
 }

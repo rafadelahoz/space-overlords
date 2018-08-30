@@ -265,11 +265,7 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        #if work
-            var special : Int = FlxG.random.getObject([-1, 0, 1], [30, 30, 30]);
-        #else
-            var special : Int = FlxG.random.getObject([-1, 0, 1], [5, 90, 5]);
-        #end
+        var special : Int = FlxG.random.getObject([-1, 0, 1], [5, 90, 5]);
 
         nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
                                 getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);

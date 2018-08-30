@@ -21,7 +21,9 @@ class VcrButton extends FlxSprite
     var pressed : Bool;
     var enabled : Bool;
 
-    public function new(X : Float, Y : Float, HighlightCallback : Void -> Void, Callback : Void -> Void)
+    var highlightable : Bool;
+
+    public function new(X : Float, Y : Float, HighlightCallback : Void -> Void, Callback : Void -> Void, ?Highlightable : Bool = true)
     {
         super(X, Y);
 
@@ -32,15 +34,27 @@ class VcrButton extends FlxSprite
         hasGraphic = false;
         enabled = true;
         allowReleaseOutside = false;
+        highlightable = Highlightable;
     }
 
-    public function loadSpritesheet(Sprite : String, Width : Float, Height : Float)
+    public function loadSpritesheet(Sprite : String, Width : Float, Height : Float, ?SingleImage : Bool = false)
     {
-        loadGraphic(Sprite, true, Std.int(Width), Std.int(Height));
+        if (SingleImage)
+        {
+            loadGraphic(Sprite);
 
-        animation.add("idle", [0]);
-        animation.add("highlighted", [1]);
-        animation.play("idle");
+            animation.add("idle", [0]);
+            animation.add("highlighted", [0]);
+            animation.play("idle");
+        }
+        else
+        {
+            loadGraphic(Sprite, true, Std.int(Width), Std.int(Height));
+
+            animation.add("idle", [0]);
+            animation.add("highlighted", [1]);
+            animation.play("idle");
+        }
 
         hasGraphic = true;
     }
@@ -159,13 +173,13 @@ class VcrButton extends FlxSprite
 
     function onReleased() : Void
     {
-        if (state == StateIdle)
+        if (highlightable && state == StateIdle)
         {
             state = StateHighlighted;
             if (highlightCallback != null)
                 highlightCallback();
         }
-        else if (state == StateHighlighted)
+        else if (!highlightable || state == StateHighlighted)
         {
             if (callback != null)
                 callback();

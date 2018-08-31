@@ -265,20 +265,37 @@ class PlayState extends GarbageState
             generationPosition.x -= Constants.TileSize;
         }
 
-        var special : Int = FlxG.random.getObject([-1, 0, 1], [5, 90, 5]);
+        var charTypes : Array<Int> = generateNextItemCharTypes();
 
-        nextItem = new ItemEntity(generationPosition.x, generationPosition.y,
-                                getNextCharType(), (special == -1 ? getSpecialCharType() : null), this);
+        nextItem = new ItemEntity(generationPosition.x, generationPosition.y, charTypes[0], charTypes[1], this);
 
         // Generate the pair item on top of that
-        var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y,
-                                                    getNextCharType(), (special == 1 ? getSpecialCharType() : null), this);
+        var slaveItem : ItemEntity = new ItemEntity(generationPosition.x, generationPosition.y, charTypes[2], charTypes[3], this);
         slaveItem.setState(ItemEntity.StateSlave);
         nextItem.setSlave(slaveItem, shape);
 
         // Go
         nextItem.setState(ItemEntity.StateGenerating);
         add(nextItem);
+    }
+
+    function generateNextItemCharTypes() : Array<Int>
+    {
+        var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], [80, 5, 5, 10, 10]);
+
+        var charTypes : Array<Int> = [];
+        for (i in 0...4)
+        {
+            if (i == specialItemPosition)
+                charTypes.push(getSpecialCharType());
+            else if (i & 1 == 0 || i & 1 == 1 && (i-1 == specialItemPosition))
+                charTypes.push(getNextCharType());
+            else
+                charTypes.push(null);
+        }
+
+        return charTypes;
+
     }
 
     function finishGeneration()

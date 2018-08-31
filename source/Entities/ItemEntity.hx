@@ -275,6 +275,7 @@ class ItemEntity extends Entity
         else
         {
             // finishPositioning();
+            velocity.set(0, 0);
             setState(StateGrace);
         }
     }
@@ -312,6 +313,12 @@ class ItemEntity extends Entity
     {
         // The piece can stop
         var currentCell : FlxPoint = getCurrentCell();
+        // Fallback if we are too low
+        if (grid.get(currentCell.x, currentCell.y) != null)
+        {
+            currentCell.y -= 1;
+        }
+
         var targetPos : FlxPoint = grid.getCellPosition(currentCell.x, currentCell.y);
 
         x = targetPos.x;

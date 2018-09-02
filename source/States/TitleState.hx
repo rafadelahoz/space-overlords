@@ -49,6 +49,8 @@ class TitleState extends GarbageState
         // GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(0, 999)));
         #end
 
+        GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(0, 999)));
+
 		bgColor = Blue;
 
         header = new FlxSprite(0, 0, "assets/ui/title-menu-header.png");

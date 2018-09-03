@@ -17,3 +17,17 @@ class PlaySessionData
         lastItemsSpeedIncrease = 0;
     }
 }
+
+class GameOverData
+{
+    public var session : PlaySessionData;
+
+    public var previousQuota : Int;
+    public var currentQuota : Int;
+    public var quotaDelta : Int;
+
+    public function new(Session : PlaySessionData)
+    {
+        session = Session;
+    }
+}

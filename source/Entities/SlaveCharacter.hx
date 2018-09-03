@@ -14,6 +14,7 @@ class SlaveCharacter extends FlxSprite
     public static var StateWalk : Int = 2;
     public static var StateRight : Int = 3;
     public static var StateLeft : Int = 4;
+    public static var StateReturn : Int = 5;
 
     var IdleDelayTime : Float = 5;
     var IdleDelayVariation : Float = 0.6;
@@ -126,6 +127,12 @@ class SlaveCharacter extends FlxSprite
                 cancelTween(motionTween);
                 var speed : Float = (Special ? 6 : 1) * fuzzyValue(TraverseSpeed, TraverseVariation);
                 motionTween = FlxTween.linearMotion(this, x, y, (state == StateRight ? Constants.Width : -width), y, speed, false);
+                state = StateWalk;
+            case SlaveCharacter.StateReturn:
+                setFlipX(true);
+                motionTween = FlxTween.linearMotion(this, Constants.Width, y - 20, x, y, fuzzyValue(TraverseSpeed, TraverseVariation), false, {startDelay: 0.5, ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
+                    switchState(StateIdle);
+                }});
                 state = StateWalk;
         }
     }

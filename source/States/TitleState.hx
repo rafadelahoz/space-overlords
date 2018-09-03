@@ -46,10 +46,10 @@ class TitleState extends GarbageState
 		// Missing a preloader
         GameController.Init();
         #if work
-        // GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(0, 999)));
+        /*ProgressData.data.quota_current = 0;
+        GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(500, 1999)));*/
         #end
 
-        GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(0, 999)));
 
 		bgColor = Blue;
 

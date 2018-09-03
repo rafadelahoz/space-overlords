@@ -159,7 +159,7 @@ class MenuState extends GarbageState
             // Normally add a slave randomly
             add(new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
                                    Constants.Height*0.7 + FlxG.random.int(0, 24),
-                                   this));
+                                   this, (status == StatusFromGameover ? SlaveCharacter.StateReturn : -1)));
         }
         else if (status == StatusNewSlave)
         {

@@ -34,7 +34,7 @@ class GameController
 		FlxG.switchState(titleState);
 	}
 
-	public static function ToMenu()
+	public static function ToMenu(?fromGameOver : Bool = false)
 	{
 		var menuStatus : Int = -1;
 		// ProgressData.data.slave_id = -1;
@@ -42,6 +42,10 @@ class GameController
 		{
 			ProgressData.StartNewGame();
 			menuStatus = MenuState.StatusNewSlave;
+		}
+		else if (fromGameOver)
+		{
+			menuStatus = MenuState.StatusFromGameover;
 		}
 
 		FlxG.switchState(new MenuState(menuStatus));
@@ -67,8 +71,25 @@ class GameController
 
 	public static function GameOver(mode : Int, data : PlaySessionData)
 	{
-		// Handle GameOver, store data, go to results screen?
-		FlxG.switchState(new GameoverState(data));
+		// Prepare game over data
+		var goData : PlaySessionData.GameOverData = new PlaySessionData.GameOverData(data);
+		// Store quota prior to this session
+		goData.previousQuota = ProgressData.data.quota_current;
+		// Compute new quota
+		goData.quotaDelta = computeQuota(data);
+		goData.currentQuota = ProgressData.data.quota_current + goData.quotaDelta;
+
+		// Store it
+		ProgressData.data.quota_current += goData.quotaDelta;
+		ProgressData.Save();
+
+		// Go to game over
+		FlxG.switchState(new GameoverState(goData));
+	}
+
+	static function computeQuota(data : PlaySessionData) : Int
+	{
+		return data.items;
 	}
 }
 

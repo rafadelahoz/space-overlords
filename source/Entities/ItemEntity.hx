@@ -103,6 +103,11 @@ class ItemEntity extends Entity
             animation.add("open", [0, 1, 2], 6, false);
             animation.play("idle");
         }
+        else if (charType == ItemData.SpecialTarget)
+        {
+            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000);
+            flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red);
+        }
         else
         {
             // if (doMakeGraphic)

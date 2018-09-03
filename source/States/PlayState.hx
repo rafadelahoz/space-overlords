@@ -27,6 +27,8 @@ class PlayState extends GarbageState
     var ItemFallTime : Float = 0.2;
     var GameoverLightsoutDelay : Float = 0.75;
 
+    var mode : Int;
+
     public var session : PlaySessionData;
 
     public var state : Int;
@@ -63,6 +65,7 @@ class PlayState extends GarbageState
     override public function create()
     {
         session = new PlaySessionData();
+        mode = GameSettings.data.mode;
 
         FlxG.camera.bgColor = 0xFF000000;
 
@@ -116,37 +119,13 @@ class PlayState extends GarbageState
         // Intensity 1-4
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
         session.fallSpeed = 16 + (intensity-1);
-        setupInitialGrid(intensity);
-    }
 
-    public function getNextCharType() : Int
-    {
-        var next : Int = FlxG.random.int(1, 8);
-        return next;
-    }
-
-    function getInitialCharType() : Int
-    {
-        // TODO: Handle mode, generate specials
-        return getNextCharType();
-    }
-
-    public function getSpecialCharType() : Int
-    {
-        var triggerProbability : Int = 20;
-        if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
-            triggerProbability = 50;
-
-        var bombProbability : Int = 50;
-        if (grid.contains(ItemData.SpecialBomb))
-            bombProbability = 5;
-
-        return FlxG.random.getObject([ItemData.SpecialBomb, ItemData.SpecialTrigger, ItemData.SpecialChemdust], [bombProbability, triggerProbability, 60]);
-    }
-
-    public function getNextItemShape() : ItemEntity.CellPosition
-    {
-        return FlxG.random.getObject([ItemEntity.CellPosition.Right, ItemEntity.CellPosition.Top]);
+        if (mode == Constants.ModeEndless)
+            setupInitialGrid(intensity);
+        else if (mode == Constants.ModeTreasure)
+        {
+            setupCycleGrid();
+        }
     }
 
     public function switchState(Next : Int)
@@ -279,9 +258,58 @@ class PlayState extends GarbageState
         add(nextItem);
     }
 
+    public function getNextCharType() : Int
+    {
+        var next : Int = FlxG.random.int(1, 8);
+        return next;
+    }
+
+    function getInitialCharType() : Int
+    {
+        return getNextCharType();
+    }
+
+    public function getSpecialCharType() : Int
+    {
+        var triggerProbability : Int = 20;
+        if (mode == Constants.ModeTreasure)
+            triggerProbability = 0;
+        if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
+            triggerProbability = 50;
+
+        var bombProbability : Int = -1;
+        if (mode == Constants.ModeTreasure)
+            bombProbability = 0;
+        else
+        {
+            if (grid.contains(ItemData.SpecialBomb))
+                bombProbability = 30;
+            else
+                bombProbability = 50;
+        }
+
+        var targetProbability : Int = 0;
+        if (mode == Constants.ModeTreasure)
+        {
+            targetProbability = 30;
+        }
+
+        var chemdustProbabilty : Int = 50;
+        if (mode == Constants.ModeTreasure)
+            chemdustProbabilty = 0;
+
+        return FlxG.random.getObject([ItemData.SpecialBomb, ItemData.SpecialTrigger, ItemData.SpecialChemdust, ItemData.SpecialTarget], [bombProbability, triggerProbability, chemdustProbabilty, targetProbability]);
+    }
+
+    public function getNextItemShape() : ItemEntity.CellPosition
+    {
+        return FlxG.random.getObject([ItemEntity.CellPosition.Right, ItemEntity.CellPosition.Top]);
+    }
+
     function generateNextItemCharTypes() : Array<Int>
     {
-        var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], [80, 5, 5, 10, 10]);
+        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 5, 5, 10, 10] : [80, 5, 5, 5, 5]);
+        var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], weights);
 
         var charTypes : Array<Int> = [];
         for (i in 0...4)
@@ -557,7 +585,8 @@ class PlayState extends GarbageState
 
     public function handleAftermathResult(?t:FlxTimer)
     {
-        session.score += aftermathScoreCounter;
+        if (aftermathScoreCounter >= 0)
+            session.score += aftermathScoreCounter;
 
         // Lose game
         if (checkForLoseConditions(currentItem))
@@ -572,13 +601,41 @@ class PlayState extends GarbageState
             {
                 session.fallSpeed += 1;
                 session.lastItemsSpeedIncrease = session.items;
+                session.timesIncreased += 1;
 
                 topDisplay.notifications.add(new TextNotice(80, 16, "!Speed Up!", Palette.Yellow));
+
+                if (mode == Constants.ModeEndless)
+                {
+                    // Do other things like change graphic set?
+                    if (session.timesIncreased % 8 == 0)
+                    {
+                        // Each 8 times, new background
+                        var color : Int = background.color;
+                        FlxTween.color(background, 0.5, color, 0xFFFFFFFF, {ease: FlxEase.circInOut});
+                        trace("8 updates: new theme");
+                    }
+                    else if (session.timesIncreased % 4 == 0)
+                    {
+                        // Each 4 times, alt bg
+                        var color : Int = background.color;
+                        FlxTween.color(background, 0.5, color, Palette.DarkBlue, {ease: FlxEase.circInOut});
+                        trace("4 updates: alternate bg");
+                    }
+                }
             }
-            // Do other things like change graphic set?
+
+            if (mode == Constants.ModeTreasure)
+            {
+                if (!grid.contains(ItemData.SpecialTarget))
+                {
+                    // Finished cycle!
+                }
+            }
 
             // Go on
-            switchState(StateGenerate);
+            if (aftermathScoreCounter >= 0)
+                switchState(StateGenerate);
         }
     }
 
@@ -669,6 +726,39 @@ class PlayState extends GarbageState
         }
     }
 
+    function setupCycleGrid()
+    {
+        emptyGrid();
+
+        var rows : Int = getTreasureRows(session.cycle);
+        var targets : Int = getTreasureTargets(session.cycle);
+
+        for (i in 0...rows)
+        {
+            generateRow(grid.rows-1-i);
+        }
+
+        for (i in 0...targets)
+        {
+            generateTarget(rows);
+        }
+    }
+
+    function emptyGrid()
+    {
+        for (item in grid.getAll())
+        {
+            if (item.entity != null)
+            {
+                items.remove(item.entity);
+                item.entity.kill();
+                item.entity.destroy();
+            }
+        }
+
+        grid.clear();
+    }
+
     function generateRow(row : Int)
     {
         var surrounding : Array<Int> = [];
@@ -690,6 +780,51 @@ class PlayState extends GarbageState
         }
     }
 
+    function generateTarget(rows : Int)
+    {
+        var tries : Int = 100;
+
+        // Get random position not touching other target
+        var surrounding : Array<Int> = [ItemData.SpecialTarget];
+        var cellX : Int = -1;
+        var cellY : Int = -1;
+        while (tries > 0 && surrounding.indexOf(ItemData.SpecialTarget) > -1)
+        {
+            cellX = FlxG.random.int(0, grid.columns-1);
+            cellY = FlxG.random.int(grid.rows - rows, grid.rows-1);
+            surrounding = grid.getSurroundingTypes(cellX, cellY);
+            tries--;
+        }
+
+        // Remove previous item
+        var item : ItemData = grid.get(cellX, cellY);
+        items.remove(item.entity);
+        item.entity.destroy();
+
+        var pos : FlxPoint = grid.getCellPosition(cellX, cellY);
+        var entity : ItemEntity = new ItemEntity(pos.x, pos.y, ItemData.SpecialTarget, this);
+        items.add(entity);
+
+        grid.set(cellX, cellY, new ItemData(cellX, cellY, ItemData.SpecialTarget, entity));
+    }
+
+    function getTreasureRows(cycle : Int) : Int
+    {
+        if (cycle >= 12)
+            return 5;
+        else if (cycle >= 8)
+            return 4;
+        else if (cycle >= 4)
+            return 3;
+        else
+            return 2;
+    }
+
+    function getTreasureTargets(cycle : Int) : Int
+    {
+        return (Std.int(cycle / 4) + cycle % 4 + 1);
+    }
+
     /* DEBUG */
 
     function handleDebug()
@@ -699,6 +834,17 @@ class PlayState extends GarbageState
             debugEnabled = !debugEnabled;
             stateLabel.visible = debugEnabled;
             gridDebugger.visible = debugEnabled;
+        }
+
+        // if (debugEnabled)
+        {
+            if (FlxG.keys.justPressed.I)
+            {
+                trace("Increasing items to " + (session.items+5));
+                session.items += 5;
+                aftermathScoreCounter = -1;
+                handleAftermathResult();
+            }
         }
     }
 }

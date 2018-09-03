@@ -143,7 +143,7 @@ class GamePreState extends GarbageState
     {
         slave.switchState(SlaveCharacter.StateRight, true);
         FlxG.camera.fade(0xFF000000, 0.5, false, function() {
-            GameController.StartEndless();
+            GameController.StartGameplay();
         });
     }
 

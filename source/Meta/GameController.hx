@@ -56,7 +56,7 @@ class GameController
 		FlxG.switchState(new GamePreState());
 	}
 
-	public static function StartEndless(?DontLoad : Bool = false)
+	public static function StartGameplay(?DontLoad : Bool = false)
 	{
 		// Start endless
 		// Load previous game?

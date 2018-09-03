@@ -22,7 +22,8 @@ class ProgressData
                     slave_head : -1, slave_detail: -1, slave_color: -1,
 
                     quota_current : -1, quota_target : -1,
-                    high_score : -1, high_items : -1
+                    endless_high_score : -1, endless_high_items : -1,
+                    treasure_high_cycles: -1, treasure_high_score: -1
                 }
             }
         }
@@ -38,8 +39,11 @@ class ProgressData
         data.quota_current = 0;
 
         // Set the first high score
-        data.high_score = 3600;
-        data.high_items = 28;
+        data.endless_high_score = 3600;
+        data.endless_high_items = 28;
+
+        data.treasure_high_cycles = 5;
+        data.treasure_high_score = 1500;
 
         Save();
     }
@@ -78,8 +82,11 @@ typedef SaveData = {
     var quota_target : Int;
     // TODO: quotas_met (progress...)
 
-    var high_score : Int;
-    var high_items : Int;
+    var endless_high_score : Int;
+    var endless_high_items : Int;
+
+    var treasure_high_score : Int;
+    var treasure_high_cycles: Int;
 
     // TODO: Museum...?
 };

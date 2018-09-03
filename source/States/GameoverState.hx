@@ -35,26 +35,33 @@ class GameoverState extends GarbageState
         displayText = text.PixelText.New(18, 146, "", Palette.Yellow);
         add(displayText);
 
+        var endless : Bool = GameSettings.data.mode == Constants.ModeEndless;
+        var highScore = (endless ? ProgressData.data.endless_high_score : ProgressData.data.treasure_high_score);
+
         if (session != null)
         {
             var dtext : String = displayText.text;
-            dtext += "Today's Production\n";
+            dtext += "Today's " + (endless ? "Production" : "Refinement") + "\n";
             dtext += "==================\n";
-            dtext += "# Processed: " + text.TextUtils.padWith("" + session.session.items, 5, " ") + "\n";
-            dtext += "# Rating: "    + text.TextUtils.padWith("" + session.session.score, 8, " ") + "\n";
+            if (endless)
+                dtext += "# Processed: " + text.TextUtils.padWith("" + session.session.items, 5, " ") + "\n";
+            else
+                dtext += "# Cycles:    " + text.TextUtils.padWith("" + session.session.cycle, 5, " ") + "\n";
+            dtext += "# Rating: "    + text.TextUtils.padWith("" + session.session.score, 8, " ") + "\n\n";
 
             displayText.text = dtext;
         }
 
         // Top producers
         {
-            var gotHighScore : Bool = ProgressData.data.high_score == session.session.score;
+            var gotHighScore : Bool = highScore == session.session.score;
             var dtext : String = displayText.text;
-            dtext += "\nTOP  PRODUCER  \n";
-            dtext += (gotHighScore ? "!" : "#") + " " +
-                    text.TextUtils.padWith("" + ProgressData.data.high_score, 8, " ") +
-                    "-" + text.TextUtils.padWith("" + ProgressData.data.high_items, 5, " ") +
-                    (gotHighScore ? "!" : "#") + " ";
+            dtext += "TOP PRODUCER " + (gotHighScore ? "!YOU!" : "     ") + "\n";
+            if (endless)
+                dtext += "# Processed: " + text.TextUtils.padWith("" + ProgressData.data.endless_high_items, 5, " ") + "\n";
+            else
+                dtext += "# Cycles: " + text.TextUtils.padWith("" + ProgressData.data.treasure_high_cycles, 5, " ") + "\n";
+            dtext += "# Rating: " +    text.TextUtils.padWith("" + highScore, 8, " ") + "\n";
             displayText.text = dtext;
         }
 

@@ -291,7 +291,7 @@ class PlayState extends GarbageState
             else if (i & 1 == 0 || i & 1 == 1 && (i-1 == specialItemPosition))
                 charTypes.push(getNextCharType());
             else
-                charTypes.push(null);
+                charTypes.push(-1);
         }
 
         return charTypes;

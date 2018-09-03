@@ -19,7 +19,8 @@ class TopDisplay extends FlxGroup
     var topFrame : FlxSprite;
 
     var scoreLabel : FlxBitmapText;
-    public var bottomLabel : ScrollingLabel;
+    var cycleLabel : FlxBitmapText;
+    var bottomLabel : ScrollingLabel;
     public var notifications : FlxGroup;
 
     var baseBeltY : Float;
@@ -69,10 +70,20 @@ class TopDisplay extends FlxGroup
         scoreLabel.visible = false;
         add(scoreLabel);
 
-        bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
-        bottomLabel.visible = false;
-        bottomLabel.pause();
-        add(bottomLabel);
+        if (world.mode == Constants.ModeEndless)
+        {
+            bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
+            bottomLabel.visible = false;
+            bottomLabel.pause();
+            add(bottomLabel);
+        }
+        else
+        {
+            add(text.PixelText.New(24, 24, "CYCLE: ", 0xFFFEE761));
+            cycleLabel = text.PixelText.New(24 + 7*8, 24, "01", 0xFFFFFFFF);
+            cycleLabel.visible = false;
+            add(cycleLabel);
+        }
 
         notifications = new FlxGroup();
         add(notifications);
@@ -95,6 +106,8 @@ class TopDisplay extends FlxGroup
         });
 
         scoreLabel.visible = true;
+        if (cycleLabel != null)
+            cycleLabel.visible = true;
 
         scanlines.on();
     }
@@ -113,17 +126,23 @@ class TopDisplay extends FlxGroup
             }
 
             scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
-
-            // DEBUG: Bottom label queue density
-            var itemsInBelt : Int = items.countLiving();
-            if (itemsInBelt >= 10)
-                bottomLabel.setText("PRODUCTION IS AS EXPECTED");
-            else if (itemsInBelt >= 6)
-                bottomLabel.setText("PRODUCTION IS AVERAGE");
-            else if (itemsInBelt >= 4)
-                bottomLabel.setText("PRODUCTION IS LOW");
-            else
-                bottomLabel.setText("PRODUCTION IS UNACCEPTABLE");
+            if (world.mode == Constants.ModeEndless)
+            {
+                // DEBUG: Bottom label queue density
+                var itemsInBelt : Int = items.countLiving();
+                if (itemsInBelt >= 10)
+                    bottomLabel.setText("PRODUCTION IS AS EXPECTED");
+                else if (itemsInBelt >= 6)
+                    bottomLabel.setText("PRODUCTION IS AVERAGE");
+                else if (itemsInBelt >= 4)
+                    bottomLabel.setText("PRODUCTION IS LOW");
+                else
+                    bottomLabel.setText("PRODUCTION IS UNACCEPTABLE");
+            }
+            else if (world.mode == Constants.ModeTreasure)
+            {
+                cycleLabel.text = text.TextUtils.padWith("" + ( world.session.cycle+1), 2, "0");
+            }
         }
         else
         {
@@ -187,7 +206,20 @@ class TopDisplay extends FlxGroup
 
     public function startScroller()
     {
-        bottomLabel.visible = true;
-        bottomLabel.resume();
+        if (bottomLabel != null)
+        {
+            bottomLabel.visible = true;
+            bottomLabel.resume();
+        }
+        else if (cycleLabel != null)
+        {
+            cycleLabel.visible = true;
+        }
+    }
+
+    public function handleGameover()
+    {
+        if (world.mode == Constants.ModeEndless)
+            bottomLabel.resetText("PRODUCTION TERMINATED!", Palette.Red);
     }
 }

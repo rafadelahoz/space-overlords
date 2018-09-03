@@ -27,7 +27,7 @@ class PlayState extends GarbageState
     var ItemFallTime : Float = 0.2;
     var GameoverLightsoutDelay : Float = 0.75;
 
-    var mode : Int;
+    public var mode : Int;
 
     public var session : PlaySessionData;
 
@@ -226,7 +226,7 @@ class PlayState extends GarbageState
                 trace("Game over!");
 
                 showGameOverNotification();
-                topDisplay.bottomLabel.resetText("PRODUCTION TERMINATED!", Palette.Red);
+                topDisplay.handleGameover();
                 FlxG.camera.flash(Palette.Red, function() {
                     gameoverLightsout = false;
                     gameoverTimer.start(GameoverLightsoutDelay*2, onGameoverTimer);
@@ -831,7 +831,8 @@ class PlayState extends GarbageState
         while (tries > 0 && surrounding.indexOf(ItemData.SpecialTarget) > -1)
         {
             cellX = FlxG.random.int(0, grid.columns-1);
-            cellY = FlxG.random.int(grid.rows - rows, grid.rows-1);
+            // Avoid generating in the top row (too easy)
+            cellY = FlxG.random.int(grid.rows - rows + 1, grid.rows-1);
             surrounding = grid.getSurroundingTypes(cellX, cellY);
             tries--;
         }

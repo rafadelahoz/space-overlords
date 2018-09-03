@@ -630,6 +630,46 @@ class PlayState extends GarbageState
                 if (!grid.contains(ItemData.SpecialTarget))
                 {
                     // Finished cycle!
+                    for (item in grid.getAll())
+                    {
+                        if (item.entity != null)
+                        {
+                            FlxTween.color(item.entity, 0.25, 0xFFFFFFFF, Palette.DarkBlue, {ease : FlxEase.sineInOut});
+                        }
+                    }
+
+                    aftermathTimer.start(1, function(_) {
+
+                        /*for (row in 2...grid.rows)
+                            add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));*/
+
+                        FlxG.camera.flash(Palette.DarkBlue, 1);
+
+                        session.cycle += 1;
+                        setupCycleGrid();
+
+                        for (item in grid.getAll())
+                        {
+                            if (item.entity != null)
+                            {
+                                item.entity.color = Palette.DarkBlue;
+                            }
+                        }
+
+                        for (item in grid.getAll())
+                        {
+                            if (item.entity != null)
+                            {
+                                FlxTween.color(item.entity, 0.25, Palette.DarkBlue, 0xFFFFFFFF, {startDelay: 1, ease : FlxEase.sineInOut});
+                            }
+                        }
+
+                        aftermathTimer.start(2.5, function(_) {
+                            switchState(StateGenerate);
+                        });
+                    });
+
+                    return;
                 }
             }
 

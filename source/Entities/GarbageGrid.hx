@@ -302,7 +302,7 @@ class GarbageGrid
             {
                 // Special items cases
                 if (cellA.type == cellB.type &&
-                    (cellA.type == ItemData.SpecialTrigger || cellA.type == ItemData.SpecialBomb || cellA.type == ItemData.SpecialTrigger))
+                    (cellA.type == ItemData.SpecialTrigger || cellA.type == ItemData.SpecialBomb || cellA.type == ItemData.SpecialTarget))
                 {
                     match = true;
                 }

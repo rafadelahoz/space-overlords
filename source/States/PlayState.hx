@@ -114,11 +114,17 @@ class PlayState extends GarbageState
         super.create();
     }
 
+    function getInitialFallSpeed() : Int
+    {
+        var intensity : Int = Std.int(GameSettings.data.intensity / 25);
+        return 16 + (intensity-1);
+    }
+
     function setupGameplay()
     {
         // Intensity 1-4
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        session.fallSpeed = 16 + (intensity-1);
+        session.fallSpeed = getInitialFallSpeed();
 
         if (mode == Constants.ModeEndless)
             setupInitialGrid(intensity);
@@ -308,7 +314,7 @@ class PlayState extends GarbageState
 
     function generateNextItemCharTypes() : Array<Int>
     {
-        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 5, 5, 10, 10] : [80, 5, 5, 5, 5]);
+        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 5, 5, 10, 10] : [92, 2, 2, 2, 2]);
         var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], weights);
 
         var charTypes : Array<Int> = [];
@@ -613,14 +619,14 @@ class PlayState extends GarbageState
                         // Each 8 times, new background
                         var color : Int = background.color;
                         FlxTween.color(background, 0.5, color, 0xFFFFFFFF, {ease: FlxEase.circInOut});
-                        trace("8 updates: new theme");
+                        session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.timesIncreased / 4);
                     }
                     else if (session.timesIncreased % 4 == 0)
                     {
                         // Each 4 times, alt bg
                         var color : Int = background.color;
                         FlxTween.color(background, 0.5, color, Palette.DarkBlue, {ease: FlxEase.circInOut});
-                        trace("4 updates: alternate bg");
+                        session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 2);
                     }
                 }
             }
@@ -647,6 +653,8 @@ class PlayState extends GarbageState
 
                         session.cycle += 1;
                         setupCycleGrid();
+
+                        session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.cycle);
 
                         for (item in grid.getAll())
                         {

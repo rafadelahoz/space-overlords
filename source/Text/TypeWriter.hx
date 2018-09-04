@@ -220,6 +220,7 @@ class TypeWriter extends FlxBitmapText
 		}
 
 		// insertBreakLines();
+		preprocessText();
 
 		#if !bitfive
 		if (useDefaultSound)
@@ -230,6 +231,43 @@ class TypeWriter extends FlxBitmapText
 
         remainingText = null;
 		finished = false;
+	}
+
+	function preprocessText()
+	{
+		var lines : Array<String> = _finalText.split("\n");
+		var plines : Array<String> = [];
+
+		var lineWidth : Int = Std.int(width/lineHeight);
+
+		for (line in lines)
+		{
+			var tokens : Array<String> = line.split(" ");
+			var pline : String = "";
+			while (tokens.length > 0)
+			{
+				var token : String = StringTools.trim(tokens.shift());
+				if (pline.length + token.length + 1 <= lineWidth)
+				{
+					pline += (pline.length > 0 ? " " : "") + token;
+					if (pline.length == lineWidth)
+					{
+						plines.push(pline);
+						pline = "";
+					}
+				}
+				else
+				{
+					plines.push(pline);
+					pline = token;
+				}
+			}
+
+			if (pline.length > 0)
+				plines.push(pline);
+		}
+
+		_finalText = plines.join("\n");
 	}
 
 	/**
@@ -553,6 +591,16 @@ class TypeWriter extends FlxBitmapText
 				}
 			}
 
+			// New message token
+			if (text.charAt(text.length-1) == "#")
+			{
+				/*trace("Found #");
+				alreadyFull = true;
+				trace("_finalText = " + _finalText.substring(0, text.length-1) + " + " + _finalText.substring(text.length));
+				_finalText = _finalText.substring(0, text.length-1) + _finalText.substring(text.length);
+				// text = text.substring(0, text.length-1);*/
+			}
+
 			if (alreadyFull && targetHeight > 0 && _length < _finalText.length)
 			{
 				finished = true;
@@ -567,8 +615,7 @@ class TypeWriter extends FlxBitmapText
 			}
 			else
 			{
-
-    			// If we're done typing, call the onComplete() function
+				// If we're done typing, call the onComplete() function
     			if (_length >= _finalText.length && _typing && !_waiting && !_erasing)
     			{
     				finished = true;

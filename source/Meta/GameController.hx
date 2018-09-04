@@ -7,6 +7,8 @@ class GameController
 	public static function Init()
 	{
 		// Init subsystems
+		text.PixelText.Init();
+
 		BgmEngine.init();
 		SfxEngine.init();
 

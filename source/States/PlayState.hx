@@ -10,6 +10,8 @@ import flixel.text.FlxBitmapText;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxWaveEffect;
 
 class PlayState extends GarbageState
 {
@@ -50,6 +52,7 @@ class PlayState extends GarbageState
 
     // Display
     var background : FlxSprite;
+    var fxBg : FlxEffectSprite;
     var gridShader : FlxSprite;
     var gridFrame : FlxSprite;
     var topDisplay : TopDisplay;
@@ -75,8 +78,9 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
-        theme = ThemeManager.ThemeWasteland;
-        add(background = new FlxSprite(0, 0).loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA)));
+        // TODO: Set initial theme from somewhere? random?
+        theme = ThemeManager.ThemeOcean;
+        setupBackground();
 
         gridShader = new FlxSprite(grid.x-2, grid.y-2);
         gridShader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
@@ -116,6 +120,18 @@ class PlayState extends GarbageState
         stateLabel.visible = false;
 
         super.create();
+    }
+
+    function setupBackground()
+    {
+        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
+        fxBg = new FlxEffectSprite(background);
+        var fxWave : FlxWaveEffect = new FlxWaveEffect(FlxWaveMode.ALL, 2);
+        fxBg.effects = [fxWave];
+        add(fxBg);
+
+        // Setup theme effects
+        handleThemeBackgroundChange(false);
     }
 
     function getInitialFallSpeed() : Int
@@ -701,11 +717,10 @@ class PlayState extends GarbageState
         if (themeChange)
         {
             // Each 8 times, new background
-            background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
-            flixel.effects.FlxFlicker.flicker(background, ThemeChangeDelay, true, function(_) {
-                // theme += 1;
+            handleThemeBackgroundChange(true);
+            flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
-                    session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.timesIncreased / 4);
+                    session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
                     switchState(StateGenerate);
                 });
             });
@@ -713,16 +728,44 @@ class PlayState extends GarbageState
         else if (sideChange)
         {
             // Each 4 times, alt bg
-            background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideB));
-            flixel.effects.FlxFlicker.flicker(background, ThemeChangeDelay, true, function(_) {
+            handleThemeSideChange();
+            flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
-                    session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 2);
+                    session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
                     switchState(StateGenerate);
                 });
             });
 
         }
     }
+
+    function handleThemeSideChange()
+    {
+        background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideB));
+    }
+
+    function handleThemeBackgroundChange(cycleTheme : Bool)
+    {
+        if (cycleTheme)
+        {
+            theme = theme+1;
+            if (theme > 2)
+                theme = 1;
+        }
+
+        background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
+        if (theme == ThemeManager.ThemeOcean)
+        {
+            fxBg.effectsEnabled = true;
+            fxBg.x = -2;
+        }
+        else
+        {
+            fxBg.effectsEnabled = false;
+            fxBg.x = 0;
+        }
+    }
+
     public function onAftermathFinished()
     {
         switchState(StateGenerate);

@@ -16,6 +16,7 @@ class ThemeManager
     {
         Backgrounds = [];
         Backgrounds[ThemeWasteland] = ["bgThemeWastelandA", "bgThemeWastelandB"];
+        Backgrounds[ThemeOcean] = ["bgThemeOceanA", "bgThemeOceanB"];
     }
 
     public static function Get(Theme : Int, Side : Int) : String
@@ -28,6 +29,6 @@ class ThemeManager
 
     static function isValid(Theme : Int, Side : Int)
     {
-        return Theme == ThemeWasteland && Side >= 0 && Side < 2;
+        return Theme >= 1 && Theme < 3 && Side >= 0 && Side < 2;
     }
 }

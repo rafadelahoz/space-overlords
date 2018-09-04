@@ -48,6 +48,10 @@ class TitleState extends GarbageState
         #if work
         /*ProgressData.data.quota_current = 0;
         GameController.GameOver(0, new PlaySessionData(FlxG.random.int(0, 99999), FlxG.random.int(500, 1999)));*/
+        // GameSettings.data.mode = Constants.ModeTreasure;
+        // GameController.StartGameplay();
+        // FlxG.switchState(new RewardState());
+        // GameController.ToMenu();
         #end
 
 
@@ -140,6 +144,13 @@ class TitleState extends GarbageState
                             SfxEngine.disable();
                     });
                     screen.add(sfxSwitch);
+
+                    var newSlaveButton : VcrButton = new VcrButton(98, baseY + 131 + 3*12, null, function() {
+                        ProgressData.data.slave_id = -1;
+                        screen.add(new MessageBox().show("Slave deleted."));
+                    });
+                    newSlaveButton.loadSpritesheet("assets/ui/gameconfig-intensity-remove.png", 11, 14, true);
+                    screen.add(newSlaveButton);
 
                 case TitleState.StateCredits:
                     clearGroup(screen);

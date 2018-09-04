@@ -92,6 +92,11 @@ class MenuState extends GarbageState
         museumButton.loadSpritesheet("assets/ui/cell-menu-museum.png", 137, 14);
         add(museumButton);
 
+        rewardButton = new VcrButton(26, 143 + 12*2, onRewardHighlighted, onRewardPressed);
+        rewardButton.loadSpritesheet("assets/ui/cell-menu-reward.png", 137, 14);
+        if (ProgressData.data.quota_current >= ProgressData.data.quota_target)
+            add(rewardButton);
+
         cursor = new FlxSprite(9, playButton.y+1, "assets/ui/title-menu-cursor.png");
         add(cursor);
 
@@ -117,12 +122,14 @@ class MenuState extends GarbageState
     {
         playButton.clearHighlight();
         museumButton.clearHighlight();
+        rewardButton.clearHighlight();
     }
 
     function onPlayHighlighted()
     {
         backButton.clearHighlight();
         museumButton.clearHighlight();
+        rewardButton.clearHighlight();
 
         cursor.y = playButton.y+1;
     }
@@ -131,8 +138,18 @@ class MenuState extends GarbageState
     {
         backButton.clearHighlight();
         playButton.clearHighlight();
+        rewardButton.clearHighlight();
 
         cursor.y = museumButton.y+1;
+    }
+
+    function onRewardHighlighted()
+    {
+        backButton.clearHighlight();
+        playButton.clearHighlight();
+        museumButton.clearHighlight();
+
+        cursor.y = rewardButton.y+1;
     }
 
     public function onArcadeButtonPressed() : Void
@@ -145,6 +162,21 @@ class MenuState extends GarbageState
     function onMuseumPressed()
     {
         // Nop!
+    }
+
+    function onRewardPressed()
+    {
+        var message : String =
+                "Slave " + ProgressData.data.slave_id + "!#" +
+                "You have reached your quota, and are going to be rewarded#" +
+                "You will have the honour of meeting our space overlord" +
+                "And then you get to choose your reward#" +
+                "Congratulations#" +
+                "Please, proceed";
+        add(new MessageBox().show(message, function() {
+            trace("HAHA");
+            // GameController.ToTitle(true);
+        }));
     }
 
     public function onBackPressed()

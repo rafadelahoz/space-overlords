@@ -220,6 +220,7 @@ class TypeWriter extends FlxBitmapText
 		}
 
 		// insertBreakLines();
+		preprocessText();
 
 		#if !bitfive
 		if (useDefaultSound)
@@ -232,40 +233,41 @@ class TypeWriter extends FlxBitmapText
 		finished = false;
 	}
 
-	/**
-	 * Internal function that replace last space in a line for a line break.
-	 * To prevent a word start typing in a line and jump to next.
-	 */
-	private function insertBreakLines()
+	function preprocessText()
 	{
-		var saveText = text;
+		var lines : Array<String> = _finalText.split("\n");
+		var plines : Array<String> = [];
 
-		var last = _finalText.length;
-		var n0:Int = 0;
-		var n1:Int = 0;
+		var lineWidth : Int = Std.int(width/lineHeight);
 
-		while (true)
+		for (line in lines)
 		{
-			last = _finalText.substr(0, last).lastIndexOf(" ");
-
-			if (last <= 0)
-				break;
-
-			text = prefix + _finalText;
-			n0 = _lines.length;
-
-			var nextText = _finalText.substr(0, last) + "\n" + _finalText.substr(last + 1, _finalText.length);
-
-			text = prefix + nextText;
-			n1 = _lines.length;
-
-			if (n0 == n1)
+			var tokens : Array<String> = line.split(" ");
+			var pline : String = "";
+			while (tokens.length > 0)
 			{
-				_finalText = nextText;
+				var token : String = StringTools.trim(tokens.shift());
+				if (pline.length + token.length + 1 <= lineWidth)
+				{
+					pline += (pline.length > 0 ? " " : "") + token;
+					if (pline.length == lineWidth)
+					{
+						plines.push(pline);
+						pline = "";
+					}
+				}
+				else
+				{
+					plines.push(pline);
+					pline = token;
+				}
 			}
+
+			if (pline.length > 0)
+				plines.push(pline);
 		}
 
-		text = saveText;
+		_finalText = plines.join("\n");
 	}
 
 	/**
@@ -567,8 +569,7 @@ class TypeWriter extends FlxBitmapText
 			}
 			else
 			{
-
-    			// If we're done typing, call the onComplete() function
+				// If we're done typing, call the onComplete() function
     			if (_length >= _finalText.length && _typing && !_waiting && !_erasing)
     			{
     				finished = true;

@@ -15,6 +15,9 @@ class GameController
 		ProgressData.Init();
 		GameSettings.Init();
 
+		if (ProgressData.data.slave_count < 0)
+			ProgressData.StartNewGame();
+
 		// FlxG.autoPause = false;
 		#if (!mobile)
 			FlxG.scaleMode = new flixel.system.scaleModes.PixelPerfectScaleMode();
@@ -42,7 +45,7 @@ class GameController
 		// ProgressData.data.slave_id = -1;
 		if (ProgressData.data.slave_id < 0)
 		{
-			ProgressData.StartNewGame();
+			ProgressData.GenerateNewSlave();
 			menuStatus = MenuState.StatusNewSlave;
 		}
 		else if (fromGameOver)

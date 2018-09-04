@@ -15,7 +15,6 @@ class RewardState extends GarbageState
         FlxG.camera.bgColor = 0xFF000000;
 
         var msgString : String =
-            "GO HOME or SPECIAL HONOR#" +
             "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings like you", "friends (I can call you friend, right?)", "slaves like you"]) +

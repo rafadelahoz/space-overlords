@@ -18,6 +18,7 @@ class ProgressData
             if (data == null)
             {
                 data = {
+                    slave_count: -1,
                     slave_id : -1,
                     slave_head : -1, slave_detail: -1, slave_color: -1,
 
@@ -31,8 +32,7 @@ class ProgressData
 
     public static function StartNewGame()
     {
-        // Generate a new slave
-        new SlaveGenerator().generate(data);
+        data.slave_count = 1;
 
         // Set the quota
         data.quota_target = 1000;
@@ -44,6 +44,18 @@ class ProgressData
 
         data.treasure_high_cycles = 5;
         data.treasure_high_score = 1500;
+
+        Save();
+    }
+
+    public static function GenerateNewSlave()
+    {
+        // Generate a new slave
+        new SlaveGenerator().generate(data);
+
+        // Set the quota
+        data.quota_target = 1000 * data.slave_count;
+        data.quota_current = 0;
 
         Save();
     }
@@ -72,6 +84,8 @@ class ProgressData
 }
 
 typedef SaveData = {
+    var slave_count : Int;
+
     var slave_id : Int;
 
     var slave_head: Int;

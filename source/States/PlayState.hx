@@ -79,7 +79,7 @@ class PlayState extends GarbageState
         grid.init();
 
         // TODO: Set initial theme from somewhere? random?
-        theme = ThemeManager.ThemeOcean;
+        theme = ThemeManager.GetRandomTheme();
         setupBackground();
 
         gridShader = new FlxSprite(grid.x-2, grid.y-2);
@@ -124,7 +124,7 @@ class PlayState extends GarbageState
 
     function setupBackground()
     {
-        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
+        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
         fxBg = new FlxEffectSprite(background);
         var fxWave : FlxWaveEffect = new FlxWaveEffect(FlxWaveMode.ALL, 2);
         fxBg.effects = [fxWave];
@@ -701,7 +701,7 @@ class PlayState extends GarbageState
 
         if (themeChange || sideChange)
         {
-            var changeText : String = (themeChange ? "TO NEW LOCATION!" : "MOVING FORWARD  ");
+            var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!MOVING FORWARD     ");
             topDisplay.notifications.add(new TextNotice(24, 16, changeText, 0xFF2ce8f5));
             aftermathTimer.start(ThemeChangeDelay, doThemeChange);
         }
@@ -741,7 +741,7 @@ class PlayState extends GarbageState
 
     function handleThemeSideChange()
     {
-        background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideB));
+        background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideB));
     }
 
     function handleThemeBackgroundChange(cycleTheme : Bool)
@@ -753,7 +753,7 @@ class PlayState extends GarbageState
                 theme = 1;
         }
 
-        background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
+        background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
         if (theme == ThemeManager.ThemeOcean)
         {
             fxBg.effectsEnabled = true;
@@ -787,6 +787,12 @@ class PlayState extends GarbageState
                 {
                     item.entity.color = Palette.DarkBlue;
                 }
+            }
+            if (nextItem != null)
+            {
+                nextItem.color = Palette.DarkBlue;
+                if (nextItem.slave != null)
+                    nextItem.slave.color = Palette.DarkBlue;
             }
 
             gridShader.alpha = 0.8;

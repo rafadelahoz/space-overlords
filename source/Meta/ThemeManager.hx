@@ -1,5 +1,7 @@
 package;
 
+import flixel.FlxG;
+
 class ThemeManager
 {
     public static var ThemeWasteland : Int = 1;
@@ -19,7 +21,12 @@ class ThemeManager
         Backgrounds[ThemeOcean] = ["bgThemeOceanA", "bgThemeOceanB"];
     }
 
-    public static function Get(Theme : Int, Side : Int) : String
+    public static function GetRandomTheme() : Int
+    {
+        return FlxG.random.getObject([ThemeWasteland, ThemeOcean]);
+    }
+
+    public static function GetBackground(Theme : Int, Side : Int) : String
     {
         if (isValid(Theme, Side))
             return "assets/backgrounds/" + Backgrounds[Theme][Side] + ".png";

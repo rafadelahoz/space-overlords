@@ -271,42 +271,6 @@ class TypeWriter extends FlxBitmapText
 	}
 
 	/**
-	 * Internal function that replace last space in a line for a line break.
-	 * To prevent a word start typing in a line and jump to next.
-	 */
-	private function insertBreakLines()
-	{
-		var saveText = text;
-
-		var last = _finalText.length;
-		var n0:Int = 0;
-		var n1:Int = 0;
-
-		while (true)
-		{
-			last = _finalText.substr(0, last).lastIndexOf(" ");
-
-			if (last <= 0)
-				break;
-
-			text = prefix + _finalText;
-			n0 = _lines.length;
-
-			var nextText = _finalText.substr(0, last) + "\n" + _finalText.substr(last + 1, _finalText.length);
-
-			text = prefix + nextText;
-			n1 = _lines.length;
-
-			if (n0 == n1)
-			{
-				_finalText = nextText;
-			}
-		}
-
-		text = saveText;
-	}
-
-	/**
 	 * Begin an animated erase of this text.
 	 *
 	 * @param	Delay			Optionally, set the delay between characters. Can also be set separately.
@@ -589,16 +553,6 @@ class TypeWriter extends FlxBitmapText
 						alreadyFull = true;
 					}
 				}
-			}
-
-			// New message token
-			if (text.charAt(text.length-1) == "#")
-			{
-				/*trace("Found #");
-				alreadyFull = true;
-				trace("_finalText = " + _finalText.substring(0, text.length-1) + " + " + _finalText.substring(text.length));
-				_finalText = _finalText.substring(0, text.length-1) + _finalText.substring(text.length);
-				// text = text.substring(0, text.length-1);*/
 			}
 
 			if (alreadyFull && targetHeight > 0 && _length < _finalText.length)

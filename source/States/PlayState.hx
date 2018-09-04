@@ -26,6 +26,7 @@ class PlayState extends GarbageState
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
     var GameoverLightsoutDelay : Float = 0.75;
+    var ThemeChangeDelay : Float = 1.33;
 
     public var mode : Int;
 
@@ -57,6 +58,8 @@ class PlayState extends GarbageState
     var gameoverTimer : FlxTimer;
     var gameoverLightsout : Bool;
 
+    var theme : Int;
+
     // Debug
     public var debugEnabled : Bool;
     var stateLabel : FlxBitmapText;
@@ -72,7 +75,8 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
-        add(background = new FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
+        theme = ThemeManager.ThemeWasteland;
+        add(background = new FlxSprite(0, 0).loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA)));
 
         gridShader = new FlxSprite(grid.x-2, grid.y-2);
         gridShader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
@@ -280,7 +284,7 @@ class PlayState extends GarbageState
         var triggerProbability : Int = 20;
         if (mode == Constants.ModeTreasure)
             triggerProbability = 0;
-        if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
+        else if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
             triggerProbability = 50;
 
         var bombProbability : Int = -1;
@@ -314,7 +318,7 @@ class PlayState extends GarbageState
 
     function generateNextItemCharTypes() : Array<Int>
     {
-        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 5, 5, 10, 10] : [92, 2, 2, 2, 2]);
+        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 2, 2, 5, 5] : [92, 2, 2, 2, 2]);
         var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], weights);
 
         var charTypes : Array<Int> = [];
@@ -613,21 +617,8 @@ class PlayState extends GarbageState
 
                 if (mode == Constants.ModeEndless)
                 {
-                    // Do other things like change graphic set?
-                    if (session.timesIncreased % 8 == 0)
-                    {
-                        // Each 8 times, new background
-                        var color : Int = background.color;
-                        FlxTween.color(background, 0.5, color, 0xFFFFFFFF, {ease: FlxEase.circInOut});
-                        session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.timesIncreased / 4);
-                    }
-                    else if (session.timesIncreased % 4 == 0)
-                    {
-                        // Each 4 times, alt bg
-                        var color : Int = background.color;
-                        FlxTween.color(background, 0.5, color, Palette.DarkBlue, {ease: FlxEase.circInOut});
-                        session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 2);
-                    }
+                    if (checkForThemeChange())
+                        return;
                 }
             }
 
@@ -687,6 +678,51 @@ class PlayState extends GarbageState
         }
     }
 
+    function checkForThemeChange() : Bool
+    {
+        var themeChange : Bool = (session.timesIncreased % 8 == 0);
+        var sideChange : Bool = (session.timesIncreased % 4 == 0);
+
+        if (themeChange || sideChange)
+        {
+            var changeText : String = (themeChange ? "TO NEW LOCATION!" : "MOVING FORWARD  ");
+            topDisplay.notifications.add(new TextNotice(24, 16, changeText, 0xFF2ce8f5));
+            aftermathTimer.start(ThemeChangeDelay, doThemeChange);
+        }
+
+        return (themeChange || sideChange);
+    }
+
+    function doThemeChange(_) {
+        var themeChange : Bool = (session.timesIncreased % 8 == 0);
+        var sideChange : Bool = (session.timesIncreased % 4 == 0);
+
+        // Do other things like change graphic set?
+        if (themeChange)
+        {
+            // Each 8 times, new background
+            background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideA));
+            flixel.effects.FlxFlicker.flicker(background, ThemeChangeDelay, true, function(_) {
+                // theme += 1;
+                aftermathTimer.start(ThemeChangeDelay, function(_) {
+                    session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.timesIncreased / 4);
+                    switchState(StateGenerate);
+                });
+            });
+        }
+        else if (sideChange)
+        {
+            // Each 4 times, alt bg
+            background.loadGraphic(ThemeManager.Get(theme, ThemeManager.SideB));
+            flixel.effects.FlxFlicker.flicker(background, ThemeChangeDelay, true, function(_) {
+                aftermathTimer.start(ThemeChangeDelay, function(_) {
+                    session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 2);
+                    switchState(StateGenerate);
+                });
+            });
+
+        }
+    }
     public function onAftermathFinished()
     {
         switchState(StateGenerate);

@@ -656,7 +656,11 @@ class PlayState extends GarbageState
         if (matches.length > 0)
         {
             aftermathCombo += 1;
-            aftermathScoreCounter += 2*aftermathCombo*10*matches.length;
+
+            // Compute matches score
+            var matchesScore : Int = computeMatchesScore(matches);
+            // Scale by combo
+            aftermathScoreCounter += 2*aftermathCombo * matchesScore;
 
             if (aftermathCombo > 1)
             {
@@ -678,6 +682,27 @@ class PlayState extends GarbageState
         {
             aftermathTimer.start(0.01, handleAftermathResult);
         }
+    }
+
+    function computeMatchesScore(matches : Array<ItemData>) : Int
+    {
+        var score : Int = 0;
+
+        // Item matching is worth less on treasure
+        var itemValue : Int = (mode == Constants.ModeEndless ? 10 : 1);
+        for (item in matches)
+        {
+            switch(item.type)
+            {
+                case ItemData.SpecialBomb:      score += 0;
+                case ItemData.SpecialTrigger:   score += 0;
+                case ItemData.SpecialChemdust:  score += 0;
+                case ItemData.SpecialTarget:    score += 200;
+                default:                        score += itemValue;
+            }
+        }
+
+        return score;
     }
 
     public function handleAftermathResult(?t:FlxTimer)

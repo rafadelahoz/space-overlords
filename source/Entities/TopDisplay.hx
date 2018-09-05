@@ -150,7 +150,12 @@ class TopDisplay extends FlxGroup
             else if (world.mode == Constants.ModeTreasure)
             {
                 cycleLabel.text = text.TextUtils.padWith("" + (world.session.cycle+1), 2, "0");
-                targetsLabel.text = text.TextUtils.padWith("" + (world.grid.count(ItemData.SpecialTarget)), 2, "0");
+                var count : Int = world.grid.count(ItemData.SpecialTarget);
+                targetsLabel.text = text.TextUtils.padWith("" + count, 2, "0");
+                if (count == 0)
+                    flixel.effects.FlxFlicker.flicker(targetsLabel, 0);
+                else
+                    flixel.effects.FlxFlicker.stopFlickering(targetsLabel);
             }
         }
         else

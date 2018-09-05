@@ -222,4 +222,34 @@ class TopDisplay extends FlxGroup
         if (world.mode == Constants.ModeEndless)
             bottomLabel.resetText("PRODUCTION TERMINATED!", Palette.Red);
     }
+
+    public function onPauseStart()
+    {
+        items.forEach(pauseEntity);
+        belts.forEach(pauseEntity);
+        notifications.forEach(pauseEntity);
+        if (bottomLabel != null)
+            bottomLabel.pause();
+    }
+
+    public function onPauseEnd()
+    {
+        items.forEach(resumeEntity);
+        belts.forEach(resumeEntity);
+        notifications.forEach(resumeEntity);
+        if (bottomLabel != null)
+            bottomLabel.resume();
+    }
+
+    function pauseEntity(basic : FlxBasic)
+    {
+       if (basic != null)
+           basic.active = false;
+    }
+
+    function resumeEntity(basic : FlxBasic)
+    {
+        if (basic != null)
+            basic.active = true;
+    }
 }

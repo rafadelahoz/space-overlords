@@ -419,6 +419,8 @@ class PlayState extends GarbageState
 
         if (nextItem != null)
             nextItem.onPauseStart();
+
+        topDisplay.onPauseStart();
     }
 
     function onPauseEnd()
@@ -429,6 +431,8 @@ class PlayState extends GarbageState
 
         if (nextItem != null)
             nextItem.onPauseEnd();
+
+        topDisplay.onPauseEnd();
     }
 
     public function onNextItemGenerated()

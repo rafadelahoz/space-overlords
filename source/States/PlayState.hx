@@ -57,6 +57,10 @@ class PlayState extends GarbageState
     var gameoverTimer : FlxTimer;
     var gameoverLightsout : Bool;
 
+    // Pause
+    public var paused : Bool;
+    var aftermathTimerActive : Bool;
+
     // Debug
     public var debugEnabled : Bool;
     var stateLabel : FlxBitmapText;
@@ -104,6 +108,9 @@ class PlayState extends GarbageState
 
         // Setup gameplay
         setupGameplay();
+
+        paused = false;
+        aftermathTimerActive = false;
 
         switchState(StateIntro);
 
@@ -343,14 +350,17 @@ class PlayState extends GarbageState
                 stateLabel.text = "Generating";
                 if (nextItem != null)
                     finishGeneration();
+                handlePause();
             case PlayState.StateWait:
                 stateLabel.text = "Waiting";
                 if (nextItem == null && !currentItem.inGenerationArea())
                 {
                     generateNextItem();
                 }
+                handlePause();
             case PlayState.StateAftermath:
                 stateLabel.text = "Aftermath";
+                handlePause();
             case PlayState.StateLost:
                 stateLabel.text = "Losing";
             default:
@@ -362,6 +372,36 @@ class PlayState extends GarbageState
         super.update(elapsed);
 
         items.sort(itemsSorter);
+    }
+
+    function handlePause()
+    {
+		if (GamePad.justReleased(GamePad.Pause))
+		{
+			onPauseStart();
+			openSubState(new PauseSubstate(this, onPauseEnd));
+		}
+    }
+
+    function onPauseStart()
+    {
+        paused = true;
+        aftermathTimerActive = aftermathTimer.active;
+        if (aftermathTimer.active)
+            aftermathTimer.active = false;
+
+        if (nextItem != null)
+            nextItem.onPauseStart();
+    }
+
+    function onPauseEnd()
+    {
+        paused = false;
+        if (aftermathTimerActive)
+            aftermathTimer.active = true;
+
+        if (nextItem != null)
+            nextItem.onPauseEnd();
     }
 
     public function onNextItemGenerated()
@@ -870,7 +910,7 @@ class PlayState extends GarbageState
 
     function handleDebug()
     {
-        if (FlxG.keys.justPressed.TAB || GamePad.justPressed(GamePad.Pause))
+        if (FlxG.keys.justPressed.TAB)
         {
             debugEnabled = !debugEnabled;
             stateLabel.visible = debugEnabled;

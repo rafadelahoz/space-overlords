@@ -253,6 +253,11 @@ class ItemEntity extends Entity
                     slave.scale.x = flixel.math.FlxMath.lerp(slave.scale.x, 1, 0.4);
             }
 
+            if (world.paused)
+            {
+                velocity.set(0, 0);
+            }
+
             // DEBUG!
             if (world.debugEnabled)
             {
@@ -538,6 +543,35 @@ class ItemEntity extends Entity
     public function canSquish() : Bool
     {
         return charType != ItemData.SpecialBomb && charType != ItemData.SpecialTrigger;
+    }
+
+    var graceTimerActive : Bool;
+    var movementTweenActive : Bool;
+
+    public function onPauseStart()
+    {
+        graceTimerActive = graceTimer.active;
+        if (graceTimer.active)
+            graceTimer.active = false;
+
+        movementTweenActive = false;
+        if (movementTween != null)
+        {
+            movementTweenActive = movementTween.active;
+            movementTween.active = false;
+        }
+    }
+
+    public function onPauseEnd()
+    {
+        if (graceTimerActive)
+            graceTimer.active = true;
+
+        if (movementTween != null)
+        {
+            if (movementTweenActive)
+                movementTween.active = movementTweenActive;
+        }
     }
 }
 

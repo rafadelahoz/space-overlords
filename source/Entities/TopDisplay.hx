@@ -20,6 +20,7 @@ class TopDisplay extends FlxGroup
 
     var scoreLabel : FlxBitmapText;
     var cycleLabel : FlxBitmapText;
+    var targetsLabel : FlxBitmapText;
     var bottomLabel : ScrollingLabel;
     public var notifications : FlxGroup;
 
@@ -79,10 +80,15 @@ class TopDisplay extends FlxGroup
         }
         else
         {
-            add(text.PixelText.New(24, 24, "CYCLE: ", 0xFFFEE761));
-            cycleLabel = text.PixelText.New(24 + 7*8, 24, "01", 0xFFFFFFFF);
+            add(text.PixelText.New(24, 24, "CYCLE ", 0xFFFEE761));
+            cycleLabel = text.PixelText.New(24 + 6*8, 24, "01", 0xFFFFFFFF);
             cycleLabel.visible = false;
             add(cycleLabel);
+
+            add(text.PixelText.New(24 + 6*8 + 3*8, 24, "LEFT ", 0xFFFEE761));
+            targetsLabel = text.PixelText.New(24 + 6*8 + 3*8 + 5*8, 24, "01", 0xFFFFFFFF);
+            targetsLabel.visible = false;
+            add(targetsLabel);
         }
 
         notifications = new FlxGroup();
@@ -108,6 +114,8 @@ class TopDisplay extends FlxGroup
         scoreLabel.visible = true;
         if (cycleLabel != null)
             cycleLabel.visible = true;
+        if (targetsLabel != null)
+            targetsLabel.visible = true;
 
         scanlines.on();
     }
@@ -141,7 +149,8 @@ class TopDisplay extends FlxGroup
             }
             else if (world.mode == Constants.ModeTreasure)
             {
-                cycleLabel.text = text.TextUtils.padWith("" + ( world.session.cycle+1), 2, "0");
+                cycleLabel.text = text.TextUtils.padWith("" + (world.session.cycle+1), 2, "0");
+                targetsLabel.text = text.TextUtils.padWith("" + (world.grid.count(ItemData.SpecialTarget)), 2, "0");
             }
         }
         else
@@ -214,6 +223,7 @@ class TopDisplay extends FlxGroup
         else if (cycleLabel != null)
         {
             cycleLabel.visible = true;
+            targetsLabel.visible = true;
         }
     }
 

@@ -10,6 +10,8 @@ import flixel.text.FlxBitmapText;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxWaveEffect;
 
 class PlayState extends GarbageState
 {
@@ -26,6 +28,7 @@ class PlayState extends GarbageState
     var ItemLeaveTime : Float = 0.35;
     var ItemFallTime : Float = 0.2;
     var GameoverLightsoutDelay : Float = 0.75;
+    var ThemeChangeDelay : Float = 1.33;
 
     public var mode : Int;
 
@@ -49,6 +52,7 @@ class PlayState extends GarbageState
 
     // Display
     var background : FlxSprite;
+    var fxBg : FlxEffectSprite;
     var gridShader : FlxSprite;
     var gridFrame : FlxSprite;
     var topDisplay : TopDisplay;
@@ -60,6 +64,9 @@ class PlayState extends GarbageState
     // Pause
     public var paused : Bool;
     var aftermathTimerActive : Bool;
+
+    // Theme
+    var theme : Int;
 
     // Debug
     public var debugEnabled : Bool;
@@ -76,7 +83,9 @@ class PlayState extends GarbageState
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
         grid.init();
 
-        add(background = new FlxSprite(0, 0).loadGraphic("assets/backgrounds/bg01.png"));
+        // TODO: Set initial theme from somewhere? random?
+        theme = ThemeManager.GetRandomTheme();
+        setupBackground();
 
         gridShader = new FlxSprite(grid.x-2, grid.y-2);
         gridShader.makeGraphic(grid.columns*Constants.TileSize+4, grid.rows*Constants.TileSize+4, 0xFF181425);
@@ -121,11 +130,29 @@ class PlayState extends GarbageState
         super.create();
     }
 
+    function setupBackground()
+    {
+        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
+        fxBg = new FlxEffectSprite(background);
+        var fxWave : FlxWaveEffect = new FlxWaveEffect(FlxWaveMode.ALL, 2);
+        fxBg.effects = [fxWave];
+        add(fxBg);
+
+        // Setup theme effects
+        handleThemeBackgroundChange(false);
+    }
+
+    function getInitialFallSpeed() : Int
+    {
+        var intensity : Int = Std.int(GameSettings.data.intensity / 25);
+        return 16 + (intensity-1);
+    }
+
     function setupGameplay()
     {
         // Intensity 1-4
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        session.fallSpeed = 16 + (intensity-1);
+        session.fallSpeed = getInitialFallSpeed();
 
         if (mode == Constants.ModeEndless)
             setupInitialGrid(intensity);
@@ -281,7 +308,7 @@ class PlayState extends GarbageState
         var triggerProbability : Int = 20;
         if (mode == Constants.ModeTreasure)
             triggerProbability = 0;
-        if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
+        else if (!grid.contains(ItemData.SpecialTrigger) && (grid.contains(ItemData.SpecialBomb) || grid.contains(ItemData.SpecialChemdust)))
             triggerProbability = 50;
 
         var bombProbability : Int = -1;
@@ -315,7 +342,7 @@ class PlayState extends GarbageState
 
     function generateNextItemCharTypes() : Array<Int>
     {
-        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 5, 5, 10, 10] : [80, 5, 5, 5, 5]);
+        var weights : Array<Float> = (mode == Constants.ModeEndless ? [80, 2, 2, 5, 5] : [92, 2, 2, 2, 2]);
         var specialItemPosition : Int = FlxG.random.getObject([-1, 0, 1, 2, 3], weights);
 
         var charTypes : Array<Int> = [];
@@ -647,21 +674,8 @@ class PlayState extends GarbageState
 
                 if (mode == Constants.ModeEndless)
                 {
-                    // Do other things like change graphic set?
-                    if (session.timesIncreased % 8 == 0)
-                    {
-                        // Each 8 times, new background
-                        var color : Int = background.color;
-                        FlxTween.color(background, 0.5, color, 0xFFFFFFFF, {ease: FlxEase.circInOut});
-                        trace("8 updates: new theme");
-                    }
-                    else if (session.timesIncreased % 4 == 0)
-                    {
-                        // Each 4 times, alt bg
-                        var color : Int = background.color;
-                        FlxTween.color(background, 0.5, color, Palette.DarkBlue, {ease: FlxEase.circInOut});
-                        trace("4 updates: alternate bg");
-                    }
+                    if (checkForThemeChange())
+                        return;
                 }
             }
 
@@ -687,6 +701,8 @@ class PlayState extends GarbageState
 
                         session.cycle += 1;
                         setupCycleGrid();
+
+                        session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.cycle);
 
                         for (item in grid.getAll())
                         {
@@ -719,6 +735,78 @@ class PlayState extends GarbageState
         }
     }
 
+    function checkForThemeChange() : Bool
+    {
+        var themeChange : Bool = (session.timesIncreased % 8 == 0);
+        var sideChange : Bool = (session.timesIncreased % 4 == 0);
+
+        if (themeChange || sideChange)
+        {
+            var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!MOVING FORWARD     ");
+            topDisplay.notifications.add(new TextNotice(24, 16, changeText, 0xFF2ce8f5));
+            aftermathTimer.start(ThemeChangeDelay, doThemeChange);
+        }
+
+        return (themeChange || sideChange);
+    }
+
+    function doThemeChange(_) {
+        var themeChange : Bool = (session.timesIncreased % 8 == 0);
+        var sideChange : Bool = (session.timesIncreased % 4 == 0);
+
+        // Do other things like change graphic set?
+        if (themeChange)
+        {
+            // Each 8 times, new background
+            handleThemeBackgroundChange(true);
+            flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
+                aftermathTimer.start(ThemeChangeDelay, function(_) {
+                    session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
+                    switchState(StateGenerate);
+                });
+            });
+        }
+        else if (sideChange)
+        {
+            // Each 4 times, alt bg
+            handleThemeSideChange();
+            flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
+                aftermathTimer.start(ThemeChangeDelay, function(_) {
+                    session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
+                    switchState(StateGenerate);
+                });
+            });
+
+        }
+    }
+
+    function handleThemeSideChange()
+    {
+        background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideB));
+    }
+
+    function handleThemeBackgroundChange(cycleTheme : Bool)
+    {
+        if (cycleTheme)
+        {
+            theme = theme+1;
+            if (theme > 2)
+                theme = 1;
+        }
+
+        background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
+        if (theme == ThemeManager.ThemeOcean)
+        {
+            fxBg.effectsEnabled = true;
+            fxBg.x = -2;
+        }
+        else
+        {
+            fxBg.effectsEnabled = false;
+            fxBg.x = 0;
+        }
+    }
+
     public function onAftermathFinished()
     {
         switchState(StateGenerate);
@@ -740,6 +828,12 @@ class PlayState extends GarbageState
                 {
                     item.entity.color = Palette.DarkBlue;
                 }
+            }
+            if (nextItem != null)
+            {
+                nextItem.color = Palette.DarkBlue;
+                if (nextItem.slave != null)
+                    nextItem.slave.color = Palette.DarkBlue;
             }
 
             gridShader.alpha = 0.8;

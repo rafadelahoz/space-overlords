@@ -47,7 +47,7 @@ class GameoverState extends GarbageState
                 dtext += "# Processed: " + text.TextUtils.padWith("" + session.session.items, 5, " ") + "\n";
             else
                 dtext += "# Cycles:    " + text.TextUtils.padWith("" + session.session.cycle, 5, " ") + "\n";
-            dtext += "# Rating: "    + text.TextUtils.padWith("" + session.session.score, 8, " ") + "\n\n";
+            dtext +=     "# Rating: "    + text.TextUtils.padWith("" + session.session.score, 8, " ") + "\n\n";
 
             displayText.text = dtext;
         }
@@ -60,7 +60,7 @@ class GameoverState extends GarbageState
             if (endless)
                 dtext += "# Processed: " + text.TextUtils.padWith("" + ProgressData.data.endless_high_items, 5, " ") + "\n";
             else
-                dtext += "# Cycles: " + text.TextUtils.padWith("" + ProgressData.data.treasure_high_cycles, 5, " ") + "\n";
+                dtext += "# Cycles:    " + text.TextUtils.padWith("" + ProgressData.data.treasure_high_cycles, 5, " ") + "\n";
             dtext += "# Rating: " +    text.TextUtils.padWith("" + highScore, 8, " ") + "\n";
             displayText.text = dtext;
         }

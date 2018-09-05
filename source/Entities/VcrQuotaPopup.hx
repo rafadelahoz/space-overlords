@@ -45,8 +45,7 @@ class VcrQuotaPopup extends FlxGroup
         quotaDelta = data.quotaDelta;
         quotaTotal = data.previousQuota;
 
-        background = new FlxSprite(X, Y);
-        background.makeGraphic(Constants.Width, 120, Palette.Red);
+        background = new FlxSprite(X, Y, "assets/ui/gameover-popup-bg.png");
         add(background);
 
         background.scale.y = 0;
@@ -64,20 +63,16 @@ class VcrQuotaPopup extends FlxGroup
 
         var th : Int = 12;
 
-        add(text.PixelText.New(x + 9, y + 1*th, "PROGRESS ASSESSMENT"));
-        add(text.PixelText.New(x + 9, y + 3*th, "QUOTA: + "));
-        add(quotaLabel = text.PixelText.New(x + 9 + 9*8, y + 3*th, "" + quotaDelta));
+        add(quotaLabel = text.VcrText.New(x + 9 + 9*8, y + 3*th, "" + quotaDelta));
 
         // Slave quota
-        add(text.PixelText.New(x+9, y + 4*th, "CURR: "));
-        add(currentLabel = text.PixelText.New(x + 9 + 6*9, y + 4*th, quotaTotal + " / " + ProgressData.data.quota_target));
+        add(currentLabel = text.VcrText.New(x + 54, y + 54, "" + quotaTotal));
+        add(text.VcrText.New(x+117, y+54, "" + ProgressData.data.quota_target));
+
         // Progress bar
-        var width : Int = Std.int(10*th);
-        progressBar = new FlxSprite(Constants.Width/2 - width/2, y + 6*th);
+        var width : Int = 128;
+        progressBar = new FlxSprite(x+26, y+71);
         progressBar.makeGraphic(width, 14, 0x00000000);
-        FlxSpriteUtil.drawRect(progressBar, 0, 0, Std.int(width), 14, 0xFFFFFFFF);
-        FlxSpriteUtil.drawRect(progressBar, 1, 1, Std.int(width-2), 12, 0xFF000000);
-        FlxSpriteUtil.drawRect(progressBar, 1, 1, Std.int(width*0.3), 12, 0xFFFFFFFF);
         add(progressBar);
 
         var addedQuota : Int = quotaTotal + quotaDelta;
@@ -93,19 +88,15 @@ class VcrQuotaPopup extends FlxGroup
         // Check if quota reached...
         if (quotaTotal > ProgressData.data.quota_target)
         {
-            var achievedLabel : FlxBitmapText = text.PixelText.New(Constants.Width/2 - 8*9, y + 8*12, "! QUOTA REACHED !");
-            var bg : FlxSprite = new FlxSprite(achievedLabel.x - 1, achievedLabel.y - 1);
-            bg.makeGraphic(Std.int(achievedLabel.width+2), Std.int(achievedLabel.height+2), 0xFF0000FF);
-            add(bg);
+            var achievedLabel : FlxSprite = new FlxSprite(x+17, y+89, "assets/ui/gameover-popup-quotareached.png");
             add(achievedLabel);
-            flixel.effects.FlxFlicker.flicker(bg, 0, 0.5, true);
             flixel.effects.FlxFlicker.flicker(achievedLabel, 0, 0.5, true);
         }
 
         // close, ok button, etc
-        add(text.PixelText.New(Constants.Width/2 - 18, y + 9*12, "<OK>"));
-        var touchArea : TouchArea = new TouchArea(Constants.Width/2 - 18, y + 9*12, 9*4, 12, closePopup);
-        add(touchArea);
+        var okButton : VcrButton = new VcrButton(x+70, y+107, null, closePopup);
+        okButton.loadSpritesheet("assets/ui/gameover-popup-ok.png", 35, 14);
+        add(okButton);
     }
 
     function closePopup()
@@ -137,12 +128,10 @@ class VcrQuotaPopup extends FlxGroup
             if (quotaLabel != null)
             {
                 quotaLabel.text = "" + Std.int(quotaDelta);
-                currentLabel.text = Std.int(quotaTotal) + " / " + Std.int(ProgressData.data.quota_target);
+                currentLabel.text = text.TextUtils.padWith("" + Std.int(quotaTotal), 4, " ");
 
                 FlxSpriteUtil.fill(progressBar, 0x00000000);
                 var width : Int = Std.int(progressBar.width);
-                FlxSpriteUtil.drawRect(progressBar, 0, 0, Std.int(width), 14, 0xFFFFFFFF);
-                FlxSpriteUtil.drawRect(progressBar, 1, 1, Std.int(width-2), 12, 0xFF000000);
                 FlxSpriteUtil.drawRect(progressBar, 1, 1, Std.int((quotaTotal / ProgressData.data.quota_target) * width), 12, 0xFFFFFFFF);
             }
         }

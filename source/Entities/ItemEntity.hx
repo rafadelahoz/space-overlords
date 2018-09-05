@@ -28,6 +28,8 @@ class ItemEntity extends Entity
     var DissolveGrowTime : Float = 0.2;
     var DissolveExitTime : Float = 0.4;
 
+    var QuickFallScore : Float = 0.2;
+
     var world : PlayState;
     var grid : GarbageGrid;
 
@@ -52,6 +54,8 @@ class ItemEntity extends Entity
     public var slave : ItemEntity;
     var slaveOffset : FlxPoint;
     var slaveCellOffset : FlxPoint;
+
+    var pieceScore : Float;
 
     public function new(X : Float, Y : Float, CharType : Int, ?AltCharType : Int = -1, World : PlayState)
     {
@@ -159,6 +163,7 @@ class ItemEntity extends Entity
                         FlxTween.tween(slave.scale, {x : 1, y: 1}, GenerationTime);
                     }
                 case ItemEntity.StateFalling:
+                    pieceScore = 0;
                     vspeed = world.getFallSpeed();
                 case ItemEntity.StateGrace:
                     finishPositioningAfterMovement = false;
@@ -239,6 +244,10 @@ class ItemEntity extends Entity
             // Go down, allow movement
             if (GamePad.checkButton(GamePad.Down))
             {
+                pieceScore += QuickFallScore;
+                world.session.score += Std.int(pieceScore);
+                pieceScore -= Std.int(pieceScore);
+
                 velocity.set(0, vspeed * SpeedUpFactor);
                 if (canSquish())
                     scale.x = flixel.math.FlxMath.lerp(scale.x, 0.8, 0.2);

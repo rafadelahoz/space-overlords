@@ -12,6 +12,8 @@ class GameController
 		BgmEngine.init();
 		SfxEngine.init();
 
+		ThemeManager.Init();
+
 		ProgressData.Init();
 		GameSettings.Init();
 

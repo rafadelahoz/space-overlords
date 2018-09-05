@@ -28,4 +28,24 @@ class BombRowEffect extends FlxSprite
             }});
         }});
     }
+
+    var tweenActive : Bool;
+    public function onPauseStart()
+    {
+        if (tween != null)
+        {
+            tweenActive = tween.active;
+            if (tween.active)
+                tween.active = false;
+        }
+    }
+
+    public function onPauseEnd()
+    {
+        if (tween != null)
+        {
+            if (tweenActive)
+                tween.active = true;
+        }
+    }
 }

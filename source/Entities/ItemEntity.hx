@@ -5,6 +5,7 @@ import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.effects.FlxFlicker;
 
 class ItemEntity extends Entity
 {
@@ -523,7 +524,7 @@ class ItemEntity extends Entity
 
     public function triggerTriggerAnimation()
     {
-        flixel.util.FlxSpriteUtil.flicker(this, 1, true, true);
+        FlxFlicker.flicker(this, 0, true, true);
         if (charType == ItemData.SpecialBomb)
             animation.play("open");
     }
@@ -532,7 +533,7 @@ class ItemEntity extends Entity
     {
         setState(StateDissolving);
 
-        flixel.util.FlxSpriteUtil.flicker(this, 0.01, 0.001, true, true);
+        FlxFlicker.flicker(this, 0.01, 0.001, true, true);
 
         FlxTween.color(this, DissolveGrowTime, 0xFFFFFFFF, 0xFF000000, {startDelay: 0.1, ease : FlxEase.expoIn, onComplete: function(t:FlxTween) {
             t.destroy();

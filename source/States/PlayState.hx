@@ -38,6 +38,7 @@ class PlayState extends GarbageState
 
     public var grid : GarbageGrid;
     public var items : FlxGroup;
+    var effects : FlxGroup;
 
     var nextItem : ItemEntity;
     var currentItem : ItemEntity;
@@ -99,6 +100,9 @@ class PlayState extends GarbageState
 
         items = new FlxGroup();
         add(items);
+
+        effects = new FlxGroup();
+        add(effects);
 
         currentItem = null;
 
@@ -421,6 +425,7 @@ class PlayState extends GarbageState
             nextItem.onPauseStart();
 
         topDisplay.onPauseStart();
+        effects.forEach(handleEffectPause);
     }
 
     function onPauseEnd()
@@ -433,6 +438,23 @@ class PlayState extends GarbageState
             nextItem.onPauseEnd();
 
         topDisplay.onPauseEnd();
+        effects.forEach(handleEffectResume);
+    }
+
+    function handleEffectPause(basic : FlxBasic)
+    {
+        if (basic != null && Std.is(basic, BombRowEffect))
+        {
+            cast(basic, BombRowEffect).onPauseStart();
+        }
+    }
+
+    function handleEffectResume(basic : FlxBasic)
+    {
+        if (basic != null && Std.is(basic, BombRowEffect))
+        {
+            cast(basic, BombRowEffect).onPauseEnd();
+        }
     }
 
     public function onNextItemGenerated()
@@ -514,17 +536,11 @@ class PlayState extends GarbageState
 
                 for (row in clearRows)
                 {
-                    // HEY: Adding directly to playstate for effect to be on top
-                    /*items.*/add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
+                    effects.add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
                 }
             }
 
-            if (bombsTriggered)
-            {
-                aftermathScoreCounter += 200;
-            }
-
-            if (chemdustCounter > 0 || bombsTriggered)
+            if (chemdustCounter > 0)
             {
                 var comboText = "SPECIAL!";
                 topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
@@ -546,6 +562,7 @@ class PlayState extends GarbageState
         aftermathTriggers = [];
 
         var somethingTriggered : Bool = false;
+        var bombsTriggered : Bool = false;
 
         // Remove resolved triggers and their related entities to avoid matching with them
         for (trigger in triggers)
@@ -571,6 +588,9 @@ class PlayState extends GarbageState
                         handleBombRowRemoval(trigger);
 
                         somethingTriggered = true;
+                        bombsTriggered = true;
+
+                        aftermathScoreCounter += 200;
                     }
                 }
 
@@ -579,8 +599,14 @@ class PlayState extends GarbageState
             }
         }
 
-        if (somethingTriggered)
+        if (somethingTriggered && bombsTriggered)
+        {
             aftermathTimer.start(TriggerCleanupDelay, handleAftermathFalling);
+
+            var comboText = "SPECIAL!";
+            topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
+            topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+        }
         else
             aftermathTimer.start(0.01, handleAftermathCleanup);
     }

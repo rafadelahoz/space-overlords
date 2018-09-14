@@ -104,6 +104,8 @@
 
 	<!--<config:android permission="android.permission.WRITE_EXTERNAL_STORAGE" />-->
 
+	<template path="android/MainActivity.java" rename="src/badladns/the/spaceoverlords/MainActivity.java" if="android" />
+
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
 	<!--<icon path="assets/icons/bubble-icon16.png" size="16" />
 	<icon path="assets/icons/bubble-icon32.png" size="32" />

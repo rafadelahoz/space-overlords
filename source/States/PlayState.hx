@@ -689,7 +689,7 @@ class PlayState extends GarbageState
         var score : Int = 0;
 
         // Item matching is worth less on treasure
-        var itemValue : Int = (mode == Constants.ModeEndless ? 10 : 1);
+        var itemValue : Int = (mode == Constants.ModeEndless ? 10 : 0);
         for (item in matches)
         {
             switch(item.type)

@@ -89,8 +89,8 @@ class MenuState extends GarbageState
         add(playButton);
 
         museumButton = new VcrButton(26, 143, onMuseumHighlighted, onMuseumPressed);
-        museumButton.loadSpritesheet("assets/ui/cell-menu-museum.png", 137, 14);
-        add(museumButton);
+        // museumButton.loadSpritesheet("assets/ui/cell-menu-museum.png", 137, 14);
+        // add(museumButton);
 
         rewardButton = new VcrButton(26, 143 + 12*2, onRewardHighlighted, onRewardPressed);
         rewardButton.loadSpritesheet("assets/ui/cell-menu-reward.png", 137, 14);

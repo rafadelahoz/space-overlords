@@ -29,7 +29,7 @@ class ItemEntity extends Entity
     var DissolveGrowTime : Float = 0.2;
     var DissolveExitTime : Float = 0.4;
 
-    var QuickFallScore : Float = 0.2;
+    var QuickFallScore : Float = 0.1;
 
     var world : PlayState;
     var grid : GarbageGrid;

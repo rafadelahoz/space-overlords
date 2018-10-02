@@ -153,12 +153,12 @@ class PlayState extends GarbageState
     function getInitialFallSpeed() : Int
     {
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        return 16 + (intensity-1);
+        return (intensity == 0 ? 12 : 15 + intensity);
     }
 
     function setupGameplay()
     {
-        // Intensity 1-4
+        // Intensity 0-4
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
         session.fallSpeed = getInitialFallSpeed();
 
@@ -696,7 +696,7 @@ class PlayState extends GarbageState
         var score : Int = 0;
 
         // Item matching is worth less on treasure
-        var itemValue : Int = (mode == Constants.ModeEndless ? 10 : 1);
+        var itemValue : Int = (mode == Constants.ModeEndless ? 10 : 0);
         for (item in matches)
         {
             switch(item.type)
@@ -968,6 +968,9 @@ class PlayState extends GarbageState
     {
         // Intensity 1-4
         var rows : Int = Std.int(Math.abs(1 - intensity));
+        if (intensity == 0)
+            rows = 0;
+
         for (i in 0...rows)
         {
             generateRow(grid.rows-1-i);

@@ -121,8 +121,8 @@ class GamePreState extends GarbageState
         backButton.clearHighlight();
 
         GameSettings.data.intensity -= 25;
-        if (GameSettings.data.intensity < 25)
-            GameSettings.data.intensity = 25;
+        if (GameSettings.data.intensity < 0)
+            GameSettings.data.intensity = 0;
 
         GameSettings.Save();
     }

@@ -68,6 +68,10 @@ class PlayState extends GarbageState
 
     // Theme
     var theme : Int;
+    var shallChangeBackground : Int;
+    var NoChange    : Int = 0;
+    var ChangeSide  : Int = 1;
+    var ChangeTheme : Int = 2;
 
     // Debug
     public var debugEnabled : Bool;
@@ -234,7 +238,7 @@ class PlayState extends GarbageState
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     topDisplay.startScroller();
                     switchState(StateGenerate);
-                    topDisplay.notifications.add(new TextNotice(24, 16, "!WORK  STARTING!", Palette.Green, true));
+                    topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
                 });
             case PlayState.StateGenerate:
                 if (nextItem == null)
@@ -543,8 +547,8 @@ class PlayState extends GarbageState
             if (chemdustCounter > 0)
             {
                 var comboText = "SPECIAL!";
-                topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
-                topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+                topDisplay.showMessage(96-(1+comboText.length)*8, comboText, 0xFF2ce8f5);
+                topDisplay.showMessage(96, "+ " + aftermathScoreCounter, 0xFFFEE761);
 
             }
 
@@ -604,8 +608,8 @@ class PlayState extends GarbageState
             aftermathTimer.start(TriggerCleanupDelay, handleAftermathFalling);
 
             var comboText = "SPECIAL!";
-            topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
-            topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
+            topDisplay.showMessage(96-(1+comboText.length)*8, comboText, 0xFF2ce8f5);
+            topDisplay.showMessage(96, "+ " + aftermathScoreCounter, 0xFFFEE761);
         }
         else
             aftermathTimer.start(0.01, handleAftermathCleanup);
@@ -662,15 +666,18 @@ class PlayState extends GarbageState
             // Scale by combo
             aftermathScoreCounter += 2*aftermathCombo * matchesScore;
 
-            if (aftermathCombo > 1)
+            if (mode == Constants.ModeEndless)
             {
-                var comboText : String = "COMBO";
-                for (i in 1...Std.int(Math.min(aftermathCombo, 3)))
-                    comboText += "!";
-                comboText = text.TextUtils.padWith(comboText, 9, " ");
-                topDisplay.notifications.add(new TextNotice(96-(1+comboText.length)*8, 16, comboText, 0xFF2ce8f5));
+                if (aftermathCombo > 1)
+                {
+                    var comboText : String = "COMBO";
+                    for (i in 1...Std.int(Math.min(aftermathCombo, 3)))
+                        comboText += "!";
+                    comboText = text.TextUtils.padWith(comboText, 9, " ");
+                    topDisplay.showMessage(96-(1+comboText.length)*8, comboText, 0xFF2ce8f5);
+                }
+                topDisplay.showMessage(96, "+ " + aftermathScoreCounter, 0xFFFEE761);
             }
-            topDisplay.notifications.add(new TextNotice(96, 16, "+ " + aftermathScoreCounter, 0xFFFEE761));
         }
 
         // Wait a bit if things are leaving, otherwise finish now
@@ -725,7 +732,8 @@ class PlayState extends GarbageState
                 session.lastItemsSpeedIncrease = session.items;
                 session.timesIncreased += 1;
 
-                topDisplay.notifications.add(new TextNotice(80, 16, "!Speed Up!", Palette.Yellow));
+                if (mode == Constants.ModeEndless)
+                    topDisplay.showMessage(80, "!Speed Up!", Palette.Yellow);
 
                 if (mode == Constants.ModeEndless)
                 {
@@ -775,9 +783,16 @@ class PlayState extends GarbageState
                             }
                         }
 
-                        aftermathTimer.start(2.5, function(_) {
+                        // Change the side/theme on each clean
+                        if (shallChangeBackground == NoChange || shallChangeBackground == ChangeTheme)
+                            shallChangeBackground = ChangeSide;
+                        else
+                            shallChangeBackground = ChangeTheme;
+
+                        aftermathTimer.start(0.01, doThemeChange);
+                        /*aftermathTimer.start(2.5, function(_) {
                             switchState(StateGenerate);
-                        });
+                        });*/
                     });
 
                     return;
@@ -798,19 +813,24 @@ class PlayState extends GarbageState
         if (themeChange || sideChange)
         {
             var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!MOVING FORWARD     ");
-            topDisplay.notifications.add(new TextNotice(24, 16, changeText, 0xFF2ce8f5));
+            topDisplay.showMessage(24, changeText, 0xFF2ce8f5);
             aftermathTimer.start(ThemeChangeDelay, doThemeChange);
         }
+
+        if (themeChange)
+            shallChangeBackground = ChangeTheme;
+        else if (sideChange)
+            shallChangeBackground = ChangeSide;
+        else
+            shallChangeBackground = NoChange;
+
 
         return (themeChange || sideChange);
     }
 
     function doThemeChange(_) {
-        var themeChange : Bool = (session.timesIncreased % 8 == 0);
-        var sideChange : Bool = (session.timesIncreased % 4 == 0);
-
         // Do other things like change graphic set?
-        if (themeChange)
+        if (shallChangeBackground == ChangeTheme)
         {
             // Each 8 times, new background
             handleThemeBackgroundChange(true);
@@ -821,7 +841,7 @@ class PlayState extends GarbageState
                 });
             });
         }
-        else if (sideChange)
+        else if (shallChangeBackground == ChangeSide)
         {
             // Each 4 times, alt bg
             handleThemeSideChange();
@@ -831,7 +851,6 @@ class PlayState extends GarbageState
                     switchState(StateGenerate);
                 });
             });
-
         }
     }
 
@@ -907,7 +926,7 @@ class PlayState extends GarbageState
 
     function showGameOverNotification()
     {
-        topDisplay.notifications.add(new TextNotice(96, 16, "!ERROR!", Palette.Red, showGameOverNotification));
+        topDisplay.showMessage(96, "!ERROR!", Palette.Red, showGameOverNotification);
     }
 
     function itemsSorter(order : Int, a : FlxBasic, b : FlxBasic) : Int

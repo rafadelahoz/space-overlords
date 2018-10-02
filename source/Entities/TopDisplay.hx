@@ -66,13 +66,13 @@ class TopDisplay extends FlxGroup
         beltShakeTimer = new FlxTimer();
         onBeltShakeTimer(beltShakeTimer);
 
-        add(new FlxSprite(24, 16, "assets/ui/rating-marker.png"));
-        scoreLabel = text.PixelText.New(48, 16, " 9999", 0xFFFFFFFF);
-        scoreLabel.visible = false;
-        add(scoreLabel);
-
         if (world.mode == Constants.ModeEndless)
         {
+            add(new FlxSprite(24, 16, "assets/ui/rating-marker.png"));
+            scoreLabel = text.PixelText.New(48, 16, " 9999", 0xFFFFFFFF);
+            scoreLabel.visible = false;
+            add(scoreLabel);
+
             bottomLabel = new ScrollingLabel(20, 24, 18, "PRODUCTION IS OK", 0xFFFEE761);
             bottomLabel.visible = false;
             bottomLabel.pause();
@@ -80,7 +80,10 @@ class TopDisplay extends FlxGroup
         }
         else
         {
+            add(text.PixelText.New(24, 16, "BEST ", 0xFFFEE761));
+            add(text.PixelText.New(24 + 6*8, 16, text.TextUtils.padWith("" + ProgressData.data.treasure_high_cycles, 2, "0")));
             add(text.PixelText.New(24, 24, "CYCLE ", 0xFFFEE761));
+
             cycleLabel = text.PixelText.New(24 + 6*8, 24, "01", 0xFFFFFFFF);
             cycleLabel.visible = false;
             add(cycleLabel);
@@ -111,7 +114,8 @@ class TopDisplay extends FlxGroup
             belt.animation.paused = false;
         });
 
-        scoreLabel.visible = true;
+        if (scoreLabel != null)
+            scoreLabel.visible = true;
         if (cycleLabel != null)
             cycleLabel.visible = true;
         if (targetsLabel != null)
@@ -133,9 +137,10 @@ class TopDisplay extends FlxGroup
                 items.add(next);
             }
 
-            scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
             if (world.mode == Constants.ModeEndless)
             {
+                scoreLabel.text = text.TextUtils.padWith(""+world.session.score, 5, " ");
+
                 // DEBUG: Bottom label queue density
                 var itemsInBelt : Int = items.countLiving();
                 if (itemsInBelt >= 10)
@@ -266,5 +271,11 @@ class TopDisplay extends FlxGroup
     {
         if (basic != null)
             basic.active = true;
+    }
+
+    public function showMessage(X : Float, ?Y : Float = -1, Message : String, Color : Int, ?Borderless : Bool = false, ?Callback : Void -> Void = null)
+    {
+        var y = (Y == -1 ? 16 : Y);
+        notifications.add(new TextNotice(X, y, Message, Color, Borderless, Callback));
     }
 }

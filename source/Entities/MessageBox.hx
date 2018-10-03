@@ -23,15 +23,28 @@ class MessageBox extends FlxGroup
 
     var touchArea : TouchArea;
 
-    public function show(Message : String, ?Callback : Void -> Void = null) : MessageBox
+    public function show(Message : String, ?Settings : MessageSettings = null, ?Callback : Void -> Void = null) : MessageBox
     {
-        x = 0;
-        y = Constants.Height/2 - 24;
-        width = Constants.Width;
-        height = 48;
-        border = 8;
-
         var bgColor : Int = Palette.DarkBlue;
+
+        if (Settings != null)
+        {
+            x = Settings.x;
+            y = Settings.y;
+            width = Settings.w;
+            height = Settings.h;
+            border = Settings.border;
+            if (Settings.color >= 0)
+                bgColor = Settings.color;
+        }
+        else
+        {
+            x = 0;
+            y = Constants.Height/2 - 24;
+            width = Constants.Width;
+            height = 48;
+            border = 8;
+        }
 
         background = new FlxSprite(x, y).makeGraphic(Std.int(width), Std.int(height), bgColor);
         background.scale.y = 0;
@@ -80,3 +93,12 @@ class MessageBox extends FlxGroup
         }
     }
 }
+
+typedef MessageSettings = {
+    var x : Float;
+    var y : Float;
+    var w : Float;
+    var h : Float;
+    var border : Int;
+    var color : Int;
+};

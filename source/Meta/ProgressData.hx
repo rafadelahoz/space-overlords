@@ -60,6 +60,14 @@ class ProgressData
         Save();
     }
 
+    public static function OnSlaveRewarded()
+    {
+        data.slave_id = -1;
+        data.slave_count++;
+
+        Save();
+    }
+
     static function loadSaveData()
     {
         var save : FlxSave = new FlxSave();

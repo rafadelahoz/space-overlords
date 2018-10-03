@@ -9,6 +9,7 @@ import flixel.tweens.FlxTween;
 
 class SlaveCharacter extends FlxSprite
 {
+    public static var StateNone : Int = -1;
     public static var StateFall : Int = 0;
     public static var StateIdle : Int = 1;
     public static var StateWalk : Int = 2;
@@ -37,7 +38,7 @@ class SlaveCharacter extends FlxSprite
 
     var motionTween : FlxTween;
 
-    public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -1)
+    public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -2)
     {
         super(X, Y);
 
@@ -48,7 +49,7 @@ class SlaveCharacter extends FlxSprite
         timer = new FlxTimer();
         motionTween = null;
 
-        if (State < 0)
+        if (State < -1)
         {
             switchState(StateWalk);
         }
@@ -94,11 +95,15 @@ class SlaveCharacter extends FlxSprite
         flixel.util.FlxSpriteUtil.drawEllipse(shadow, 4, 0, width-8, 6, Palette.AlmostBlack);
     }
 
-    public function switchState(Next : Int, ?Special : Bool = false)
+    public function switchState(Next : Int, ?Destination : FlxPoint = null, ?Special : Bool = false, ?Callback : Void -> Void = null)
     {
         state = Next;
         switch(state)
         {
+            case SlaveCharacter.StateNone:
+                // nop!
+                if (timer != null && timer.active)
+                    timer.cancel();
             case SlaveCharacter.StateFall:
                 playAnim("fall");
                 cancelTween(motionTween);
@@ -113,11 +118,15 @@ class SlaveCharacter extends FlxSprite
                     switchState(StateWalk);
                 });
             case SlaveCharacter.StateWalk:
-                var nextPos : FlxPoint = findNextPosition();
+                var nextPos : FlxPoint = Destination;
+                if (nextPos == null)
+                    nextPos = findNextPosition();
 
                 setFlipX(nextPos.x < x);
                 cancelTween(motionTween);
                 motionTween = FlxTween.linearMotion(this, x, y, nextPos.x, nextPos.y, fuzzyValue(WalkTime, WalkTimeVariation), true, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
+                    if (Callback != null)
+                        Callback();
                     switchState(StateIdle);
                 }});
 
@@ -198,6 +207,8 @@ class SlaveCharacter extends FlxSprite
             detail.y += 6;
         }
 
+        head.color = color;
+
         super.draw();
         head.draw();
         detail.draw();
@@ -260,5 +271,10 @@ class SlaveCharacter extends FlxSprite
         {
             tween.cancel();
         }
+    }
+
+    public function walkTo(destination : FlxPoint, ?callback : Void->Void = null)
+    {
+        switchState(StateWalk, destination, callback);
     }
 }

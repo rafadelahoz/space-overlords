@@ -94,6 +94,11 @@ class GameController
 		FlxG.switchState(new GameoverState(goData));
 	}
 
+	public static function ToReward()
+	{
+		FlxG.switchState(new RewardState());
+	}
+
 	static function computeQuota(data : PlaySessionData) : Int
 	{
 		return data.items;

@@ -27,6 +27,8 @@ class MenuState extends GarbageState
     var background : FlxSprite;
     var backgroundShader : FlxSprite;
 
+    var slave : SlaveCharacter;
+
     var backButton : VcrButton;
     var playButton : VcrButton;
     var museumButton : VcrButton;
@@ -92,7 +94,7 @@ class MenuState extends GarbageState
         // museumButton.loadSpritesheet("assets/ui/cell-menu-museum.png", 137, 14);
         // add(museumButton);
 
-        rewardButton = new VcrButton(26, 143 + 12*2, onRewardHighlighted, onRewardPressed);
+        rewardButton = new VcrButton(26, 143 /*+ 12*2*/, onRewardHighlighted, onRewardPressed);
         rewardButton.loadSpritesheet("assets/ui/cell-menu-reward.png", 137, 14);
         if (ProgressData.data.quota_current >= ProgressData.data.quota_target)
             add(rewardButton);
@@ -154,6 +156,12 @@ class MenuState extends GarbageState
 
     public function onArcadeButtonPressed() : Void
     {
+        disableButtons();
+
+        // Walk towards door
+        var doorPosition : FlxPoint = new FlxPoint(Constants.Width - 80, Constants.Height*0.7);
+        slave.walkTo(doorPosition);
+
         FlxG.camera.fade(0xFF000000, 0.25, false, function() {
             GameController.ToGameConfiguration();
         });
@@ -166,21 +174,34 @@ class MenuState extends GarbageState
 
     function onRewardPressed()
     {
+        disableButtons();
+
         var message : String =
-                "Slave " + ProgressData.data.slave_id + "!#" +
+                /*"Slave " + ProgressData.data.slave_id + "!#" +
                 "You have reached your quota, and are going to be rewarded#" +
                 "You will have the honour of meeting our space overlord" +
                 "And then you get to choose your reward#" +
-                "Congratulations#" +
+                "Congratulations#" +*/
                 "Please, proceed";
         add(new MessageBox().show(message, function() {
-            trace("HAHA");
-            // GameController.ToTitle(true);
+            // Door opening
+            var doorPosition : FlxPoint = new FlxPoint(Constants.Width - 80, Constants.Height*0.7);
+            slave.walkTo(doorPosition, function() {
+                slave.switchState(SlaveCharacter.StateNone);
+                var color : Int = slave.color;
+                FlxTween.color(slave, 0.5, color, 0xFF000000, {onComplete: function(_) {
+                    FlxG.camera.fade(0xFF000000, 0.25, false, function() {
+                        GameController.ToReward();
+                    });
+                }});
+            });
         }));
     }
 
     public function onBackPressed()
     {
+        disableButtons();
+
         GameController.ToTitle(true);
     }
 
@@ -189,14 +210,25 @@ class MenuState extends GarbageState
         if (status == StatusNone || status == StatusFromGameover)
         {
             // Normally add a slave randomly
-            add(new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
+            add(slave = new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
                                    Constants.Height*0.7 + FlxG.random.int(0, 24),
                                    this, (status == StatusFromGameover ? SlaveCharacter.StateReturn : -1)));
         }
         else if (status == StatusNewSlave)
         {
             // New slaves fall from top
-            add(new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
+            add(slave = new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
         }
+    }
+
+    function disableButtons()
+    {
+        backButton.disable();
+        playButton.disable();
+        // museumButton.disable();
+        rewardButton.disable();
+
+        playButton.visible = false;
+        rewardButton.visible = false;
     }
 }

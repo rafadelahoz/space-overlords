@@ -50,7 +50,8 @@ class RewardState extends GarbageState
 
         var settings : MessageBox.MessageSettings =
         {
-            x : 4, y : 4, w: Constants.Width-8, h: Constants.Height/4, color: -1, border: 4
+            x : 4, y : 4, w: Constants.Width-8, h: Constants.Height/4, border: 4,
+            color: -1, animatedBackground: true
         };
 
         add(new MessageBox().show(message, settings, function() {

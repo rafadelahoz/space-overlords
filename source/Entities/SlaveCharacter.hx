@@ -104,6 +104,7 @@ class SlaveCharacter extends FlxSprite
                 // nop!
                 if (timer != null && timer.active)
                     timer.cancel();
+                cancelTween(motionTween);
             case SlaveCharacter.StateFall:
                 playAnim("fall");
                 cancelTween(motionTween);
@@ -127,7 +128,8 @@ class SlaveCharacter extends FlxSprite
                 motionTween = FlxTween.linearMotion(this, x, y, nextPos.x, nextPos.y, fuzzyValue(WalkTime, WalkTimeVariation), true, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
                     if (Callback != null)
                         Callback();
-                    switchState(StateIdle);
+                    else
+                        switchState(StateIdle);
                 }});
 
                 nextPos.put();

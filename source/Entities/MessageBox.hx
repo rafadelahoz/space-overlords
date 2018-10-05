@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
@@ -26,6 +27,7 @@ class MessageBox extends FlxGroup
     public function show(Message : String, ?Settings : MessageSettings = null, ?Callback : Void -> Void = null) : MessageBox
     {
         var bgColor : Int = Palette.DarkBlue;
+        var animatedBackground : Bool = false;
 
         if (Settings != null)
         {
@@ -36,6 +38,7 @@ class MessageBox extends FlxGroup
             border = Settings.border;
             if (Settings.color >= 0)
                 bgColor = Settings.color;
+            animatedBackground = Settings.animatedBackground;
         }
         else
         {
@@ -64,9 +67,18 @@ class MessageBox extends FlxGroup
 
         FlxTween.tween(background.scale, {y: 1}, OpenTime, {ease : FlxEase.circInOut, onComplete: function(_) {
             doMessage();
+            if (animatedBackground)
+                doBackgroundAnimation();
         }});
 
         return this;
+    }
+
+    function doBackgroundAnimation(?tween : FlxTween = null)
+    {
+        if (tween != null) tween.destroy();
+        background.scale.set(1.05, 1.05);
+        FlxTween.tween(background.scale, {x: 0.95, y: 0.95}, FlxG.random.float(0.05, 0.15), {ease: FlxEase.backInOut, loopDelay: FlxG.random.float(0.05, 0.2), type: FlxTween.PINGPONG});
     }
 
     function doMessage()
@@ -101,4 +113,5 @@ typedef MessageSettings = {
     var h : Float;
     var border : Int;
     var color : Int;
+    var animatedBackground : Bool;
 };

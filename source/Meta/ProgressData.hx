@@ -28,6 +28,8 @@ class ProgressData
                 }
             }
         }
+
+        data.quota_current = data.quota_target;
     }
 
     public static function StartNewGame()

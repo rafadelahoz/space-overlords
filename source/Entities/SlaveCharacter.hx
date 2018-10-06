@@ -104,7 +104,6 @@ class SlaveCharacter extends FlxSprite
                 // nop!
                 if (timer != null && timer.active)
                     timer.cancel();
-                cancelTween(motionTween);
             case SlaveCharacter.StateFall:
                 playAnim("fall");
                 cancelTween(motionTween);
@@ -171,7 +170,7 @@ class SlaveCharacter extends FlxSprite
         {
             case SlaveCharacter.StateFall:
                 // playAnim("fall");
-            case SlaveCharacter.StateIdle:
+            case SlaveCharacter.StateIdle, SlaveCharacter.StateNone:
                 playAnim("idle");
             case SlaveCharacter.StateWalk, SlaveCharacter.StateRight, SlaveCharacter.StateLeft:
                 playAnim("walk");

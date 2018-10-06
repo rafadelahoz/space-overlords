@@ -153,7 +153,7 @@ class PlayState extends GarbageState
     function getInitialFallSpeed() : Int
     {
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        return (intensity == 0 ? 12 : 15 + intensity);
+        return (intensity == 0 ? 14 : 16 + intensity);
     }
 
     function setupGameplay()

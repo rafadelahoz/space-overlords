@@ -177,7 +177,7 @@ class TypeWriter extends FlxBitmapText
         fieldWidth = Width;
 		text = "";
 		color = 0xFFFFFFFF;
-		useTextColor = false;
+		useTextColor = true;
 		textColor = Color;
 
         font = PixelText.font;

@@ -152,6 +152,13 @@ class TitleState extends GarbageState
                     newSlaveButton.loadSpritesheet("assets/ui/gameconfig-intensity-remove.png", 11, 14, true);
                     screen.add(newSlaveButton);
 
+                    var reachQuotaButton : VcrButton = new VcrButton(98 + 3*12, baseY + 131 + 3*12, null, function() {
+                        ProgressData.data.quota_current = ProgressData.data.quota_target;
+                        screen.add(new MessageBox().show("Quota reached"));
+                    });
+                    reachQuotaButton.loadSpritesheet("assets/ui/gameconfig-intensity-add.png", 11, 14, true);
+                    screen.add(reachQuotaButton);
+
                 case TitleState.StateCredits:
                     clearGroup(screen);
                     screen.add(new FlxSprite(0, baseY, "assets/ui/title-credits-main.png"));

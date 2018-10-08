@@ -65,11 +65,11 @@ class RewardState extends GarbageState
         var message : String =
             "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
-            "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings like you", "friends (I can call you friend, right?)", "slaves like you"]) +
-            " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet.", "managing to fix the mess this \"humans\" made."]) + "#" +
-            "You know this weird material that is scattered around the whole planet?#The science team says it's not a natural resource! Turns out HOMINS produced it!#They used it for everything. It was named something like PLASTIX.#They must have really liked it, because they didn't develop a way to dispose of it.#It's literally everywhere!#" +
-            "Now please, tell me what would you like the best?#" +
-            "GO HOME or SPECIAL HONOR";
+            "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
+            " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
+            LoreLibrary.getLore() + "#" +
+            "As the reward for reaching your quota, we are sending you home.#" +
+            "Thank you very very much for your hard work";
 
         var settings : MessageBox.MessageSettings =
         {
@@ -82,6 +82,10 @@ class RewardState extends GarbageState
             FlxG.camera.flash(Palette.Red, 0.75, function() {
                 ProgressData.OnSlaveRewarded();
                 GameController.ToMenu();
+
+                // DEBUG: Iterate on messages
+                // ProgressData.data.slave_count += 1;
+                // showMessage();
             });
         }));
     }

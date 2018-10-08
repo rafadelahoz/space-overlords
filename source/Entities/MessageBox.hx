@@ -30,7 +30,7 @@ class MessageBox extends FlxGroup
     public function show(Message : String, ?Settings : MessageSettings = null, ?Callback : Void -> Void = null) : MessageBox
     {
         var bgColor : Int = Palette.DarkBlue;
-        var textColor : Int = Palette.White;
+        var textColor : Int = 0xFFFFFFFF;
         var animatedBackground : Bool = false;
 
         if (Settings != null)
@@ -41,7 +41,6 @@ class MessageBox extends FlxGroup
             height = Settings.h;
             border = Settings.border;
             textColor = Settings.color;
-            trace(textColor + " vs " + Palette.Black);
             animatedBackground = Settings.animatedBackground;
         }
         else
@@ -71,7 +70,8 @@ class MessageBox extends FlxGroup
 
         messages = Message.split("#");
 
-        touchArea = new TouchArea(x, y, Std.int(width), Std.int(height), function() {
+        // touchArea = new TouchArea(x, y, Std.int(width), Std.int(height), function() {
+        touchArea = new TouchArea(x, y, Constants.Width, Constants.Height, function() {
             GamePad.setPressed(GamePad.Shoot);
         });
         add(touchArea);
@@ -110,7 +110,7 @@ class MessageBox extends FlxGroup
                 backgroundTween.destroy();
                 backgroundTween = null;
             }
-            
+
             messages = null;
             remove(textBox);
             textBox.destroy();

@@ -17,6 +17,12 @@ class GameController
 		ProgressData.Init();
 		GameSettings.Init();
 
+		LoreLibrary.Init();
+
+		// Test LoreLibrary
+		// LoreLibrary.Test();
+		// throw "END";
+
 		if (ProgressData.data.slave_count < 0)
 			ProgressData.StartNewGame();
 

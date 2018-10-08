@@ -79,9 +79,16 @@ class RewardState extends GarbageState
 
         add(new MessageBox().show(message, settings, function() {
             // DONE!
-            FlxG.camera.flash(Palette.Red, 0.75, function() {
+            FlxG.camera.flash(Palette.White, 0.75, function() {
                 ProgressData.OnSlaveRewarded();
-                GameController.ToMenu();
+
+                var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY#NOW YOU GET A NEW SLAVE";
+                add(new MessageBox().show(tempMsg, {
+                    x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+                    color: Palette.White, animatedBackground: false
+                }, function() {
+                    GameController.ToMenu();
+                }));
 
                 // DEBUG: Iterate on messages
                 // ProgressData.data.slave_count += 1;

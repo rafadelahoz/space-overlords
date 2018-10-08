@@ -110,8 +110,8 @@ class ItemEntity extends Entity
         }
         else if (charType == ItemData.SpecialTarget)
         {
-            makeGraphic(Constants.TileSize, Constants.TileSize, 0x00000000);
-            flixel.util.FlxSpriteUtil.drawRect(this, 1, 1, 14, 14, Palette.Red);
+            loadGraphic("assets/images/target.png");
+            offset.set(1, 1);
         }
         else
         {

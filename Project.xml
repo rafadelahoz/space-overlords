@@ -39,6 +39,7 @@
 	<classpath name="source/Meta" />
 	<classpath name="source/States" />
 	<classpath name="source/Entities" />
+	<classpath name="source/Database" />
 
 	<assets path="assets/backgrounds" />
 	<assets path="assets/fonts" />

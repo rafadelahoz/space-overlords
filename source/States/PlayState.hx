@@ -267,6 +267,8 @@ class PlayState extends GarbageState
             case PlayState.StateLost:
                 trace("Game over!");
 
+                session.endTime = Date.now().getTime();
+
                 showGameOverNotification();
                 topDisplay.handleGameover();
                 FlxG.camera.flash(Palette.Red, function() {
@@ -916,6 +918,7 @@ class PlayState extends GarbageState
         }
         else
         {
+            DataServiceClient.SendSessionData(GameSettings.data, session);
             gameoverTimer.start(GameoverLightsoutDelay, function(t:FlxTimer) {
                 FlxG.camera.fade(0xFF000000, GameoverLightsoutDelay * 2, false, function() {
                     GameController.GameOver(Constants.ModeEndless, session);

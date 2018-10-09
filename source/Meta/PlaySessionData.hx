@@ -11,6 +11,9 @@ class PlaySessionData
     public var lastItemsSpeedIncrease : Int;
     public var timesIncreased : Int;
 
+    public var startTime : Float;
+    public var endTime : Float;
+
     public function new(?Score : Int = 0, ?Items : Int = 0)
     {
         score = Score;
@@ -21,6 +24,9 @@ class PlaySessionData
         fallSpeed = 0;
         lastItemsSpeedIncrease = 0;
         timesIncreased = 0;
+
+        startTime = Date.now().getTime();
+        endTime = -1;
     }
 }
 

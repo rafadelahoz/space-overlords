@@ -19,10 +19,6 @@ class GameController
 
 		LoreLibrary.Init();
 
-		// Test LoreLibrary
-		// LoreLibrary.Test();
-		// throw "END";
-
 		if (ProgressData.data.slave_count < 0)
 			ProgressData.StartNewGame();
 

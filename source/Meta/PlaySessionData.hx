@@ -1,5 +1,7 @@
 package;
 
+import flixel.FlxG;
+
 class PlaySessionData
 {
     public var score : Int;
@@ -27,6 +29,21 @@ class PlaySessionData
 
         startTime = Date.now().getTime();
         endTime = -1;
+    }
+
+    public static function Random() : PlaySessionData
+    {
+        var data : PlaySessionData = new PlaySessionData();
+        data.cycle = FlxG.random.int(0, 20);
+        data.endTime = Date.now().getTime() + FlxG.random.int(60, 500);
+        data.startTime = Date.now().getTime();
+        data.fallSpeed = FlxG.random.int(12, 25);
+        data.items = FlxG.random.int(10, 600);
+        data.lastItemsSpeedIncrease = 0;
+        data.score = FlxG.random.int(20, 26000);
+        data.timesIncreased = FlxG.random.int(1, 20);
+
+        return data;
     }
 }
 

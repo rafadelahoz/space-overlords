@@ -140,7 +140,7 @@ class SlaveCharacter extends FlxSprite
                 state = StateWalk;
             case SlaveCharacter.StateReturn:
                 setFlipX(true);
-                motionTween = FlxTween.linearMotion(this, Constants.Width, y - 20, x, y, fuzzyValue(TraverseSpeed, TraverseVariation), false, {startDelay: 0.5, ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
+                motionTween = FlxTween.linearMotion(this, Constants.Width, y - 8, x, y, fuzzyValue(TraverseSpeed, TraverseVariation), false, {startDelay: 0.5, ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
                     switchState(StateIdle);
                 }});
                 state = StateWalk;

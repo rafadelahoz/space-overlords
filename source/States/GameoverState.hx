@@ -133,9 +133,9 @@ class GameoverState extends GarbageState
             popup.destroy();
         }
 
-        /*againButton = new VcrButton(8, 36 + 47, onBackHighlighted, onBackPressed);
-        againButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
-        add(againButton);*/
+        againButton = new VcrButton(Constants.Width - 8 - 64, 36 + 47, onAgainHighlighted, onAgainPressed);
+        againButton.loadSpritesheet("assets/ui/gameover-btn-again.png", 64, 14);
+        add(againButton);
 
         backButton = new VcrButton(8, 36 + 47, onBackHighlighted, onBackPressed);
         backButton.loadSpritesheet("assets/ui/title-menu-back.png", 56, 14);
@@ -144,7 +144,17 @@ class GameoverState extends GarbageState
 
     function onBackHighlighted()
     {
-        // againButton.clearHighlight...
+        againButton.clearHighlight();
+    }
+
+    function onAgainHighlighted()
+    {
+        backButton.clearHighlight();
+    }
+
+    function onAgainPressed()
+    {
+        GameController.StartGameplay();
     }
 
     function onBackPressed()

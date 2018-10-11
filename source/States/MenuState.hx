@@ -25,6 +25,7 @@ class MenuState extends GarbageState
     var yearsLabel : FlxBitmapText;
     var creditsLabel : FlxBitmapText;
     var background : FlxSprite;
+    var doorOpenFx : FlxSprite;
     var backgroundShader : FlxSprite;
 
     var slave : SlaveCharacter;
@@ -64,6 +65,13 @@ class MenuState extends GarbageState
 
         background = new FlxSprite(0, 0, "assets/backgrounds/bgCell.png");
         add(background);
+
+        doorOpenFx = new FlxSprite(0, 152);
+        doorOpenFx.loadGraphic("assets/backgrounds/bgCellDoorOpen.png", true, 180, 152);
+        doorOpenFx.animation.add("idle", [0]);
+        doorOpenFx.animation.add("open", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 16, false);
+        doorOpenFx.animation.play("idle");
+        add(doorOpenFx);
 
         initSlave();
 
@@ -185,16 +193,19 @@ class MenuState extends GarbageState
                 "Please, proceed";
         add(new MessageBox().show(message, function() {
             // Door opening
-            var doorPosition : FlxPoint = new FlxPoint(Constants.Width - 80, Constants.Height*0.7);
-            slave.walkTo(doorPosition, function() {
-                slave.switchState(SlaveCharacter.StateNone);
-                var color : Int = slave.color;
-                FlxTween.color(slave, 0.5, color, 0xFF000000, {onComplete: function(_) {
-                    FlxG.camera.fade(0xFF000000, 0.25, false, function() {
-                        GameController.ToReward();
-                    });
-                }});
-            });
+            doorOpenFx.animation.finishCallback = function(_) {
+                var doorPosition : FlxPoint = new FlxPoint(126, 204);
+                slave.walkTo(doorPosition, function() {
+                    slave.switchState(SlaveCharacter.StateNone);
+                    var color : Int = slave.color;
+                    FlxTween.color(slave, 0.5, color, 0xFF000000, {onComplete: function(_) {
+                        FlxG.camera.fade(0xFF000000, 0.25, false, function() {
+                            GameController.ToReward();
+                        });
+                    }});
+                });
+            };
+            doorOpenFx.animation.play("open");
         }));
     }
 
@@ -212,7 +223,7 @@ class MenuState extends GarbageState
             // Normally add a slave randomly
             add(slave = new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
                                    Constants.Height*0.7 + FlxG.random.int(0, 24),
-                                   this, (status == StatusFromGameover ? SlaveCharacter.StateReturn : -1)));
+                                   this, (status == StatusFromGameover ? SlaveCharacter.StateReturn : -2)));
         }
         else if (status == StatusNewSlave)
         {

@@ -416,7 +416,7 @@ class PlayState extends GarbageState
 		if (GamePad.justReleased(GamePad.Pause))
 		{
 			onPauseStart();
-			openSubState(new PauseSubstate(this, onPauseEnd));
+			openSubState(new PauseSubstate(this, onPauseEnd, onPauseAbort));
 		}
     }
 
@@ -445,6 +445,11 @@ class PlayState extends GarbageState
 
         topDisplay.onPauseEnd();
         effects.forEach(handleEffectResume);
+    }
+
+    function onPauseAbort()
+    {
+        topDisplay.onPauseEnd();
     }
 
     function handleEffectPause(basic : FlxBasic)
@@ -897,19 +902,28 @@ class PlayState extends GarbageState
     {
         if (!gameoverLightsout)
         {
+            var color : Int = Palette.DarkBlue;
+
             gameoverLightsout = true;
             for (item in grid.getAll())
             {
                 if (item.entity != null)
                 {
-                    item.entity.color = Palette.DarkBlue;
+                    item.entity.color = color;
                 }
             }
             if (nextItem != null)
             {
-                nextItem.color = Palette.DarkBlue;
+                nextItem.color = color;
                 if (nextItem.slave != null)
-                    nextItem.slave.color = Palette.DarkBlue;
+                    nextItem.slave.color = color;
+            }
+
+            if (currentItem != null)
+            {
+                currentItem.color = color;
+                if (currentItem.slave != null)
+                    currentItem.slave.color = color;
             }
 
             gridShader.alpha = 0.8;

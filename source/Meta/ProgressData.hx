@@ -54,7 +54,7 @@ class ProgressData
         new SlaveGenerator().generate(data);
 
         // Set the quota
-        data.quota_target = Std.int(Math.min(data.slave_count*250, 1000));
+        data.quota_target = 1000; // Std.int(Math.min(data.slave_count*250, 1000));
         data.quota_current = 0;
 
         Save();

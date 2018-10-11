@@ -82,11 +82,25 @@ class GameController
 	{
 		// Prepare game over data
 		var goData : PlaySessionData.GameOverData = new PlaySessionData.GameOverData(data);
-		// Store quota prior to this session
-		goData.previousQuota = ProgressData.data.quota_current;
-		// Compute new quota
-		goData.quotaDelta = computeQuota(data);
-		goData.currentQuota = ProgressData.data.quota_current + goData.quotaDelta;
+			// Store quota prior to this session
+			goData.previousQuota = ProgressData.data.quota_current;
+			// Compute new quota
+			goData.quotaDelta = computeQuota(mode, data);
+			goData.currentQuota = ProgressData.data.quota_current + goData.quotaDelta;
+
+			// Store scores and totals
+			if (mode == Constants.ModeEndless)
+			{
+				if (data.score > ProgressData.data.endless_high_score)
+					ProgressData.data.endless_high_score = data.score;
+				if (data.items > ProgressData.data.endless_high_items)
+					ProgressData.data.endless_high_items = data.items;
+			}
+			else if (mode == Constants.ModeTreasure)
+			{
+				if (data.cycle > ProgressData.data.treasure_high_cycles)
+					ProgressData.data.treasure_high_cycles = data.cycle;
+			}
 
 		// Store it
 		ProgressData.data.quota_current += goData.quotaDelta;
@@ -101,9 +115,12 @@ class GameController
 		FlxG.switchState(new RewardState());
 	}
 
-	static function computeQuota(data : PlaySessionData) : Int
+	static function computeQuota(mode : Int, data : PlaySessionData) : Int
 	{
-		return data.items;
+		if (mode == Constants.ModeEndless)
+			return data.items;
+		else
+			return data.cycle * 100;
 	}
 }
 

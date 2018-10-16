@@ -8,7 +8,7 @@ class DataServiceClient
     public static function SendSessionData(settings : GameSettings.GameSettingsData, session : PlaySessionData) : Void
     {
         new FlxTimer().start(0.1, function(_) {
-            var req = new Http("http://badladns.com/api/spaceoverlords/report");
+            var req = new Http("http://api.badladns.com/api/spaceoverlords/report");
 
             var dataObject = {
                 mode: settings.mode,

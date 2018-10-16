@@ -59,6 +59,38 @@ class Main extends Sprite
 		#if android
 		Lib.current.stage.displayState = openfl.display.StageDisplayState.FULL_SCREEN_INTERACTIVE;
 		#end
+
+		Logger.batch("### RESIZE EVENT @ " + Date.now().toString() + " ###");
+		Logger.batch("Lib.current.stage.stageWidth: " + Lib.current.stage.stageWidth);
+		Logger.batch("Lib.current.stage.stageHeight: " + Lib.current.stage.stageHeight);
+ 		Logger.batch("Lib.current.stage.width: " + Lib.current.stage.width);
+		Logger.batch("Lib.current.stage.height: " + Lib.current.stage.height);
+ 		Logger.batch("Lib.current.width: " + Lib.current.width);
+		Logger.batch("Lib.current.height: " + Lib.current.height);
+ 		Logger.batch("Capabilities.screenDPI: " + openfl.system.Capabilities.screenDPI);
+ 		Logger.batch("os: " + openfl.system.Capabilities.os);
+		Logger.batch("screenDPI: " + openfl.system.Capabilities.screenDPI);
+		Logger.batch("screenResolutionX: " + openfl.system.Capabilities.screenResolutionX);
+		Logger.batch("screenResolutionY: " + openfl.system.Capabilities.screenResolutionY);
+
+		var stageWidth:Int = Lib.current.stage.stageWidth;
+		var stageHeight:Int = Lib.current.stage.stageHeight;
+
+		// if (zoom == -1)
+		{
+			Logger.batch("=> Zoom computation");
+			var ratioX:Float = stageWidth / gameWidth;
+			var ratioY:Float = stageHeight / gameHeight;
+			Logger.batch("Game size: " + gameWidth + ", " + gameHeight);
+			var zoom = Math.min(ratioX, ratioY);
+			var gameWidth = Math.ceil(stageWidth / zoom);
+			var gameHeight = Math.ceil(stageHeight / zoom);
+			Logger.batch("Ratio (stage/game): " + ratioX + ", " + ratioY);
+			Logger.batch("Zoom: " + zoom);
+			Logger.batch("Result size: " + gameWidth + ", " + gameHeight);
+		}
+
+		Logger.done();
 	}
 
 	private function init(?E:Event):Void

@@ -30,8 +30,9 @@ class PlayState extends GarbageState
     var GameoverLightsoutDelay : Float = 0.75;
     var ThemeChangeDelay : Float = 1.33;
 
-    public var mode : Int;
+    var restoredSessionData : Dynamic;
 
+    public var mode : Int;
     public var session : PlaySessionData;
 
     public var state : Int;
@@ -78,9 +79,19 @@ class PlayState extends GarbageState
     var stateLabel : FlxBitmapText;
     var gridDebugger : GridDebugger;
 
+    public function new(RestoredSessionData : Dynamic)
+    {
+        super();
+
+        restoredSessionData = RestoredSessionData;
+    }
+
     override public function create()
     {
-        session = new PlaySessionData();
+        if (restoredSessionData == null || restoredSessionData.session == null)
+            session = new PlaySessionData();
+        else
+            session = restoredSessionData.session;
         mode = GameSettings.data.mode;
 
         FlxG.camera.bgColor = 0xFF000000;
@@ -159,14 +170,22 @@ class PlayState extends GarbageState
     function setupGameplay()
     {
         // Intensity 0-4
-        var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        session.fallSpeed = getInitialFallSpeed();
-
-        if (mode == Constants.ModeEndless)
-            setupInitialGrid(intensity);
-        else if (mode == Constants.ModeTreasure)
+        if (restoredSessionData == null)
         {
-            setupCycleGrid();
+            var intensity : Int = Std.int(GameSettings.data.intensity / 25);
+            session.fallSpeed = getInitialFallSpeed();
+
+            if (mode == Constants.ModeEndless)
+                setupInitialGrid(intensity);
+            else if (mode == Constants.ModeTreasure)
+            {
+                setupCycleGrid();
+            }
+        }
+        else
+        {
+            trace("Restored session (fallspeed = " + session.fallSpeed + ")");
+            grid.loadStoredGridData(this, restoredSessionData.grid);
         }
     }
 
@@ -942,7 +961,7 @@ class PlayState extends GarbageState
             DataServiceClient.SendSessionData(GameSettings.data, session);
             gameoverTimer.start(GameoverLightsoutDelay, function(t:FlxTimer) {
                 FlxG.camera.fade(0xFF000000, GameoverLightsoutDelay * 2, false, function() {
-                    GameController.GameOver(Constants.ModeEndless, session);
+                    GameController.GameOver(GameSettings.data.mode, session);
                 });
             });
         }
@@ -1017,6 +1036,11 @@ class PlayState extends GarbageState
         {
             generateTarget(rows);
         }
+    }
+
+    function setupStoredGrid(data : GarbageGrid.GarbageGridData)
+    {
+
     }
 
     function emptyGrid()
@@ -1099,6 +1123,20 @@ class PlayState extends GarbageState
     function getTreasureTargets(cycle : Int) : Int
     {
         return (Std.int(cycle / 4) + cycle % 4 + 1);
+    }
+
+    public function onDeactivate()
+    {
+        trace("SAVING FROM PlayState");
+        switch (state)
+        {
+            case PlayState.StateGenerate,
+                 PlayState.StateWait,
+                 PlayState.StateAftermath:
+                SaveStateManager.savePlayStateData(this);
+            case PlayState.StateLost:
+                GameController.ProcessGameoverData(GameSettings.data.mode, session);
+        }
     }
 
     /* DEBUG */

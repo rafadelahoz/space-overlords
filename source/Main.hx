@@ -52,6 +52,10 @@ class Main extends Sprite
 	private function onDeactivate(?E:Event):Void
 	{
 		// Save here!
+		if (Std.instance(FlxG.state, PlayState) != null)
+		{
+			cast(FlxG.state, PlayState).onDeactivate();
+		}
 	}
 
 	private function onResize(?E:Event) : Void

@@ -429,6 +429,58 @@ class GarbageGrid
         return surrounding;
     }
 
+    public function getSaveData() : GarbageGridData
+    {
+        return {
+            grid: serializeGridData()
+        }
+    }
+
+    function serializeGridData() : Array<Int>
+    {
+        var data : Array<Int> = [];
+
+        for (row in 0...rows)
+        {
+            for (col in 0...columns)
+            {
+                var entry : ItemData = get(col, row);
+                if (entry == null)
+                    data.push(0);
+                else
+                    data.push(entry.type);
+            }
+        }
+
+        return data;
+    }
+
+    public function loadStoredGridData(world : PlayState, sdata : GarbageGridData)
+    {
+        // trace("Restoring " + sdata);
+        for (row in 0...rows)
+        {
+            for (col in 0...columns)
+            {
+                var type : Int = sdata.grid.shift();
+                if (type == 0)
+                {
+                    set(col, row, null);
+                }
+                else
+                {
+                    var pos : FlxPoint = getCellPosition(col, row);
+                    var entity : ItemEntity = new ItemEntity(pos.x, pos.y, type, world);
+                    world.items.add(entity);
+                    set(col, row, new ItemData(col, row, type, entity));
+                }
+            }
+        }
+
+        // trace("Finished, loaded: ");
+        // dump();
+    }
+
     /* DEBUG */
     public function dump()
     {
@@ -458,4 +510,8 @@ class GarbageGrid
 
         trace(str);
     }
+}
+
+typedef GarbageGridData = {
+    var grid : Array<Int>;
 }

@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxG;
+import PlaySessionData.GameOverData;
 
 class GameController
 {
@@ -68,11 +69,22 @@ class GameController
 		FlxG.switchState(new GamePreState());
 	}
 
-	public static function StartGameplay(?DontLoad : Bool = false)
+	public static function StartGameplay(?DontLoad : Bool = true)
 	{
-		// Start endless
-		// Load previous game?
-		FlxG.switchState(new PlayState());
+		var restoredSessionData : Dynamic = null;
+		if (!DontLoad && SaveStateManager.savestateExists())
+		{
+			// Load previous game
+			trace("RESTORING DATA");
+			restoredSessionData = SaveStateManager.loadAndErase();
+		}
+		else
+		{
+			// Delete stored game
+			SaveStateManager.loadAndErase();
+		}
+
+		FlxG.switchState(new PlayState(restoredSessionData));
 	}
 
 	public static function OnGameplayEnd()
@@ -84,7 +96,16 @@ class GameController
 	public static function GameOver(mode : Int, data : PlaySessionData)
 	{
 		// Prepare game over data
-		var goData : PlaySessionData.GameOverData = new PlaySessionData.GameOverData(data);
+		var goData : GameOverData = ProcessGameoverData(mode, data);
+
+		// Go to game over
+		FlxG.switchState(new GameoverState(goData));
+	}
+
+	public static function ProcessGameoverData(mode : Int, data : PlaySessionData) : GameOverData
+	{
+		// Prepare game over data
+		var goData : GameOverData = new GameOverData(data);
 			// Store quota prior to this session
 			goData.previousQuota = ProgressData.data.quota_current;
 			// Compute new quota
@@ -109,8 +130,7 @@ class GameController
 		ProgressData.data.quota_current += goData.quotaDelta;
 		ProgressData.Save();
 
-		// Go to game over
-		FlxG.switchState(new GameoverState(goData));
+		return goData;
 	}
 
 	public static function ToReward()

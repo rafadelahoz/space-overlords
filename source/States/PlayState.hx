@@ -736,6 +736,7 @@ class PlayState extends GarbageState
             if ((session.items - session.lastItemsSpeedIncrease) >= 10)
             {
                 session.fallSpeed += 1;
+                Logger.log("-- fall speed " + session.fallSpeed + " [++] (" + Date.now() + ")");
                 session.lastItemsSpeedIncrease = session.items;
                 session.timesIncreased += 1;
 
@@ -772,7 +773,9 @@ class PlayState extends GarbageState
                         session.cycle += 1;
                         setupCycleGrid();
 
+                        // Reset a tad the fall speed when the cycle is cleared
                         session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.cycle);
+                        Logger.log("-- fall speed " + session.fallSpeed + " [cycle] (" + Date.now() + ")");
 
                         for (item in grid.getAll())
                         {
@@ -844,6 +847,8 @@ class PlayState extends GarbageState
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
+                    Logger.log("-- fall speed " + session.fallSpeed + " [theme] (" + Date.now() + ")");
+
                     switchState(StateGenerate);
                 });
             });
@@ -855,6 +860,8 @@ class PlayState extends GarbageState
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
+                    Logger.log("-- fall speed " + session.fallSpeed + " [side] (" + Date.now() + ")");
+
                     switchState(StateGenerate);
                 });
             });

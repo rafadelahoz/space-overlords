@@ -19,6 +19,9 @@ class GameController
 
 		LoreLibrary.Init();
 
+		if (ProgressData.data.uuid == null)
+			ProgressData.GenerateUUID();
+
 		if (ProgressData.data.slave_count < 0)
 			ProgressData.StartNewGame();
 

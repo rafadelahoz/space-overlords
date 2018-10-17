@@ -26,7 +26,7 @@ class DataServiceClient
             };
 
             req.setParameter("session", haxe.Json.stringify(dataObject));
-            req.setParameter("id", "102292");
+            req.setParameter("id", ProgressData.data.uuid);
 
             req.onStatus = function(status) {
                 trace("STATUS: " + status);

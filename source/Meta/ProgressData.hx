@@ -18,6 +18,8 @@ class ProgressData
             if (data == null)
             {
                 data = {
+                    uuid: null,
+
                     slave_count: -1,
                     slave_id : -1,
                     slave_head : -1, slave_detail: -1, slave_color: -1,
@@ -46,6 +48,11 @@ class ProgressData
         data.treasure_high_score = 1500;
 
         Save();
+    }
+
+    public static function GenerateUUID()
+    {
+        data.uuid = UUID.uuid();
     }
 
     public static function GenerateNewSlave()
@@ -92,6 +99,8 @@ class ProgressData
 }
 
 typedef SaveData = {
+    var uuid : String;
+
     var slave_count : Int;
 
     var slave_id : Int;

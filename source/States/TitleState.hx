@@ -93,9 +93,10 @@ class TitleState extends GarbageState
                     if (SaveStateManager.savestateExists())
                     {
                         clearGroup(screen);
-                        screen.add(new MessageBox().show("An on-going work session is present. It will be restored", function() {
+                        screen.add(new VcrResumePopup(function() {
                             GameController.StartGameplay(false);
                         }));
+                        // screen.add(new MessageBox().show("An on-going work session is present. It will be restored", ));
                     }
                     else
                     {

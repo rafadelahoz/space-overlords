@@ -90,24 +90,33 @@ class TitleState extends GarbageState
                     screen.add(touchArea);
 
                 case TitleState.StateMain:
-                    clearGroup(screen);
-                    screen.add(new FlxSprite(0, baseY, "assets/ui/title-menu-main.png"));
+                    if (SaveStateManager.savestateExists())
+                    {
+                        clearGroup(screen);
+                        screen.add(new MessageBox().show("An on-going work session is present. It will be restored", function() {
+                            GameController.StartGameplay(false);
+                        }));
+                    }
+                    else
+                    {
+                        clearGroup(screen);
+                        screen.add(new FlxSprite(0, baseY, "assets/ui/title-menu-main.png"));
 
-                    playButton = new VcrButton(26, 119, onPlayHighlighted, onPlayPressed);
-                    playButton.loadSpritesheet("assets/ui/title-menu-cellfeed.png", 83, 14);
-                    screen.add(playButton);
+                        playButton = new VcrButton(26, 119, onPlayHighlighted, onPlayPressed);
+                        playButton.loadSpritesheet("assets/ui/title-menu-cellfeed.png", 83, 14);
+                        screen.add(playButton);
 
-                    settingsButton = new VcrButton(26, baseY + 107, onSettingsHighlighted, onSettingsPressed);
-                    settingsButton.loadSpritesheet("assets/ui/title-menu-settings.png", 83, 14);
-                    screen.add(settingsButton);
+                        settingsButton = new VcrButton(26, baseY + 107, onSettingsHighlighted, onSettingsPressed);
+                        settingsButton.loadSpritesheet("assets/ui/title-menu-settings.png", 83, 14);
+                        screen.add(settingsButton);
 
-                    creditsButton = new VcrButton(26, baseY + 131, onCreditsHighlighted, onCreditsPressed);
-                    creditsButton.loadSpritesheet("assets/ui/title-menu-credits.png", 83, 14);
-                    screen.add(creditsButton);
+                        creditsButton = new VcrButton(26, baseY + 131, onCreditsHighlighted, onCreditsPressed);
+                        creditsButton.loadSpritesheet("assets/ui/title-menu-credits.png", 83, 14);
+                        screen.add(creditsButton);
 
-                    cursor = new FlxSprite(9, playButton.y+1, "assets/ui/title-menu-cursor.png");
-                    screen.add(cursor);
-
+                        cursor = new FlxSprite(9, playButton.y+1, "assets/ui/title-menu-cursor.png");
+                        screen.add(cursor);
+                    }
                 case TitleState.StateSettings:
                     clearGroup(screen);
                     screen.add(new FlxSprite(0, baseY, "assets/ui/title-settings-main.png"));

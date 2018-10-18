@@ -94,6 +94,8 @@ class PlayState extends GarbageState
             session = restoredSessionData.session;
         mode = GameSettings.data.mode;
 
+        Logger.log("==== " + (mode == Constants.ModeEndless ? "PROCESS" : "REFINE") + " session begins");
+
         FlxG.camera.bgColor = 0xFF000000;
 
         grid = new GarbageGrid(8, 240 - 9*Constants.TileSize - 8); // Centered: Constants.Width / 2 - 96 /2
@@ -175,6 +177,8 @@ class PlayState extends GarbageState
             var intensity : Int = Std.int(GameSettings.data.intensity / 25);
             session.fallSpeed = getInitialFallSpeed();
 
+            Logger.log("--- " + intensity + " -> " + session.fallSpeed);
+
             if (mode == Constants.ModeEndless)
                 setupInitialGrid(intensity);
             else if (mode == Constants.ModeTreasure)
@@ -184,7 +188,7 @@ class PlayState extends GarbageState
         }
         else
         {
-            trace("Restored session (fallspeed = " + session.fallSpeed + ")");
+            Logger.log("--- Restored, fallspeed " + session.fallSpeed);
             grid.loadStoredGridData(this, restoredSessionData.grid);
         }
     }
@@ -284,7 +288,7 @@ class PlayState extends GarbageState
                 // Call cleanupo!
                 aftermathTimer.start(CleanUpDelay, handleAftermathFalling);
             case PlayState.StateLost:
-                trace("Game over!");
+                Logger.log("==== session ends");
 
                 session.endTime = Date.now().getTime();
 

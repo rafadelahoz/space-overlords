@@ -24,7 +24,7 @@ class Logger
         }
     }
 
-    static function getPath() : String
+    public static function getPath() : String
     {
         var path = ".";
 
@@ -49,7 +49,7 @@ class Logger
         return path;
     }
 
-    static function getFilename() : String
+    public static function getFilename() : String
     {
         var now : Date = Date.now();
         var filename : String = "spaceoverlords-" + now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate() + ".log";

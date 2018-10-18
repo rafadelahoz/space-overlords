@@ -5,10 +5,14 @@ import haxe.Http;
 
 class DataServiceClient
 {
+    static var uri : String = "http://api.badladns.com/api/spaceoverlords";
+    // static var uri : String = "http://localhost:3000/api/spaceoverlords";
+
     public static function SendSessionData(settings : GameSettings.GameSettingsData, session : PlaySessionData) : Void
     {
         new FlxTimer().start(0.1, function(_) {
-            var req = new Http("http://api.badladns.com/api/spaceoverlords/report");
+            var req = new Http(uri + "/report");
+            // var req = new Http("http://localhost:3000/api/spaceoverlords/report");
 
             var dataObject = {
                 mode: settings.mode,
@@ -42,5 +46,34 @@ class DataServiceClient
 
             req.request(true);
         });
+    }
+
+    public static function SendLog() : Void
+    {
+        var path : String = Logger.getPath();
+        var filename : String = Logger.getFilename();
+
+        if (sys.FileSystem.exists(path + "/" + filename))
+        {
+            var contents : String = sys.io.File.getContent(path + "/" + filename);
+
+            var req = new Http(uri + "/log");
+            req.setParameter("id", ProgressData.data.uuid);
+            req.setParameter("contents", contents);
+
+            req.onStatus = function(status) {
+                trace("STATUS: " + status);
+            }
+
+            req.onError = function(error) {
+                trace("ERROR: " + error);
+            }
+
+            req.onData = function(data) {
+                trace("DATA: " + data);
+            }
+
+            req.request(true);
+        }
     }
 }

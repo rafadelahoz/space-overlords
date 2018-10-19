@@ -90,15 +90,6 @@ class TitleState extends GarbageState
                     screen.add(touchArea);
 
                 case TitleState.StateMain:
-                    if (SaveStateManager.savestateExists())
-                    {
-                        clearGroup(screen);
-                        screen.add(new VcrResumePopup(function() {
-                            GameController.StartGameplay(false);
-                        }));
-                        // screen.add(new MessageBox().show("An on-going work session is present. It will be restored", ));
-                    }
-                    else
                     {
                         clearGroup(screen);
                         screen.add(new FlxSprite(0, baseY, "assets/ui/title-menu-main.png"));
@@ -183,7 +174,15 @@ class TitleState extends GarbageState
     /* Button handlers */
     function onPlayPressed()
     {
-        GameController.ToMenu();
+        if (SaveStateManager.savestateExists())
+        {
+            disableGroup(screen);
+            screen.add(new VcrResumePopup(function() {
+                GameController.StartGameplay(false);
+            }));
+        }
+        else
+            GameController.ToMenu();
     }
 
     function onSettingsPressed()
@@ -253,5 +252,18 @@ class TitleState extends GarbageState
         }
 
         group.clear();
+    }
+
+    function disableGroup(group : FlxGroup)
+    {
+        var iterator  = group.iterator();
+        while (iterator.hasNext())
+        {
+            var item : FlxBasic = iterator.next();
+            if (item != null)
+            {
+                item.active = false;
+            }
+        }
     }
 }

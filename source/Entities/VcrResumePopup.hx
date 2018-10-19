@@ -28,9 +28,12 @@ class VcrResumePopup extends FlxGroup
 
         callback = Callback;
 
-        background = new FlxSprite(x, y).makeGraphic(Constants.Width, 132, Palette.Red);
+        background = new FlxSprite(x, y, "assets/ui/session-restore-background.png");
         background.scale.y = 0;
         add(background);
+
+        var slaveNumber : flixel.text.FlxBitmapText = text.VcrText.New(x + 70, y + 32, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
+        add(slaveNumber);
 
         finished = false;
 

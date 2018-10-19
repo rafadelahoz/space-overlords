@@ -1131,10 +1131,10 @@ class PlayState extends GarbageState
 
     public function onDeactivate()
     {
-        trace("SAVING FROM PlayState");
         switch (state)
         {
-            case PlayState.StateGenerate,
+            case PlayState.StateIntro,
+                 PlayState.StateGenerate,
                  PlayState.StateWait,
                  PlayState.StateAftermath:
                 SaveStateManager.savePlayStateData(this);

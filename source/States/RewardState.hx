@@ -6,6 +6,7 @@ import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
+import flixel.group.FlxSpriteGroup;
 
 class RewardState extends GarbageState
 {
@@ -19,6 +20,9 @@ class RewardState extends GarbageState
 
     var responseReward : VcrButton;
     var responseHome : VcrButton;
+
+    var rewardBot : FlxSprite;
+    var rewardMinislave : FlxSpriteGroup;
 
     override public function create()
     {
@@ -36,9 +40,16 @@ class RewardState extends GarbageState
         overlord.loadGraphic("assets/images/overlord-anim-sprite.png", true, 153, 87);
         overlord.animation.add("idle", [0]);
         overlord.animation.add("talk", [0, 1, 2, 3, 4, 5], 6, true);
+        overlord.animation.add("open", [0, 6, 7], 8, false);
+        overlord.animation.add("drama", [8, 9, 10], 20, true);
+        overlord.animation.add("gulp", [11, 12, 0], 1, false);
         overlord.animation.play("idle");
         overlord.scale.y = 0;
         add(overlord);
+
+        // Minislave added here to be behind scanlines
+        rewardMinislave = new FlxSpriteGroup(154, 174);
+        add(rewardMinislave);
 
         add(new Scanlines(14, 127, "assets/ui/overlord-scanlines.png", Palette.Yellow));
 
@@ -56,6 +67,7 @@ class RewardState extends GarbageState
         FlxTween.tween(overlordBg.scale, {y : 1}, 0.5, {ease: FlxEase.circOut,
             onComplete: function(_) {
                 showMainMessage();
+                // showSlaveResponses();
             }
         });
         FlxTween.tween(overlord.scale, {y : 1}, 0.5, {ease: FlxEase.circOut});
@@ -169,14 +181,103 @@ class RewardState extends GarbageState
             "Oh! It's a great honor to receive the special reward!#" +
             "You are a very lucky slave!#" +
             "Please, stay still for a second.";
-        showMessage(message, function() {
-            var tempMsg : String = "OH! SPECIAL HONORS! IT WAS VERY SPECIAL FOR THE SLAVE AND IT DID NOT DIE AT ALL#NOW YOU GET A NEW SLAVE";
-            add(new MessageBox().show(tempMsg, {
-                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
-                color: Palette.White, animatedBackground: false
-            }, function() {
-                GameController.ToMenu();
-            }));
+        showMessage(message, startRewardSequence);
+    }
+
+    function startRewardSequence()
+    {
+        rewardBot = new FlxSprite(45-18, -100);
+        rewardBot.loadGraphic("assets/images/reward-robot-arm.png", true, 36, 51);
+        rewardBot.animation.add("go", [0, 1], FlxG.random.int(2, 6));
+        rewardBot.animation.play("go");
+        add(rewardBot);
+
+        // FlxTween.tween(rewardBot, {y : rewardBot.y - 4}, 0.4, {ease : FlxEase.quadInOut, type: FlxTween.PINGPONG});
+
+        var path : Array<FlxPoint> = [FlxPoint.get(slave.x - 2, -100),
+                                      FlxPoint.get(slave.x - 2, 195)];
+        FlxTween.linearPath(rewardBot, path, 5, true, {ease: FlxEase.cubeInOut, onComplete: function(_) {
+            FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
+                                             rewardBot.x, rewardBot.y + 8, 0.5,
+                                             true, {ease: FlxEase.elasticIn, onComplete: rewardGrabSlave});
+        }});
+    }
+
+    function rewardGrabSlave(_)
+    {
+        FlxG.camera.shake(0.005);
+        var offset : FlxPoint = FlxPoint.get(slave.x - rewardBot.x, slave.y - rewardBot.y);
+        new FlxTimer().start(0.5, function(_) {
+            FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
+                                            rewardBot.x, rewardBot.y - 60, 2,
+                                            true, {ease: FlxEase.quartInOut,
+                onUpdate: function(_) {
+                    slave.x = rewardBot.x + offset.x;
+                    slave.y = rewardBot.y + offset.y;
+                },
+                onComplete: function(t:FlxTween) {
+                    new FlxTimer().start(0.5, function(_) {
+                        FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
+                                            -200, rewardBot.y, 2,
+                                            true,
+                        {ease: FlxEase.backIn,
+                            onUpdate: function(_) {
+                                slave.x = rewardBot.x + offset.x;
+                                slave.y = rewardBot.y + offset.y;
+                                slave.shadow.x = slave.x;
+                            },
+                            onComplete: rewardFeedSlave
+                        });
+                    });
+                }
+            });
+        });
+    }
+
+    function rewardFeedSlave(_)
+    {
+        overlord.animation.play("open");
+        overlord.animation.finishCallback = function(_) {
+            // FlxG.camera.shake(0.01,10);
+            overlord.animation.play("drama");
+        }
+
+        new FlxTimer().start(1, function(_) {
+            // FlxG.camera.shake(0.02,10);
+
+            // Spawn small slave
+            var minislaveColor : FlxSprite = new FlxSprite(0, 0);
+            minislaveColor.loadGraphic("assets/images/reward-slave-color.png", true, 12, 18);
+            minislaveColor.animation.add("wiggle", [0, 1, 2, 3], 4, true);
+            minislaveColor.animation.play("wiggle");
+            minislaveColor.color = slave.color;
+            rewardMinislave.add(minislaveColor);
+
+            var minislaveBorder : FlxSprite = new FlxSprite(0, 0);
+            minislaveBorder.loadGraphic("assets/images/reward-slave-border.png", true, 12, 18);
+            minislaveBorder.animation.add("wiggle", [0, 1, 2, 3], 4, true);
+            minislaveBorder.animation.play("wiggle");
+            rewardMinislave.add(minislaveBorder);
+
+            // Move it to mouth
+            FlxTween.linearMotion(rewardMinislave, rewardMinislave.x, rewardMinislave.y, 96, rewardMinislave.y, 6, true, {onComplete: rewardEatSlave});
+        });
+    }
+
+    function rewardEatSlave(_)
+    {
+        new FlxTimer().start(1.5, function(_) {
+            FlxG.camera.shake(0.05);
+            // Flash red
+            FlxG.camera.flash(Palette.Red, 0.25);
+            // Close mouth
+            rewardMinislave.visible = false;
+            rewardMinislave.destroy();
+            overlord.animation.play("gulp");
+            overlord.animation.finishCallback = function(name : String) {
+                overlord.animation.play("idle");
+                showMessage("Now get me another slave!", onSceneEnd);
+            }
         });
     }
 
@@ -197,6 +298,14 @@ class RewardState extends GarbageState
         FlxTween.tween(response.scale, {y: 0}, duration, {ease: FlxEase.bounceInOut, onComplete: function(_) {
             response.destroy();
         }});
+    }
+
+    function onSceneEnd()
+    {
+        ProgressData.OnSlaveRewarded();
+        FlxG.camera.fade(Palette.Black, 2, false, function() {
+            GameController.ToMenu();
+        });
     }
 
     function oldEnding()

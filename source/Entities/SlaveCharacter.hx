@@ -28,7 +28,7 @@ class SlaveCharacter extends FlxSprite
 
     var world : GarbageState;
 
-    var shadow : FlxSprite;
+    public var shadow : FlxSprite;
 
     var head : FlxSprite;
     var detail : FlxSprite;

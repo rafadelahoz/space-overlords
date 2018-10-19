@@ -17,6 +17,9 @@ class RewardState extends GarbageState
     var overlord : FlxSprite;
     var overlordBg : FlxSprite;
 
+    var responseReward : VcrButton;
+    var responseHome : VcrButton;
+
     override public function create()
     {
         super.create();
@@ -52,24 +55,30 @@ class RewardState extends GarbageState
         slave.switchState(SlaveCharacter.StateNone);
         FlxTween.tween(overlordBg.scale, {y : 1}, 0.5, {ease: FlxEase.circOut,
             onComplete: function(_) {
-                showMessage();
+                showMainMessage();
             }
         });
         FlxTween.tween(overlord.scale, {y : 1}, 0.5, {ease: FlxEase.circOut});
     }
 
-    function showMessage()
+    function showMainMessage()
     {
-        overlord.animation.play("talk");
-
         var message : String =
-            "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
+            /*"Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
             " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
             LoreLibrary.getLore() + "#" +
-            "As the reward for reaching your quota, we are sending you home.#" +
-            "Thank you very very much for your hard work";
+            "Anyhow!#" +
+            "As you have reached your quota, you can now choose. " +*/
+            "Would you like to go back home, or a special reward?";
+
+        showMessage(message, showSlaveResponses);
+    }
+
+    function showMessage(message : String, callback : Void -> Void)
+    {
+        overlord.animation.play("talk");
 
         var settings : MessageBox.MessageSettings =
         {
@@ -78,22 +87,134 @@ class RewardState extends GarbageState
         };
 
         add(new MessageBox().show(message, settings, function() {
-            // DONE!
-            FlxG.camera.flash(Palette.White, 0.75, function() {
-                ProgressData.OnSlaveRewarded();
-
-                var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY#NOW YOU GET A NEW SLAVE";
-                add(new MessageBox().show(tempMsg, {
-                    x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
-                    color: Palette.White, animatedBackground: false
-                }, function() {
-                    GameController.ToMenu();
-                }));
-
-                // DEBUG: Iterate on messages
-                // ProgressData.data.slave_count += 1;
-                // showMessage();
-            });
+            overlord.animation.play("idle");
+            callback();
         }));
+    }
+
+    function showSlaveResponses()
+    {
+        responseHome = new VcrButton(101, 186, onResponseHomeHighlighted, onResponseHomeSelected);
+        responseHome.loadSpritesheet("assets/images/slave-answer-home.png", 72, 44);
+        // responseHome.invertWhilePressed = false;
+        add(responseHome);
+        makeResponseAppear(responseHome);
+
+        responseReward = new VcrButton(39, 210, onResponseRewardHighlighted, onResponseRewardSelected);
+        responseReward.loadSpritesheet("assets/images/slave-answer-reward.png", 72, 40);
+        // responseReward.invertWhilePressed = false;
+        add(responseReward);
+        makeResponseAppear(responseReward);
+    }
+
+    function makeResponseAppear(response : VcrButton)
+    {
+        var duration : Float = 0.5;
+        response.scale.set(1, 0);
+        response.alpha = 0;
+        FlxTween.tween(response.scale, {y: 1}, duration, {ease: FlxEase.bounceOut});
+        FlxTween.tween(response, {alpha: 1}, duration, {ease: FlxEase.circInOut});
+
+        FlxTween.tween(response, {y : response.y-4},
+                       2*FlxG.random.float(duration, duration*1.1),
+                       {
+                           ease : FlxEase.quintInOut,
+                           loopDelay: FlxG.random.float(duration*0.9, duration*1.1),
+                           type: FlxTween.PINGPONG
+                       });
+    }
+
+    function onResponseHomeHighlighted()
+    {
+        responseReward.clearHighlight();
+    }
+
+    function onResponseRewardHighlighted()
+    {
+        responseHome.clearHighlight();
+    }
+
+    function onResponseHomeSelected()
+    {
+        hideSelectedResponse(responseHome, handleHomeEnding);
+        hideOtherResponse(responseReward);
+    }
+
+    function onResponseRewardSelected()
+    {
+        hideSelectedResponse(responseReward, handleRewardEnding);
+        hideOtherResponse(responseHome);
+    }
+
+    function handleHomeEnding()
+    {
+        var message : String =
+            "Ok! You are going home then!#" +
+            "We will prepare a ship for you immediately#" +
+            "Thank you for the good work!";
+        showMessage(message, function() {
+            var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY!#NOW YOU GET A NEW SLAVE";
+            add(new MessageBox().show(tempMsg, {
+                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+                color: Palette.White, animatedBackground: false
+            }, function() {
+                GameController.ToMenu();
+            }));
+        });
+    }
+
+    function handleRewardEnding()
+    {
+        var message : String =
+            "Oh! It's a great honor to receive the special reward!#" +
+            "You are a very lucky slave!#" +
+            "Please, stay still for a second.";
+        showMessage(message, function() {
+            var tempMsg : String = "OH! SPECIAL HONORS! IT WAS VERY SPECIAL FOR THE SLAVE AND IT DID NOT DIE AT ALL#NOW YOU GET A NEW SLAVE";
+            add(new MessageBox().show(tempMsg, {
+                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+                color: Palette.White, animatedBackground: false
+            }, function() {
+                GameController.ToMenu();
+            }));
+        });
+    }
+
+    function hideSelectedResponse(response : VcrButton, callback : Void -> Void)
+    {
+        var duration : Float = 0.75;
+        FlxTween.tween(response, {y : response.y - 32, alpha : 0}, duration, {ease: FlxEase.expoOut, onComplete: function(_) {
+            response.destroy();
+            if (callback != null)
+                callback();
+        }});
+    }
+
+    function hideOtherResponse(response : VcrButton)
+    {
+        var duration : Float = 0.45;
+        FlxTween.tween(response, {y : response.y + 32, alpha : 0}, duration, {ease: FlxEase.quadIn});
+        FlxTween.tween(response.scale, {y: 0}, duration, {ease: FlxEase.bounceInOut, onComplete: function(_) {
+            response.destroy();
+        }});
+    }
+
+    function oldEnding()
+    {
+        FlxG.camera.flash(Palette.White, 0.75, function() {
+            ProgressData.OnSlaveRewarded();
+
+            var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY#NOW YOU GET A NEW SLAVE";
+            add(new MessageBox().show(tempMsg, {
+                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+                color: Palette.White, animatedBackground: false
+            }, function() {
+                GameController.ToMenu();
+            }));
+
+            // DEBUG: Iterate on messages
+            // ProgressData.data.slave_count += 1;
+            // showMessage();
+        });
     }
 }

@@ -22,6 +22,7 @@ class VcrButton extends FlxSprite
     var enabled : Bool;
 
     var highlightable : Bool;
+    public var invertWhilePressed : Bool;
 
     public function new(X : Float, Y : Float, HighlightCallback : Void -> Void, Callback : Void -> Void, ?Highlightable : Bool = true)
     {
@@ -35,6 +36,7 @@ class VcrButton extends FlxSprite
         enabled = true;
         allowReleaseOutside = false;
         highlightable = Highlightable;
+        invertWhilePressed = true;
     }
 
     public function loadSpritesheet(Sprite : String, Width : Float, Height : Float, ?SingleImage : Bool = false)
@@ -168,7 +170,8 @@ class VcrButton extends FlxSprite
         if (hasGraphic)
             animation.play("highlighted");
 
-        color = 0xFF9e2835;
+        if (invertWhilePressed)
+            color = 0xFF9e2835;
     }
 
     function onReleased() : Void
@@ -176,6 +179,8 @@ class VcrButton extends FlxSprite
         if (highlightable && state == StateIdle)
         {
             state = StateHighlighted;
+            if (hasGraphic)
+                animation.play("highlighted");
             if (highlightCallback != null)
                 highlightCallback();
         }
@@ -188,7 +193,8 @@ class VcrButton extends FlxSprite
 
     function whileReleased() : Void
     {
-        color = 0xFFFFFFFF;
+        if (invertWhilePressed)
+            color = 0xFFFFFFFF;
     }
 
     public function enable()

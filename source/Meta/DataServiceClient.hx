@@ -50,6 +50,7 @@ class DataServiceClient
 
     public static function SendLog() : Void
     {
+        #if !html5
         var path : String = Logger.getPath();
         var filename : String = Logger.getFilename();
 
@@ -75,5 +76,6 @@ class DataServiceClient
 
             req.request(true);
         }
+        #end
     }
 }

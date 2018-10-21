@@ -106,6 +106,11 @@ class RewardState extends GarbageState
 
     function showSlaveResponses()
     {
+        // DEBUG: Iterate on messages
+        // ProgressData.data.slave_count += 1;
+        // showMainMessage();
+        // return;
+
         responseHome = new VcrButton(101, 186, onResponseHomeHighlighted, onResponseHomeSelected);
         responseHome.loadSpritesheet("assets/images/slave-answer-home.png", 72, 44);
         // responseHome.invertWhilePressed = false;
@@ -186,17 +191,15 @@ class RewardState extends GarbageState
 
     function startRewardSequence()
     {
-        rewardBot = new FlxSprite(45-18, -100);
+        rewardBot = new FlxSprite(slave.x-2 , -100);
         rewardBot.loadGraphic("assets/images/reward-robot-arm.png", true, 36, 51);
         rewardBot.animation.add("go", [0, 1], FlxG.random.int(2, 6));
         rewardBot.animation.play("go");
         add(rewardBot);
 
-        // FlxTween.tween(rewardBot, {y : rewardBot.y - 4}, 0.4, {ease : FlxEase.quadInOut, type: FlxTween.PINGPONG});
+        trace("Start at : " + rewardBot.x + ", " + rewardBot.y);
 
-        var path : Array<FlxPoint> = [FlxPoint.get(slave.x - 2, -50),
-                                      FlxPoint.get(slave.x - 2, 195)];
-        FlxTween.linearPath(rewardBot, path, 4, true, {ease: FlxEase.cubeInOut, onComplete: function(_) {
+        FlxTween.linearMotion(rewardBot, rewardBot.x, -50, rewardBot.x, 195, 4, true, {ease: FlxEase.sineInOut, onComplete: function(_) {
             FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
                                              rewardBot.x, rewardBot.y + 8, 0.5,
                                              true, {ease: FlxEase.elasticIn, onComplete: rewardGrabSlave});
@@ -305,25 +308,6 @@ class RewardState extends GarbageState
         ProgressData.OnSlaveRewarded();
         FlxG.camera.fade(Palette.Black, 2, false, function() {
             GameController.ToMenu();
-        });
-    }
-
-    function oldEnding()
-    {
-        FlxG.camera.flash(Palette.White, 0.75, function() {
-            ProgressData.OnSlaveRewarded();
-
-            var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY#NOW YOU GET A NEW SLAVE";
-            add(new MessageBox().show(tempMsg, {
-                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
-                color: Palette.White, animatedBackground: false
-            }, function() {
-                GameController.ToMenu();
-            }));
-
-            // DEBUG: Iterate on messages
-            // ProgressData.data.slave_count += 1;
-            // showMessage();
         });
     }
 }

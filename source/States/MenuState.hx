@@ -27,6 +27,7 @@ class MenuState extends GarbageState
     var background : FlxSprite;
     var doorOpenFx : FlxSprite;
     var backgroundShader : FlxSprite;
+    var cellSpeaker : FlxSprite;
 
     var slave : SlaveCharacter;
 
@@ -72,6 +73,13 @@ class MenuState extends GarbageState
         doorOpenFx.animation.add("open", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 16, false);
         doorOpenFx.animation.play("idle");
         add(doorOpenFx);
+
+        cellSpeaker = new FlxSprite(140, 89);
+        cellSpeaker.loadGraphic("assets/images/cell-speaker-sheet.png", true, 33, 27);
+        cellSpeaker.animation.add("idle", [0]);
+        cellSpeaker.animation.add("speak", [0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1], 5, true);
+        cellSpeaker.animation.play("idle");
+        add(cellSpeaker);
 
         initSlave();
 
@@ -215,14 +223,24 @@ class MenuState extends GarbageState
     {
         disableButtons();
 
+        cellSpeaker.animation.play("speak");
+
+        var settings : MessageBox.MessageSettings =
+        {
+            x : 0, y : 143, w: Constants.Width, h: 68, border: 10,
+            bgOffsetX : 0, bgOffsetY: 25, bgGraphic: "assets/ui/cell-speaker-dialog-bg.png",
+            color: Palette.Black, animatedBackground: true
+        };
+
         var message : String =
-                /*"Slave " + ProgressData.data.slave_id + "!#" +
-                "You have reached your quota, and are going to be rewarded#" +
-                "You will have the honour of meeting our space overlord" +
-                "And then you get to choose your reward#" +
-                "Congratulations#" +*/
-                "Please, proceed";
-        add(new MessageBox().show(message, function() {
+                "Slave " + ProgressData.data.slave_id + "!#" +
+                "You have reached your quota, and are going to be rewarded.#" +
+                "You will now have the honor of meeting our space overlord.#" +
+                "Suspicious behaviour or rebellious acts will result in the termination of your being.#" +
+                "You have been warned.#" +
+                "Please, proceed through the door.#" +
+                "Congratulations.";
+        add(new MessageBox().show(message, settings, function() {
             // Door opening
             doorOpenFx.animation.finishCallback = function(_) {
                 var doorPosition : FlxPoint = new FlxPoint(126, 204);

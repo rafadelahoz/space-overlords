@@ -24,13 +24,13 @@ class RewardState extends GarbageState
     var rewardBot : FlxSprite;
     var rewardMinislave : FlxSpriteGroup;
 
+    var homeTrapdoor : FlxSprite;
+
     override public function create()
     {
         super.create();
 
-        FlxG.camera.bgColor = 0xFF000000;
-
-        add(new FlxSprite(0, 0, "assets/backgrounds/overlord-background.png"));
+        FlxG.camera.bgColor = 0xFF262b44;
 
         overlordBg = new FlxSprite(14, 127);
         overlordBg.makeGraphic(152, 87, 0xFFe8b796);
@@ -52,6 +52,11 @@ class RewardState extends GarbageState
         add(rewardMinislave);
 
         add(new Scanlines(14, 127, "assets/ui/overlord-scanlines.png", Palette.Yellow));
+
+        add(new FlxSprite(0, 0, "assets/backgrounds/overlord-background.png"));
+
+        homeTrapdoor = new FlxSprite(0, 256, "assets/images/reward-trapdoor.png");
+        add(homeTrapdoor);
 
         slave = new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateNone);
         add(slave);
@@ -76,13 +81,13 @@ class RewardState extends GarbageState
     function showMainMessage()
     {
         var message : String =
-            /*"Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
+            "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
             " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
             LoreLibrary.getLore() + "#" +
             "Anyhow!#" +
-            "As you have reached your quota, you can now choose. " +*/
+            "As you have reached your quota, you can now choose.#" +
             "Would you like to go back home, or a special reward?";
 
         showMessage(message, showSlaveResponses);
@@ -95,6 +100,7 @@ class RewardState extends GarbageState
         var settings : MessageBox.MessageSettings =
         {
             x : 0, y : 0, w: Constants.Width, h: 88, border: 10,
+            bgOffsetX : 0, bgOffsetY: 0, bgGraphic: "assets/ui/overlord-dialog-bg.png",
             color: Palette.Black, animatedBackground: true
         };
 
@@ -173,6 +179,7 @@ class RewardState extends GarbageState
             var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY!#NOW YOU GET A NEW SLAVE";
             add(new MessageBox().show(tempMsg, {
                 x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+                bgOffsetX : 0, bgOffsetY: 0, bgGraphic: "assets/ui/overlord-dialog-bg.png",
                 color: Palette.White, animatedBackground: false
             }, function() {
                 GameController.ToMenu();

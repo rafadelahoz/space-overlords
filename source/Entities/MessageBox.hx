@@ -31,6 +31,7 @@ class MessageBox extends FlxGroup
     {
         var bgColor : Int = Palette.DarkBlue;
         var textColor : Int = 0xFFFFFFFF;
+        var bgGraphic : String = null;
         var animatedBackground : Bool = false;
 
         if (Settings != null)
@@ -41,6 +42,7 @@ class MessageBox extends FlxGroup
             height = Settings.h;
             border = Settings.border;
             textColor = Settings.color;
+            bgGraphic = Settings.bgGraphic;
             animatedBackground = Settings.animatedBackground;
         }
         else
@@ -54,11 +56,13 @@ class MessageBox extends FlxGroup
 
         if (!animatedBackground)
         {
-            background = new FlxSprite(x, y).makeGraphic(Std.int(width), Std.int(height), bgColor);
+            background = new FlxSprite().makeGraphic(Std.int(width), Std.int(height), bgColor);
         }
         else
         {
-            background = new FlxSprite(x, y, "assets/ui/overlord-dialog-bg.png");
+            var bgOffsetX : Int = Settings.bgOffsetX;
+            var bgOffsetY : Int = Settings.bgOffsetY;
+            background = new FlxSprite(x - bgOffsetX, y - bgOffsetY, bgGraphic);
         }
         background.scale.y = 0;
         add(background);
@@ -71,7 +75,7 @@ class MessageBox extends FlxGroup
         messages = Message.split("#");
 
         // touchArea = new TouchArea(x, y, Std.int(width), Std.int(height), function() {
-        touchArea = new TouchArea(x, y, Constants.Width, Constants.Height, function() {
+        touchArea = new TouchArea(0, 0, Constants.Width, Constants.Height, function() {
             GamePad.setPressed(GamePad.Shoot);
         });
         add(touchArea);
@@ -133,6 +137,9 @@ typedef MessageSettings = {
     var w : Float;
     var h : Float;
     var border : Int;
+    var bgGraphic : String;
+    var bgOffsetX : Int;
+    var bgOffsetY : Int;
     var color : Int;
     var animatedBackground : Bool;
 };

@@ -113,9 +113,40 @@ class MenuState extends GarbageState
         // VCR effect
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
-        allowInteraction();
+        hideButtons();
 
         FlxG.camera.scroll.set(0, 0);
+    }
+
+    public function hideButtons()
+    {
+        backButton.exists = false;
+        playButton.exists = false;
+        museumButton.exists = false;
+        rewardButton.exists = false;
+
+        cursor.visible = false;
+    }
+
+    public function showButtons()
+    {
+        backButton.exists = true;
+        playButton.exists = true;
+        museumButton.exists = true;
+        rewardButton.exists = true;
+
+        cursor.visible = true;
+
+        backButton.alpha = 0;
+        playButton.alpha = 0;
+        museumButton.alpha = 0;
+        rewardButton.alpha = 0;
+        FlxTween.tween(backButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
+        FlxTween.tween(playButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
+        // FlxTween.tween(museumButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
+        FlxTween.tween(rewardButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
+
+        allowInteraction();
     }
 
     public function allowInteraction(?_):Void
@@ -224,12 +255,22 @@ class MenuState extends GarbageState
             add(slave = new SlaveCharacter(FlxG.random.int(64, Constants.Width-64),
                                    Constants.Height*0.7 + FlxG.random.int(0, 24),
                                    this, (status == StatusFromGameover ? SlaveCharacter.StateReturn : -2)));
+            new FlxTimer().start(0.2, afterSlaveEntry);
         }
         else if (status == StatusNewSlave)
         {
-            // New slaves fall from top
-            add(slave = new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
+            new FlxTimer().start(2, function(t : FlxTimer) {
+                // New slaves fall from top
+                add(slave = new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
+                t.start(4.5, afterSlaveEntry);
+            });
         }
+    }
+
+    function afterSlaveEntry(t:FlxTimer)
+    {
+        t.destroy();
+        showButtons();
     }
 
     function disableButtons()
@@ -238,6 +279,8 @@ class MenuState extends GarbageState
         playButton.disable();
         // museumButton.disable();
         rewardButton.disable();
+
+        cursor.visible = false;
 
         playButton.visible = false;
         rewardButton.visible = false;

@@ -124,6 +124,9 @@ class SlaveCharacter extends FlxSprite
 
                 setFlipX(nextPos.x < x);
                 cancelTween(motionTween);
+                if (timer != null && timer.active)
+                    timer.cancel();
+
                 motionTween = FlxTween.linearMotion(this, x, y, nextPos.x, nextPos.y, fuzzyValue(WalkTime, WalkTimeVariation), true, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
                     if (Callback != null)
                         Callback();

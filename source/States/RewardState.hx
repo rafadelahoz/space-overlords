@@ -194,9 +194,9 @@ class RewardState extends GarbageState
 
         // FlxTween.tween(rewardBot, {y : rewardBot.y - 4}, 0.4, {ease : FlxEase.quadInOut, type: FlxTween.PINGPONG});
 
-        var path : Array<FlxPoint> = [FlxPoint.get(slave.x - 2, -100),
+        var path : Array<FlxPoint> = [FlxPoint.get(slave.x - 2, -50),
                                       FlxPoint.get(slave.x - 2, 195)];
-        FlxTween.linearPath(rewardBot, path, 5, true, {ease: FlxEase.cubeInOut, onComplete: function(_) {
+        FlxTween.linearPath(rewardBot, path, 4, true, {ease: FlxEase.cubeInOut, onComplete: function(_) {
             FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
                                              rewardBot.x, rewardBot.y + 8, 0.5,
                                              true, {ease: FlxEase.elasticIn, onComplete: rewardGrabSlave});

@@ -22,12 +22,14 @@ class MessageBox extends FlxGroup
     var messages : Array<String>;
     var textBox : text.TypeWriter;
     var callback : Void -> Void;
+    var messageEndCallback : Void -> Void;
+    var messageStartCallback : Void -> Void;
 
     var backgroundTween : FlxTween;
 
     var touchArea : TouchArea;
 
-    public function show(Message : String, ?Settings : MessageSettings = null, ?Callback : Void -> Void = null) : MessageBox
+    public function show(Message : String, ?Settings : MessageSettings = null, ?Callback : Void -> Void = null, ?MessageStartCallback : Void -> Void = null, ?MessageEndCallback : Void -> Void = null) : MessageBox
     {
         var bgColor : Int = Palette.DarkBlue;
         var textColor : Int = 0xFFFFFFFF;
@@ -68,6 +70,8 @@ class MessageBox extends FlxGroup
         add(background);
 
         textBox = new text.TypeWriter(x+border, y+border, Std.int(width-2*border), Std.int(height-2*border), "", textColor);
+        textBox.startNewBoxCallback = MessageStartCallback;
+        textBox.boxFilledCallback = MessageEndCallback;
         add(textBox);
 
         callback = Callback;

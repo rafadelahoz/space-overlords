@@ -72,7 +72,6 @@ class RewardState extends GarbageState
         FlxTween.tween(overlordBg.scale, {y : 1}, 0.5, {ease: FlxEase.circOut,
             onComplete: function(_) {
                 showMainMessage();
-                // showSlaveResponses();
             }
         });
         FlxTween.tween(overlord.scale, {y : 1}, 0.5, {ease: FlxEase.circOut});
@@ -81,13 +80,13 @@ class RewardState extends GarbageState
     function showMainMessage()
     {
         var message : String =
-            /*"Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
+            "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
             " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
             LoreLibrary.getLore() + "#" +
             "Anyhow!#" +
-            "As you have reached your quota, you can now choose.#" +*/
+            "As you have reached your quota, you can now choose.#" +
             "Would you like to go back home, or a special reward?";
 
         showMessage(message, showSlaveResponses);
@@ -107,6 +106,10 @@ class RewardState extends GarbageState
         add(new MessageBox().show(message, settings, function() {
             overlord.animation.play("idle");
             callback();
+        }, function() {
+            overlord.animation.play("talk");
+        }, function() {
+            overlord.animation.play("idle");
         }));
     }
 

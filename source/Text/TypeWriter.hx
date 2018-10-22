@@ -153,6 +153,12 @@ class TypeWriter extends FlxBitmapText
     public var finished : Bool;
 
 	/**
+	 * Partial callbacks
+	 */
+	public var boxFilledCallback : Void -> Void;
+	public var startNewBoxCallback : Void -> Void;
+
+	/**
 	 * Create a FlxTypeText object, which is very similar to FlxText except that the text is initially hidden and can be
 	 * animated one character at a time by calling start().
 	 *
@@ -332,6 +338,9 @@ class TypeWriter extends FlxBitmapText
 
 		finished = false;
 		remainingText = null;
+
+		if (startNewBoxCallback != null)
+			startNewBoxCallback();
 	}
 
 	/**
@@ -383,8 +392,11 @@ class TypeWriter extends FlxBitmapText
 		}
 	}
 
+	var skipping : Bool = false;
+
 	override public function update(elapsed:Float):Void
 	{
+		var wasFinished : Bool = finished;
 
         if (finished)
 		{
@@ -416,9 +428,13 @@ class TypeWriter extends FlxBitmapText
 		#if !FLX_NO_KEYBOARD
 		if (skipKeys != null && skipKeys.length > 0 && FlxG.keys.anyJustPressed(skipKeys))
 		{
-			skip();
+			skipping = true;
 		}
 		#end
+		if (GamePad.justPressed(GamePad.Shoot) && !skipping)
+		{
+			skipping = true;
+		}
 
 		if (_waiting && !paused)
 		{
@@ -447,141 +463,196 @@ class TypeWriter extends FlxBitmapText
 
 		// If the timer value is higher than the rate at which we should be changing letters, increase or decrease desired string length.
 
-		if (_typing || _erasing)
+		var done : Bool = false;
+		while (!done)
 		{
-			if (_typing && _timer >= delay)
-			{
-				_length ++;
-			}
+			if (!skipping)
+				done = true;
+			else
+				_waiting = false;
 
-			if (_erasing && _timer >= eraseDelay)
+			if (_typing || _erasing)
 			{
-				_length --;
-			}
-
-			if ((_typing && _timer >= delay) || (_erasing && _timer >= eraseDelay))
-			{
-				if (_typingVariation)
+				if (_typing && (skipping || _timer >= delay))
 				{
-					if (_typing)
+					_length ++;
+				}
+
+				if (_erasing && (skipping || _timer >= eraseDelay))
+				{
+					_length --;
+				}
+
+				if (!skipping)
+				{
+					if ((_typing && _timer >= delay) || (_erasing && _timer >= eraseDelay))
 					{
-						_timer = FlxG.random.float( -delay * _typeVarPercent / 2, delay * _typeVarPercent / 2);
+						if (_typingVariation)
+						{
+							if (_typing)
+							{
+								_timer = FlxG.random.float( -delay * _typeVarPercent / 2, delay * _typeVarPercent / 2);
+							}
+							else
+							{
+								_timer = FlxG.random.float( -eraseDelay * _typeVarPercent / 2, eraseDelay * _typeVarPercent / 2);
+							}
+						}
+						else
+						{
+							_timer = 0;
+						}
+
+						if (sounds != null && !useDefaultSound)
+						{
+							for (sound in sounds)
+							{
+								sound.stop();
+							}
+
+							// FlxG.random.getObject(sounds).play(true);
+						}
+						else if (useDefaultSound)
+						{
+							#if !bitfive
+							// _sound.play(true);
+							#end
+						}
 					}
-					else
+				}
+			}
+
+			// Update the helper string with what could potentially be the new text.
+			helperString = prefix + _finalText.substr(0, _length);
+
+			// Append the cursor if needed.
+			if (showCursor)
+			{
+				_cursorTimer += elapsed;
+
+				// Prevent word wrapping because of cursor
+				var isBreakLine = (prefix + _finalText).charAt(helperString.length) == "\n";
+
+				if (_cursorTimer > cursorBlinkSpeed / 2 && !isBreakLine)
+				{
+					helperString += cursorCharacter.charAt(0);
+				}
+
+				if (_cursorTimer > cursorBlinkSpeed)
+				{
+					_cursorTimer = 0;
+				}
+			}
+
+			// If the text changed, update it.
+			if (helperString != text && !finished)
+			{
+				text = helperString;
+
+	            // Check for dramatic wrapping in the last line
+				var alreadyFull : Bool = false;
+
+	            textLines = _lines;
+
+				if (textLines.length >= targetLines-1)
+				{
+	                var lineText = textLines[textLines.length-1];
+
+					if (lineText != null)
 					{
-						_timer = FlxG.random.float( -eraseDelay * _typeVarPercent / 2, eraseDelay * _typeVarPercent / 2);
+						var remainer : String = _finalText.substring(_length - 1);
+						var remainerWords : Array<String> = remainer.split(" ");
+						var nextWordChunk : String = remainerWords[0];
+
+						// Consider that the last chunk may have a "\n"!!
+						if (nextWordChunk.indexOf("\n") > 0)
+						{
+							var splittedChunk : Array<String> = nextWordChunk.split("\n");
+							nextWordChunk = splittedChunk.shift();
+							if (nextWordChunk.length > 1)
+							{
+								while (splittedChunk.length > 0)
+									remainerWords.unshift(splittedChunk.pop());
+							}
+						}
+
+						var currentLineWidth = getStringWidth(lineText);
+						var nextWordWidth = getStringWidth(nextWordChunk);
+
+						/*trace("Remainer: " + remainer);
+						trace("RemainerWords: " + remainerWords);
+						trace("Next chunk: " + nextWordChunk + " (length " + nextWordWidth + ")");
+						trace("Line width: "+ currentLineWidth);
+						trace("Width: " + width);*/
+
+						// This was wrapping the last line as soon as it could?
+						// It was also colliding with the custom line formatter
+						/*if (validWrapChar(lineText.charAt(lineText.length-1)))
+	                    {
+							trace(lineText.charAt(lineText.length-1));
+	                        alreadyFull = true;
+	                    }
+	                    else*/ if (currentLineWidth + nextWordWidth > width)
+						{
+							 /*trace("Current line: " + lineText);
+							 trace("Cutting at:   " + lineText.charAt(lineText.length-1));
+							 trace("Remainer:     " + remainer);
+							 trace("Next word:    " + nextWordChunk);*/
+							alreadyFull = true;
+							done = true;
+
+							// trace("Length: ", _length);
+						}
 					}
+				}
+
+				if (alreadyFull && targetHeight > 0 && _length < _finalText.length)
+				{
+					finished = true;
+					done = true;
+
+					// Remove 1 character
+					text = text.substring(0, text.length-1);
+
+					// We have run out of space!
+					remainingText = StringTools.ltrim(_finalText.substring(_length - 1));
+
+					// trace("There is no more space for: \n" + remainingText);
 				}
 				else
 				{
-					_timer = 0;
-				}
+					// If we're done typing, call the onComplete() function
+	    			if (_length >= _finalText.length && _typing && !_waiting && !_erasing)
+	    			{
+	    				finished = true;
+						done = true;
+	    			}
 
-				if (sounds != null && !useDefaultSound)
-				{
-					for (sound in sounds)
-					{
-						sound.stop();
-					}
+	    			// If we're done erasing, call the onErased() function
+	    			if (_length == 0 && _erasing && !_typing && !_waiting)
+	    			{
+	    				finished = true;
+						done = true;
+	    			}
+	            }
+			}
 
-					// FlxG.random.getObject(sounds).play(true);
-				}
-				else if (useDefaultSound)
-				{
-					#if !bitfive
-					// _sound.play(true);
-					#end
-				}
+			if (!done && skipping)
+			{
+				quickUpdateText();
 			}
 		}
 
-		// Update the helper string with what could potentially be the new text.
-		helperString = prefix + _finalText.substr(0, _length);
-
-		// Append the cursor if needed.
-		if (showCursor)
+		if (skipping)
 		{
-			_cursorTimer += elapsed;
-
-			// Prevent word wrapping because of cursor
-			var isBreakLine = (prefix + _finalText).charAt(helperString.length) == "\n";
-
-			if (_cursorTimer > cursorBlinkSpeed / 2 && !isBreakLine)
-			{
-				helperString += cursorCharacter.charAt(0);
-			}
-
-			if (_cursorTimer > cursorBlinkSpeed)
-			{
-				_cursorTimer = 0;
-			}
+			skipping = false;
+			done = false;
 		}
 
-		// If the text changed, update it.
-		if (helperString != text && !finished)
+		if (finished && !wasFinished)
 		{
-			text = helperString;
-
-            // Check for dramatic wrapping in the last line
-			var alreadyFull : Bool = false;
-
-            textLines = _lines;
-
-			if (textLines.length >= targetLines-1)
-			{
-                var lineText = textLines[textLines.length-1];
-
-				if (lineText != null)
-				{
-					var remainer : String = _finalText.substring(_length - 1);
-					var remainerWords : Array<String> = remainer.split(" ");
-					var nextWordChunk : String = remainerWords[0];
-
-					var currentLineWidth = getStringWidth(lineText);
-					var nextWordWidth = getStringWidth(nextWordChunk);
-
-					if (validWrapChar(lineText.charAt(lineText.length-1)))
-                    {
-                        alreadyFull = true;
-                    }
-                    else if (currentLineWidth + nextWordWidth > width)
-					{
-						// trace("Current line: " + lineText);
-						// trace("Cutting at:   " + lineText.charAt(lineText.length-1));
-						// trace("Remainer:     " + remainer);
-						// trace("Next word:    " + nextWordChunk);
-						alreadyFull = true;
-					}
-				}
-			}
-
-			if (alreadyFull && targetHeight > 0 && _length < _finalText.length)
-			{
-				finished = true;
-
-				// Remove 1 character
-				text = text.substring(0, text.length-1);
-
-				// We have run out of space!
-				remainingText = StringTools.ltrim(_finalText.substring(_length - 1));
-
-				// trace("There is no more space for: \n" + remainingText);
-			}
-			else
-			{
-				// If we're done typing, call the onComplete() function
-    			if (_length >= _finalText.length && _typing && !_waiting && !_erasing)
-    			{
-    				finished = true;
-    			}
-
-    			// If we're done erasing, call the onErased() function
-    			if (_length == 0 && _erasing && !_typing && !_waiting)
-    			{
-    				finished = true;
-    			}
-
-            }
+			if (boxFilledCallback != null)
+				boxFilledCallback();
 		}
 
 		super.update(elapsed);
@@ -653,6 +724,25 @@ class TypeWriter extends FlxBitmapText
 
 		pendingTextChange = false;
 		pendingTextBitmapChange = true;
+	}
+
+	private function quickUpdateText() : Void
+	{
+		var tmp:String = (autoUpperCase) ? text.toUpperCase() : text;
+
+        _lines = tmp.split("\n");
+
+		if (!multiLine)
+		{
+			_lines = [_lines[0]];
+		}
+
+		var line:String;
+		var numLines:Int = _lines.length;
+		for (i in 0...numLines)
+		{
+			_lines[i] = StringTools.rtrim(_lines[i]);
+		}
 	}
 
     /**

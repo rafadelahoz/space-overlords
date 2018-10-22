@@ -277,8 +277,13 @@ class SlaveCharacter extends FlxSprite
         }
     }
 
-    public function walkTo(destination : FlxPoint, ?callback : Void->Void = null)
+    public function walkTo(destination : FlxPoint, ?duration : Float = 0, ?callback : Void->Void = null)
     {
+        var oldWalkTime : Float = WalkTime;
+        if (duration > 0)
+            WalkTime = duration;
         switchState(StateWalk, destination, callback);
+        if (duration > 0)
+            WalkTime = oldWalkTime;
     }
 }

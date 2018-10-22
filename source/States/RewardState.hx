@@ -81,13 +81,13 @@ class RewardState extends GarbageState
     function showMainMessage()
     {
         var message : String =
-            "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
+            /*"Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
             FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
             " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
             LoreLibrary.getLore() + "#" +
             "Anyhow!#" +
-            "As you have reached your quota, you can now choose.#" +
+            "As you have reached your quota, you can now choose.#" +*/
             "Would you like to go back home, or a special reward?";
 
         showMessage(message, showSlaveResponses);
@@ -173,25 +173,48 @@ class RewardState extends GarbageState
     {
         var message : String =
             "Ok! You are going home then!#" +
-            "We will prepare a ship for you immediately#" +
-            "Thank you for the good work!";
-        showMessage(message, function() {
-            var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY!#NOW YOU GET A NEW SLAVE";
-            add(new MessageBox().show(tempMsg, {
-                x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
-                bgOffsetX : 0, bgOffsetY: 0, bgGraphic: "assets/ui/overlord-dialog-bg.png",
-                color: Palette.White, animatedBackground: false
-            }, function() {
-                GameController.ToMenu();
-            }));
+            "We will prepare a ship for you immediately. " +
+            "Proceed to the launch platform.#" +
+            "Thank you for the hard work!";
+        showMessage(message, openTrapdoor);
+    }
+
+    function openTrapdoor()
+    {
+        FlxTween.tween(homeTrapdoor, {x : homeTrapdoor.x - homeTrapdoor.width}, 2, {startDelay: 0.85});
+        FlxTween.tween(homeTrapdoor, {y : homeTrapdoor.y+1}, 0.0075, {type: FlxTween.PINGPONG});
+
+        new FlxTimer().start(3.5, function(t : FlxTimer) {
+            slave.walkTo(FlxPoint.get(-50, slave.y), 4);
+            t.start(1, function(_t : FlxTimer) {
+                FlxG.camera.fade(Palette.Black, 0.5, function() {
+                    // Hide everything
+                    clear();
+                    FlxG.camera.fade(Palette.Black, 0.01, true);
+                    homeEnding();
+                });
+            });
         });
+    }
+
+    function homeEnding()
+    {
+        var tempMsg : String = "OK SO THE SLAVE WENT BACK TO ITS PLANET AND NOBODY WAS KILLED IN ANY WAY!#NOW YOU GET A NEW SLAVE";
+        add(new MessageBox().show(tempMsg, {
+            x : 0, y : Constants.Height/2-Constants.Height/4, w: Constants.Width, h: Constants.Height/2, border: 10,
+            bgOffsetX : 0, bgOffsetY: 0, bgGraphic: "assets/ui/overlord-dialog-bg.png",
+            color: Palette.White, animatedBackground: false
+        }, function() {
+            onSceneEnd();
+        }));
     }
 
     function handleRewardEnding()
     {
         var message : String =
-            "Oh! It's a great honor to receive the special reward!#" +
-            "You are a very lucky slave!#" +
+            "It's a great honor to receive the special reward!#" +
+            "It's a tradition my species maintain since the dawn of time.#" +
+            "You are a very lucky slave! " +
             "Please, stay still for a second.";
         showMessage(message, startRewardSequence);
     }

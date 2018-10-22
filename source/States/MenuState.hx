@@ -277,9 +277,12 @@ class MenuState extends GarbageState
         }
         else if (status == StatusNewSlave)
         {
+            add(slave = new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateNone));
+            slave.visible = false;
             new FlxTimer().start(2, function(t : FlxTimer) {
                 // New slaves fall from top
-                add(slave = new SlaveCharacter(Constants.Width/2 - 16, -40, this, SlaveCharacter.StateFall));
+                slave.visible = true;
+                slave.switchState(SlaveCharacter.StateFall);
                 t.start(4.5, afterSlaveEntry);
             });
         }

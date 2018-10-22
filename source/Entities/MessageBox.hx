@@ -56,7 +56,7 @@ class MessageBox extends FlxGroup
 
         if (!animatedBackground)
         {
-            background = new FlxSprite().makeGraphic(Std.int(width), Std.int(height), bgColor);
+            background = new FlxSprite(x, y).makeGraphic(Std.int(width), Std.int(height), bgColor);
         }
         else
         {

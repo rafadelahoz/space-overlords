@@ -425,13 +425,7 @@ class TypeWriter extends FlxBitmapText
 		}
 
 		// If the skip key was pressed, complete the animation.
-		#if !FLX_NO_KEYBOARD
-		if (skipKeys != null && skipKeys.length > 0 && FlxG.keys.anyJustPressed(skipKeys))
-		{
-			skipping = true;
-		}
-		#end
-		if (GamePad.justPressed(GamePad.Shoot) && !skipping)
+		if (GamePad.justPressed(GamePad.Shoot) && _typing && !skipping)
 		{
 			skipping = true;
 		}

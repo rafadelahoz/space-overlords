@@ -145,6 +145,33 @@ class GameController
 		else
 			return data.cycle * 100;
 	}
+
+	/* DEBUG */
+
+	static function HandleMessageboxDebug()
+	{
+		var message : String =
+            /*"Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
+            FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
+            "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
+            " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +*/
+            LoreLibrary.getLore() /*+ "#" +
+            "Anyhow!#" +
+            "As you have reached your quota, you can now choose.#" +
+            "Would you like to go back home, or a special reward?"*/;
+			//"";
+		var settings : MessageBox.MessageSettings =
+        {
+            x : 0, y : 0, w: Constants.Width, h: 88, border: 10,
+            bgOffsetX : 0, bgOffsetY: 0, bgGraphic: "assets/ui/overlord-dialog-bg.png",
+            color: Palette.Black ,  animatedBackground: false
+        };
+
+        FlxG.state.add(new MessageBox().show(message, settings, function() {
+			ProgressData.data.slave_count += 1;
+            HandleMessageboxDebug();
+        }));
+	}
 }
 
 enum GameState { Loading; Title; Menu; Play; GameOver; }

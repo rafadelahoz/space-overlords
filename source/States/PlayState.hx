@@ -639,7 +639,7 @@ class PlayState extends GarbageState
             }
         }
 
-        if (somethingTriggered && bombsTriggered)
+        if (somethingTriggered || bombsTriggered)
         {
             aftermathTimer.start(TriggerCleanupDelay, handleAftermathFalling);
 

@@ -38,11 +38,14 @@ class SlaveCharacter extends FlxSprite
 
     var motionTween : FlxTween;
 
+    var forcedColorize : Bool;
+
     public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -2)
     {
         super(X, Y);
 
         world = World;
+        forcedColorize = false;
 
         handleGraphic();
 
@@ -212,6 +215,8 @@ class SlaveCharacter extends FlxSprite
         }
 
         head.color = color;
+        if (canColorizeDetail())
+            detail.color = color;
 
         super.draw();
         head.draw();
@@ -285,5 +290,21 @@ class SlaveCharacter extends FlxSprite
         switchState(StateWalk, destination, callback);
         if (duration > 0)
             WalkTime = oldWalkTime;
+    }
+
+    public function colorize(targetColor : Int, duration : Float, ?callback : Void -> Void = null)
+    {
+        forcedColorize = true;
+        var currentColor : Int = color;
+        FlxTween.color(this, duration, currentColor, targetColor, {onComplete: function(_) {
+            if (callback != null)
+                callback();
+            }
+        });
+    }
+
+    function canColorizeDetail() : Bool
+    {
+        return forcedColorize || ProgressData.data.slave_detail > 1;
     }
 }

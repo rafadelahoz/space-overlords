@@ -246,12 +246,11 @@ class MenuState extends GarbageState
                 var doorPosition : FlxPoint = new FlxPoint(126, 204);
                 slave.walkTo(doorPosition, function() {
                     slave.switchState(SlaveCharacter.StateNone);
-                    var color : Int = slave.color;
-                    FlxTween.color(slave, 0.5, color, 0xFF000000, {onComplete: function(_) {
+                    slave.colorize(0xFF000000, 0.5, function() {
                         FlxG.camera.fade(0xFF000000, 0.25, false, function() {
                             GameController.ToReward();
                         });
-                    }});
+                    });
                 });
             };
             doorOpenFx.animation.play("open");

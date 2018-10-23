@@ -30,4 +30,9 @@ class ItemData
     {
         return (item != null && item.type == SpecialTrigger);
     }
+
+    public static function IsTargetFilter(item : ItemData) : Bool
+    {
+        return (item != null && item.type == SpecialTarget);
+    }
 }

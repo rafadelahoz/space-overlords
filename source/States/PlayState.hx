@@ -260,7 +260,12 @@ class PlayState extends GarbageState
                 delay += 2;
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     topDisplay.startScroller();
-                    switchState(StateGenerate);
+
+                    if (mode == Constants.ModeEndless)
+                        switchState(StateGenerate);
+                    else
+                        highlightTargets();
+
                     topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
                 });
             case PlayState.StateGenerate:
@@ -279,6 +284,7 @@ class PlayState extends GarbageState
                 items.add(currentItem.slave);
 
                 // Clear current item references
+                remove(currentItem);
                 currentItem.slave = null;
                 currentItem = null;
 
@@ -872,7 +878,10 @@ class PlayState extends GarbageState
                     session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
                     Logger.log("-- fall speed " + session.fallSpeed + " [theme] (" + Date.now() + ")");
 
-                    switchState(StateGenerate);
+                    if (mode == Constants.ModeEndless)
+                        switchState(StateGenerate);
+                    else
+                        highlightTargets();
                 });
             });
         }
@@ -885,9 +894,44 @@ class PlayState extends GarbageState
                     session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
                     Logger.log("-- fall speed " + session.fallSpeed + " [side] (" + Date.now() + ")");
 
-                    switchState(StateGenerate);
+                    if (mode == Constants.ModeEndless)
+                        switchState(StateGenerate);
+                    else
+                        highlightTargets();
                 });
             });
+        }
+    }
+
+    function highlightTargets()
+    {
+        // Find targets
+        var targets : Array<ItemData> = grid.getAll(ItemData.IsTargetFilter);
+        for (target in targets)
+        {
+            // Flash them white? Scale them?
+            highlightTarget(target.entity);
+        }
+
+        new FlxTimer().start(1, function(_) {
+            // After that
+            switchState(StateGenerate);
+        });
+    }
+
+    function highlightTarget(target : ItemEntity, ?times : Int = 2)
+    {
+        var duration : Float = 0.15;
+        if (times > 0 && target != null)
+        {
+            target.scale.set(0.9, 0.9);
+            FlxTween.tween(target.scale, {x: 1.1, y: 1.1}, duration, {ease: FlxEase.circOut, startDelay: 0.1, onComplete: function(_) {
+                highlightTarget(target, times-1);
+            }});
+        }
+        else
+        {
+            target.scale.set(1, 1);
         }
     }
 

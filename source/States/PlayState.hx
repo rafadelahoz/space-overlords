@@ -921,7 +921,7 @@ class PlayState extends GarbageState
 
     function highlightTarget(target : ItemEntity, ?times : Int = 2)
     {
-        var duration : Float = 0.15;
+        var duration : Float = 0.125;
         if (times > 0 && target != null)
         {
             target.scale.set(0.9, 0.9);
@@ -931,7 +931,9 @@ class PlayState extends GarbageState
         }
         else
         {
-            target.scale.set(1, 1);
+            new FlxTimer().start(0.05, function(_){
+                target.scale.set(1, 1);
+            });
         }
     }
 

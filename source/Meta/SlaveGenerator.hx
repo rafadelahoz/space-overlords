@@ -25,12 +25,12 @@ class SlaveGenerator
 
     public function getHead() : Int
     {
-        return FlxG.random.int(0, 1);
+        return FlxG.random.int(0, 4, [ProgressData.data.slave_head]);
     }
 
     public function getDetail() : Int
     {
-        return FlxG.random.int(0, 2);
+        return FlxG.random.int(0, 6, [ProgressData.data.slave_detail]);
     }
 
     public function getColor() : Int

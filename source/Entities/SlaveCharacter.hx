@@ -305,6 +305,6 @@ class SlaveCharacter extends FlxSprite
 
     function canColorizeDetail() : Bool
     {
-        return forcedColorize || ProgressData.data.slave_detail > 1;
+        return forcedColorize || ProgressData.data.slave_detail > 2;
     }
 }

@@ -33,7 +33,7 @@ class HomeShip extends Entity
         var _width : Int = 16;
         var _height : Int = 16;
 
-        super(Constants.Width/2 - _width/2, Constants.Height * 0.7);
+        super(Constants.Width/2 - _width/2, 228-_height);
 
         loadGraphic("assets/images/home-ship.png");
 
@@ -53,12 +53,17 @@ class HomeShip extends Entity
     {
         callback = Callback;
         launching = true;
+
+        thrustTimer.start(2.5, function(_) {
+            initFx();
+        });
         delayTimer.start(5, function(_){
             launching = false;
             acceleration.set(0, Gravity);
 
             thrust(delayTimer);
-            initFx();
+
+            world.onLaunch();
         });
     }
 
@@ -77,7 +82,7 @@ class HomeShip extends Entity
 
     function finalThrust(_)
     {
-        acceleration.set(0, 0);
+        acceleration.set(0, -100);
         velocity.set(FlxG.random.float(-2, 2), -ThrustSpeed*8);
         emitter.start(false, 0.0025, 1050);
 
@@ -132,7 +137,7 @@ class HomeShip extends Entity
                 world.stars.starVelocityOffset.y = 0.1;
         }
 
-        if (finishing && y < -50)
+        if (finishing && y < -150)
         {
             // done!
             world.onShipLeftForHome();

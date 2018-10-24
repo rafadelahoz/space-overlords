@@ -11,13 +11,15 @@ import flixel.addons.display.FlxStarField.FlxStarField2D;
 
 class GoingHomeState extends GarbageState
 {
-    var ship : HomeShip;
     public var stars : FlxStarField2D;
+    var ship : HomeShip;
+    var tower : FlxSprite;
 
     var button : VcrButton;
-    var pressed : Bool;
+
     var overlay : FlxSprite;
 
+    var pressed : Bool;
     var colorTween : FlxTween;
 
     override public function create()
@@ -29,6 +31,9 @@ class GoingHomeState extends GarbageState
         stars = new FlxStarField2D(0, 0, Constants.Width, Constants.Height, 34);
         stars.starVelocityOffset.set(0.005, 0);
         add(stars);
+
+        tower = new FlxSprite(Constants.Width/2 - 7, 228, "assets/images/home-tower.png");
+        add(tower);
 
         ship = new HomeShip(this);
         add(ship);
@@ -60,6 +65,11 @@ class GoingHomeState extends GarbageState
             ship.launch(onFinalThrust);
             FlxG.camera.shake(0.005, 10);
         });
+    }
+
+    public function onLaunch()
+    {
+        FlxTween.tween(tower, {y : tower.y + tower.height}, 0.35);
     }
 
     public function onShipLeftForHome()

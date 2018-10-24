@@ -166,7 +166,7 @@ class PlayState extends GarbageState
     function getInitialFallSpeed() : Int
     {
         var intensity : Int = Std.int(GameSettings.data.intensity / 25);
-        return (intensity == 0 ? 14 : 16 + intensity);
+        return 16 + intensity;
     }
 
     function setupGameplay()
@@ -764,7 +764,7 @@ class PlayState extends GarbageState
             // Increase speed?
             if ((session.items - session.lastItemsSpeedIncrease) >= 10)
             {
-                session.fallSpeed += 1;
+                session.fallSpeed += 2;
                 Logger.log("-- fall speed " + session.fallSpeed + " [++] (" + Date.now() + ")");
                 session.lastItemsSpeedIncrease = session.items;
                 session.timesIncreased += 1;
@@ -803,8 +803,8 @@ class PlayState extends GarbageState
                         setupCycleGrid();
 
                         // Reset a tad the fall speed when the cycle is cleared
-                        session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.cycle);
-                        Logger.log("-- fall speed " + session.fallSpeed + " [cycle] (" + Date.now() + ")");
+                        // session.fallSpeed = Math.max(session.fallSpeed - 4, getInitialFallSpeed() + session.cycle);
+                        // Logger.log("-- fall speed " + session.fallSpeed + " [cycle] (" + Date.now() + ")");
 
                         for (item in grid.getAll())
                         {
@@ -875,7 +875,8 @@ class PlayState extends GarbageState
             handleThemeBackgroundChange(true);
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
-                    session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
+                    // session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
+                    session.fallSpeed -= 8;
                     Logger.log("-- fall speed " + session.fallSpeed + " [theme] (" + Date.now() + ")");
 
                     if (mode == Constants.ModeEndless)
@@ -891,7 +892,8 @@ class PlayState extends GarbageState
             handleThemeSideChange();
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
-                    session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
+                    // session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
+                    session.fallSpeed -= 4;
                     Logger.log("-- fall speed " + session.fallSpeed + " [side] (" + Date.now() + ")");
 
                     if (mode == Constants.ModeEndless)

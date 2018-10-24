@@ -192,9 +192,10 @@ class RewardState extends GarbageState
             t.start(1, function(_t : FlxTimer) {
                 FlxG.camera.fade(Palette.Black, 0.5, function() {
                     // Hide everything
-                    clear();
-                    FlxG.camera.fade(Palette.Black, 0.01, true);
-                    homeEnding();
+                    // clear();
+                    /*FlxG.camera.fade(Palette.Black, 0.01, true);
+                    homeEnding();*/
+                    FlxG.switchState(new GoingHomeState());
                 });
             });
         });

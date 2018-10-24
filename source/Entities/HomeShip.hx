@@ -21,29 +21,45 @@ class HomeShip extends Entity
     var delayTimer : FlxTimer;
 
     var thrustOn : Bool;
+    var launching : Bool;
     var finishing : Bool;
+
+    var callback : Void -> Void;
 
     public function new(World : GoingHomeState)
     {
         world = World;
 
-        var _width : Int = 14;
+        var _width : Int = 16;
         var _height : Int = 16;
 
         super(Constants.Width/2 - _width/2, Constants.Height * 0.7);
 
-        makeGraphic(_width, _height, Palette.White);
+        loadGraphic("assets/images/home-ship.png");
 
-        acceleration.set(0, Gravity);
         thrustTimer = new FlxTimer();
         delayTimer = new FlxTimer();
-
-        thrust(delayTimer);
 
         thrustOn = false;
         finishing = false;
 
-        initFx();
+        emitter = new FlxEmitter(x + width/2, y + height*0.9, 50);
+        world.add(emitter);
+
+        launching = false;
+    }
+
+    public function launch(Callback : Void -> Void)
+    {
+        callback = Callback;
+        launching = true;
+        delayTimer.start(5, function(_){
+            launching = false;
+            acceleration.set(0, Gravity);
+
+            thrust(delayTimer);
+            initFx();
+        });
     }
 
     function thrust(_)
@@ -61,23 +77,40 @@ class HomeShip extends Entity
 
     function finalThrust(_)
     {
-        velocity.set(FlxG.random.float(-2, 2), -ThrustSpeed*10);
-        emitter.start(true);
+        acceleration.set(0, 0);
+        velocity.set(FlxG.random.float(-2, 2), -ThrustSpeed*8);
+        emitter.start(false, 0.0025, 1050);
+
+        world.stars.starVelocityOffset.set(world.stars.starVelocityOffset.x, 8);
+
+        flixel.tweens.FlxTween.tween(world.stars.starVelocityOffset, {y : 0.005}, 0.7, {startDelay: 0.8, ease : flixel.tweens.FlxEase.expoOut});
     }
 
     override public function update(elapsed : Float)
     {
-        if (y < 60 && !finishing)
+        if (y < 90 && !finishing)
         {
             finishing = true;
 
             thrustOff(null);
             delayTimer.cancel();
             thrustTimer.cancel();
-            velocity.y *= 0.2;
-            // acceleration.set(0, Gravity*0.1);
+            velocity.y *= 0.25;
+            acceleration.set(0, Gravity*0.45);
             // Start vibrating
-            delayTimer.start(2, finalThrust);
+            delayTimer.start(3, finalThrust);
+
+            callback();
+        } else if (y >= 232) {
+            thrustOff(null);
+            delayTimer.cancel();
+            thrustTimer.cancel();
+            thrust(null);
+        }
+
+        if (launching || finishing)
+        {
+            angle = FlxG.random.float(-10, 10);
         }
 
         if (!finishing && thrustOn)
@@ -86,30 +119,45 @@ class HomeShip extends Entity
             angle = velocity.x;
         }
 
+        if (!finishing)
+        {
+            if (velocity.y < 0)
+                world.stars.starVelocityOffset.y = -velocity.y*0.025;
+            else
+                world.stars.starVelocityOffset.y = 0;
+        }
+        else
+        {
+            if (acceleration.y > 0)
+                world.stars.starVelocityOffset.y = 0.1;
+        }
+
+        if (finishing && y < -50)
+        {
+            // done!
+            world.onShipLeftForHome();
+        }
+
         super.update(elapsed);
 
-        emitter.x = x + width/2 - 5;
+        emitter.x = x + width/2 - 2;
         emitter.y = y + height - 1;
     }
 
     var emitter : FlxEmitter;
     function initFx()
     {
-        emitter = new FlxEmitter(x + width/2, y + height*0.9, 50);
-
-        emitter.makeParticles(3, 3, Palette.Yellow, 50);
+        emitter.makeParticles(3, 3, Palette.Yellow, 150);
 
         // emitter.launchMode = FlxEmitterMode.CIRCLE;
         emitter.launchMode = FlxEmitterMode.SQUARE;
         emitter.velocity.set(0, 10, 0, 30, 0, 0, 0, 2);
-        emitter.setSize(10, 2);
+        emitter.setSize(3, 2);
         emitter.alpha.set(0.8, 1, 0.0, 0.1);
         emitter.ignoreAngularVelocity = true;
         // emitter.angularVelocity.set()
         emitter.lifespan.set(0.17, 0.3);
         emitter.color.set(Palette.Yellow, Palette.Green, Palette.DarkGreen, Palette.Green);
-
-        world.add(emitter);
 
         emitter.start(false, 0.005);
     }

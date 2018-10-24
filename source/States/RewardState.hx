@@ -313,7 +313,7 @@ class RewardState extends GarbageState
             overlord.animation.play("gulp");
             overlord.animation.finishCallback = function(name : String) {
                 overlord.animation.play("idle");
-                showMessage("Now get me another slave!", onSceneEnd);
+                showMessage("A wonderful tradition, it is.#Now get me another slave!", onSceneEnd);
             }
         });
     }

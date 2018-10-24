@@ -764,7 +764,7 @@ class PlayState extends GarbageState
             // Increase speed?
             if ((session.items - session.lastItemsSpeedIncrease) >= 10)
             {
-                session.fallSpeed += 2;
+                session.fallSpeed += (mode == Constants.ModeEndless ? 2 : 1);
                 Logger.log("-- fall speed " + session.fallSpeed + " [++] (" + Date.now() + ")");
                 session.lastItemsSpeedIncrease = session.items;
                 session.timesIncreased += 1;
@@ -876,7 +876,10 @@ class PlayState extends GarbageState
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     // session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
-                    session.fallSpeed -= 8;
+                    if (mode == Constants.ModeEndless)
+                        session.fallSpeed -= 8;
+                    else
+                        session.fallSpeed = getInitialFallSpeed() + 2*session.cycle;
                     Logger.log("-- fall speed " + session.fallSpeed + " [theme] (" + Date.now() + ")");
 
                     if (mode == Constants.ModeEndless)
@@ -893,7 +896,10 @@ class PlayState extends GarbageState
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     // session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);
-                    session.fallSpeed -= 4;
+                    if (mode == Constants.ModeEndless)
+                        session.fallSpeed -= 4;
+                    else
+                        session.fallSpeed = getInitialFallSpeed() + 2*session.cycle;
                     Logger.log("-- fall speed " + session.fallSpeed + " [side] (" + Date.now() + ")");
 
                     if (mode == Constants.ModeEndless)

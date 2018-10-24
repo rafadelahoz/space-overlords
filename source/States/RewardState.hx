@@ -26,6 +26,15 @@ class RewardState extends GarbageState
 
     var homeTrapdoor : FlxSprite;
 
+    var slaveWentHome : Int;
+
+    public function new(?SlaveWentHome : Int = -1)
+    {
+        super();
+
+        slaveWentHome = SlaveWentHome;
+    }
+
     override public function create()
     {
         super.create();
@@ -35,7 +44,7 @@ class RewardState extends GarbageState
         overlordBg = new FlxSprite(14, 127);
         overlordBg.makeGraphic(152, 87, 0xFFe8b796);
         add(overlordBg);
-        overlordBg.scale.y = 0;
+
         overlord = new FlxSprite(13, 127);
         overlord.loadGraphic("assets/images/overlord-anim-sprite.png", true, 153, 87);
         overlord.animation.add("idle", [0]);
@@ -44,8 +53,13 @@ class RewardState extends GarbageState
         overlord.animation.add("drama", [8, 9, 10], 20, true);
         overlord.animation.add("gulp", [11, 12, 0], 1, false);
         overlord.animation.play("idle");
-        overlord.scale.y = 0;
         add(overlord);
+
+        if (slaveWentHome < 0)
+        {
+            overlord.scale.y = 0;
+            overlordBg.scale.y = 0;
+        }
 
         // Minislave added here to be behind scanlines
         rewardMinislave = new FlxSpriteGroup(154, 174);
@@ -53,17 +67,54 @@ class RewardState extends GarbageState
 
         add(new Scanlines(14, 127, "assets/ui/overlord-scanlines.png", Palette.Yellow));
 
-        add(new FlxSprite(0, 0, "assets/backgrounds/overlord-background.png"));
+        var overlay : FlxSprite;
+        add(overlay = new FlxSprite(0, 0, "assets/backgrounds/overlord-background.png"));
 
-        homeTrapdoor = new FlxSprite(0, 256, "assets/images/reward-trapdoor.png");
-        add(homeTrapdoor);
+        if (slaveWentHome < 0)
+        {
+            homeTrapdoor = new FlxSprite(0, 256, "assets/images/reward-trapdoor.png");
+            add(homeTrapdoor);
 
-        slave = new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateNone);
-        add(slave);
-        var color : Int = slave.color;
-        FlxTween.color(slave, 1, 0xFF000000, color, {onComplete: function(_) {
-            slave.walkTo(new FlxPoint(Constants.Width/2 + 24, 235), onSlavePositioned);
-        }});
+            slave = new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateNone);
+            add(slave);
+            var color : Int = slave.color;
+            FlxTween.color(slave, 1, 0xFF000000, color, {onComplete: function(_) {
+                slave.walkTo(new FlxPoint(Constants.Width/2 + 24, 235), onSlavePositioned);
+            }});
+        }
+        else
+        {
+            FlxTween.color(overlay, 0.6, Palette.White, slaveWentHome == 1 ? Palette.Green : Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.3, loopDelay: 0.3});
+
+            var message : String = null;
+            if (slaveWentHome == 0)
+            {
+                message = (FlxG.random.bool(50) ? "Hm...#" : "") +
+                    FlxG.random.getObject(["That went bad.",
+                                           "I suppose that counts as freedom?",
+                                           "Such a pity.",
+                                           "There goes a fine slave..."]) + "#" +
+                    FlxG.random.getObject(["We ought to start spending more on those tiny ships...#Oh well!",
+                                           "Happens all the time.",
+                                           "Nothing we can do now!"]) + "#" +
+                    "Now get me another slave!";
+            }
+            else if (slaveWentHome == 1)
+            {
+                message = (FlxG.random.bool(50) ? "Hm...#" : "") +
+                    FlxG.random.getObject(["It's always hard to see them go.",
+                                           "Did we load the food into the ship?",
+                                           "That ship won't get too far...",
+                                           "There goes a fine slave!"]) + "#" +
+                    FlxG.random.getObject(["I wonder if it will reach its home. Hmm.",
+                                           "Was that the correct direction?.",
+                                           "I envy it!",
+                                           "Oh well!"]) + "#" +
+                    "Now get me another slave!";
+            }
+
+            showMessage(message, onSceneEnd);
+        }
     }
 
     function onSlavePositioned()

@@ -45,6 +45,7 @@ class GoingHomeState extends GarbageState
 
         button = new VcrButton(Constants.Width, Constants.Height-51, null, onButtonPressed, false);
         button.loadSpritesheet("assets/ui/home-button.png", 124, 51);
+        button.invertWhilePressed = false;
         add(button);
         pressed = false;
 
@@ -84,7 +85,8 @@ class GoingHomeState extends GarbageState
         new FlxTimer().start(1, function(_) {
             ProgressData.OnSlaveRewarded();
             FlxG.camera.fade(Palette.Black, 2, false, function() {
-                GameController.ToMenu();
+                // Return with success!
+                FlxG.switchState(new RewardState(1));
             });
         });
     }

@@ -177,6 +177,7 @@ class TitleState extends GarbageState
         if (SaveStateManager.savestateExists())
         {
             disableGroup(screen);
+            SfxEngine.play(SfxEngine.SFX.PauseStart);
             screen.add(new VcrResumePopup(function() {
                 GameController.StartGameplay(false);
             }));

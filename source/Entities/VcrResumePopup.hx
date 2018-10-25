@@ -65,6 +65,8 @@ class VcrResumePopup extends FlxGroup
             }
         });
 
+        SfxEngine.play(SfxEngine.SFX.PauseEnd);
+
         FlxTween.tween(background.scale, {y : 0}, OpenTime, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
             t.destroy();
             if (callback != null)

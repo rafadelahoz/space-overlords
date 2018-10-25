@@ -288,6 +288,7 @@ class ItemEntity extends Entity
 
             if (GamePad.justPressed(GamePad.Shoot))
             {
+                playSfx("flip");
                 flipCharType();
                 slave.flipCharType();
             }
@@ -323,6 +324,7 @@ class ItemEntity extends Entity
 
             if (GamePad.justPressed(GamePad.Shoot))
             {
+                playSfx("flip");
                 flipCharType();
                 slave.flipCharType();
             }
@@ -331,6 +333,8 @@ class ItemEntity extends Entity
 
     function finishPositioning()
     {
+        playSfx("land");
+
         // The piece can stop
         var currentCell : FlxPoint = getCurrentCell();
         // Fallback if we are too low
@@ -408,6 +412,7 @@ class ItemEntity extends Entity
 
     function moveHorizontallyToCell(cellX : Float, cellY : Float)
     {
+        SfxEngine.play(SfxEngine.SFX.Move);
         movementTween = FlxTween.tween(this, {x: grid.getCellPosition(cellX, cellY).x}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: onHorizontalMovementEnd});
     }
 
@@ -488,7 +493,9 @@ class ItemEntity extends Entity
             grid.set(targetCell.x, targetCell.y, new ItemData(targetCell.x, targetCell.y, charType, this));
 
             // And go
-            movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.sineIn});
+            movementTween = FlxTween.tween(this, {y: targetPos.y}, ForcedFallTime, {ease: FlxEase.sineIn, onComplete: function(_) {
+                playSfx("land");
+            }});
 
             return true;
         }
@@ -526,7 +533,10 @@ class ItemEntity extends Entity
     {
         FlxFlicker.flicker(this, 0, true, true);
         if (charType == ItemData.SpecialBomb)
+        {
             animation.play("open");
+            SfxEngine.play(SfxEngine.SFX.BombTrigger);
+        }
     }
 
     public function triggerDissolve(?leaveCallback : Void -> Void = null)
@@ -582,6 +592,45 @@ class ItemEntity extends Entity
             if (movementTweenActive)
                 movementTween.active = movementTweenActive;
         }
+    }
+
+    function playSfx(type : String)
+    {
+        var sfx : SfxEngine.SFX = null;
+
+        var char : Int = charType;
+        // Priorize special types even if they are on the slave!
+        if (slave != null && slave.charType > 20)
+            char = slave.charType;
+
+        switch (type)
+        {
+            case "flip":
+                     if (char == 1) sfx = SfxEngine.SFX.FlipPillA;
+                else if (char == 2) sfx = SfxEngine.SFX.FlipPillB;
+                else if (char == 3) sfx = SfxEngine.SFX.FlipEyeA;
+                else if (char == 4) sfx = SfxEngine.SFX.FlipEyeB;
+                else if (char == 5) sfx = SfxEngine.SFX.FlipRaddishA;
+                else if (char == 6) sfx = SfxEngine.SFX.FlipRaddishB;
+                else if (char == 7) sfx = SfxEngine.SFX.FlipMutantA;
+                else if (char == 8) sfx = SfxEngine.SFX.FlipMutantB;
+                else if (char > 20) sfx = SfxEngine.SFX.FlipChemdust;
+            case "land":
+                     if (char == 1) sfx = SfxEngine.SFX.LandPillA;
+                else if (char == 2) sfx = SfxEngine.SFX.LandPillB;
+                else if (char == 3) sfx = SfxEngine.SFX.LandEyeA;
+                else if (char == 4) sfx = SfxEngine.SFX.LandEyeB;
+                else if (char == 5) sfx = SfxEngine.SFX.LandRaddishA;
+                else if (char == 6) sfx = SfxEngine.SFX.LandRaddishB;
+                else if (char == 7) sfx = SfxEngine.SFX.LandMutantA;
+                else if (char == 8) sfx = SfxEngine.SFX.LandMutantB;
+                else if (char > 20) sfx = SfxEngine.SFX.LandChemdust;
+        }
+
+        if (sfx != null)
+            SfxEngine.play(sfx);
+        else
+            trace("NULL sfx for " + type + ", " + charType);
     }
 }
 

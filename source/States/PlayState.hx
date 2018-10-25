@@ -461,6 +461,8 @@ class PlayState extends GarbageState
 
         topDisplay.onPauseStart();
         effects.forEach(handleEffectPause);
+
+        SfxEngine.play(SfxEngine.SFX.PauseStart);
     }
 
     function onPauseEnd()
@@ -474,6 +476,8 @@ class PlayState extends GarbageState
 
         topDisplay.onPauseEnd();
         effects.forEach(handleEffectResume);
+
+        SfxEngine.play(SfxEngine.SFX.PauseEnd);
     }
 
     function onPauseAbort()
@@ -695,6 +699,8 @@ class PlayState extends GarbageState
 
         if (matches.length > 0)
         {
+            SfxEngine.play(SfxEngine.SFX.Pair);
+            
             aftermathCombo += 1;
 
             // Compute matches score

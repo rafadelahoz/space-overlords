@@ -23,6 +23,7 @@ class VcrButton extends FlxSprite
 
     var highlightable : Bool;
     public var invertWhilePressed : Bool;
+    public var playSfx : Bool;
 
     public function new(X : Float, Y : Float, HighlightCallback : Void -> Void, Callback : Void -> Void, ?Highlightable : Bool = true)
     {
@@ -37,6 +38,7 @@ class VcrButton extends FlxSprite
         allowReleaseOutside = false;
         highlightable = Highlightable;
         invertWhilePressed = true;
+        playSfx = true;
     }
 
     public function loadSpritesheet(Sprite : String, Width : Float, Height : Float, ?SingleImage : Bool = false)
@@ -183,11 +185,17 @@ class VcrButton extends FlxSprite
                 animation.play("highlighted");
             if (highlightCallback != null)
                 highlightCallback();
+
+            if (playSfx)
+                SfxEngine.play(SfxEngine.SFX.VcrSelect);
         }
         else if (!highlightable || state == StateHighlighted)
         {
             if (callback != null)
                 callback();
+
+            if (playSfx)
+                SfxEngine.play(SfxEngine.SFX.VcrAccept);
         }
     }
 

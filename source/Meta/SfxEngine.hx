@@ -7,8 +7,36 @@ import flixel.tweens.FlxTween;
 
 enum SFX {
     None;
-    Click;
-    Accept;
+    VcrSelect;
+    VcrAccept;
+    PauseStart;
+    PauseEnd;
+
+    FlipEyeA;
+    FlipEyeB;
+    FlipRaddishA;
+    FlipRaddishB;
+    FlipMutantA;
+    FlipMutantB;
+    FlipPillA;
+    FlipPillB;
+    FlipChemdust;
+
+    LandEyeA;
+    LandEyeB;
+    LandRaddishA;
+    LandRaddishB;
+    LandMutantA;
+    LandMutantB;
+    LandPillA;
+    LandPillB;
+    LandChemdust;
+
+    BombTrigger;
+    BombExplode;
+
+    Move;
+    Pair;
 }
 
 class SfxEngine
@@ -34,8 +62,36 @@ class SfxEngine
         initialized = true;
 
         sfxFiles = new Map<SFX, String>();
-        sfxFiles.set(SFX.Click,          path + "btn_click.wav");
-        sfxFiles.set(SFX.Accept,         path + "accept.wav");
+        sfxFiles.set(SFX.VcrSelect,      path + "vcr-select.wav");
+        sfxFiles.set(SFX.VcrAccept,      path + "vcr-accept.wav");
+        sfxFiles.set(SFX.PauseStart,     path + "pause-in.wav");
+        sfxFiles.set(SFX.PauseEnd,       path + "pause-end.wav");
+
+        sfxFiles.set(SFX.FlipEyeA,       path + "turn-eye-a.wav");
+        sfxFiles.set(SFX.FlipEyeB,       path + "turn-eye-b.wav");
+        sfxFiles.set(SFX.FlipRaddishA,   path + "turn-raddish-a.wav");
+        sfxFiles.set(SFX.FlipRaddishB,   path + "turn-raddish-b.wav");
+        sfxFiles.set(SFX.FlipMutantA,    path + "turn-mutant-a.wav");
+        sfxFiles.set(SFX.FlipMutantB,    path + "turn-mutant-b.wav");
+        sfxFiles.set(SFX.FlipPillA,      path + "turn-pill-a.wav");
+        sfxFiles.set(SFX.FlipPillB,      path + "turn-pill-b.wav");
+        sfxFiles.set(SFX.FlipChemdust,   path + "flip-chemdust.wav");
+
+        sfxFiles.set(SFX.LandEyeA,       path + "land-eye-a.wav");
+        sfxFiles.set(SFX.LandEyeB,       path + "land-eye-b.wav");
+        sfxFiles.set(SFX.LandRaddishA,   path + "land-raddish-a.wav");
+        sfxFiles.set(SFX.LandRaddishB,   path + "land-raddish-b.wav");
+        sfxFiles.set(SFX.LandMutantA,    path + "land-mutant-a.wav");
+        sfxFiles.set(SFX.LandMutantB,    path + "land-mutant-b.wav");
+        sfxFiles.set(SFX.LandPillA,      path + "land-pill-a.wav");
+        sfxFiles.set(SFX.LandPillB,      path + "land-pill-b.wav");
+        sfxFiles.set(SFX.LandChemdust,   path + "land-chemdust.wav");
+
+        sfxFiles.set(SFX.BombTrigger,    path + "bomb-trigger.wav");
+        sfxFiles.set(SFX.BombExplode,    path + "bomb-explode.wav");
+
+        sfxFiles.set(SFX.Move,           path + "move.wav");
+        sfxFiles.set(SFX.Pair,           path + "pair-b.wav");
 
         sfx = new Map<SFX, FlxSound>();
         for (sf in sfxFiles.keys())

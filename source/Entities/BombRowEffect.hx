@@ -21,6 +21,9 @@ class BombRowEffect extends FlxSprite
 
         makeGraphic(world.grid.columns*Constants.TileSize, Constants.TileSize, 0xFFFFFFFF);
         scale.y = 0;
+        new flixel.util.FlxTimer().start(0.9, function(_) {
+            SfxEngine.play(SfxEngine.SFX.BombExplode);
+        });
         tween = FlxTween.tween(this.scale, {y : 1}, GrowTime, {startDelay: 0.9, ease : FlxEase.expoIn, onComplete: function(t:FlxTween) {
             tween = FlxTween.tween(this, {alpha : 0}, ExitTime, {startDelay: 0.4, ease : FlxEase.expoIn, onComplete: function(tt:FlxTween) {
                 tt.destroy();

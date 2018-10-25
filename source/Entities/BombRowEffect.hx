@@ -9,17 +9,13 @@ class BombRowEffect extends FlxSprite
     var GrowTime : Float = 0.25;
     var ExitTime : Float = 0.9;
 
-    var world : PlayState;
-
     var tween : FlxTween;
 
-    public function new(X : Float, Y : Float, World : PlayState)
+    public function new(X : Float, Y : Float, Width : Int, Height : Int)
     {
         super(X, Y);
 
-        world = World;
-
-        makeGraphic(world.grid.columns*Constants.TileSize, Constants.TileSize, 0xFFFFFFFF);
+        makeGraphic(Width, Height, 0xFFFFFFFF);
         scale.y = 0;
         new flixel.util.FlxTimer().start(0.9, function(_) {
             SfxEngine.play(SfxEngine.SFX.BombExplode);

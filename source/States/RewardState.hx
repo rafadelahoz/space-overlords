@@ -84,12 +84,13 @@ class RewardState extends GarbageState
         }
         else
         {
-            FlxTween.color(overlay, 0.6, Palette.White, slaveWentHome == 1 ? Palette.Green : Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.3, loopDelay: 0.3});
+            // Avoid lights for now
+            // FlxTween.color(overlay, 0.6, Palette.White, slaveWentHome == 1 ? Palette.Green : Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.3, loopDelay: 0.3});
 
             var message : String = null;
             if (slaveWentHome == 0)
             {
-                message = (FlxG.random.bool(50) ? "Hm...#" : "") +
+                message = "Hm...#" +
                     FlxG.random.getObject(["That went bad.",
                                            "I suppose that counts as freedom?",
                                            "Such a pity.",
@@ -97,6 +98,7 @@ class RewardState extends GarbageState
                     FlxG.random.getObject(["We ought to start spending more on those tiny ships...#Oh well!",
                                            "Happens all the time.",
                                            "Nothing we can do now!"]) + "#" +
+                    "...#" +
                     "Now get me another slave!";
             }
             else if (slaveWentHome == 1)
@@ -107,9 +109,10 @@ class RewardState extends GarbageState
                                            "That ship won't get too far...",
                                            "There goes a fine slave!"]) + "#" +
                     FlxG.random.getObject(["I wonder if it will reach its home. Hmm.",
-                                           "Was that the correct direction?.",
-                                           "I envy it!",
+                                           "Wait... Was that the correct direction?.",
+                                           "I would love to be in its place!",
                                            "Oh well!"]) + "#" +
+                    "...#" +
                     "Now get me another slave!";
             }
 

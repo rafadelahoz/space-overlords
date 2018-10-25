@@ -6,6 +6,7 @@ import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
+import flixel.group.FlxGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.addons.display.FlxStarField.FlxStarField2D;
 
@@ -14,6 +15,7 @@ class GoingHomeState extends GarbageState
     public var stars : FlxStarField2D;
     var ship : HomeShip;
     var tower : FlxSprite;
+    public var effects : FlxGroup;
 
     var button : VcrButton;
 
@@ -37,6 +39,9 @@ class GoingHomeState extends GarbageState
 
         ship = new HomeShip(this);
         add(ship);
+
+        effects = new FlxGroup();
+        add(effects);
 
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png", Palette.Red));
 
@@ -63,7 +68,7 @@ class GoingHomeState extends GarbageState
 
         FlxTween.tween(button, {x : Constants.Width}, 0.5, {ease : FlxEase.circInOut});
         FlxG.camera.shake(0.005, 2, function() {
-            ship.launch(onFinalThrust);
+            ship.launch();
             FlxG.camera.shake(0.005, 10);
         });
     }
@@ -71,6 +76,15 @@ class GoingHomeState extends GarbageState
     public function onLaunch()
     {
         FlxTween.tween(tower, {y : tower.y + tower.height}, 0.35);
+    }
+
+    public function onFinalDecissionTaken()
+    {
+        FlxG.camera.shake(0.0085, 100);
+        colorTween.cancel();
+        var c : Int = overlay.color;
+        //FlxTween.color(overlay, 0.5, c, Palette.White, {ease: FlxEase.cubeInOut, startDelay: 0.25});
+        FlxTween.color(overlay, 0.25, Palette.White, Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.125, loopDelay: 0.125});
     }
 
     public function onShipLeftForHome()
@@ -91,12 +105,17 @@ class GoingHomeState extends GarbageState
         });
     }
 
-    function onFinalThrust()
+    public function onShipDestroyed()
     {
-        FlxG.camera.shake(0.0085, 100);
-        colorTween.cancel();
-        var c : Int = overlay.color;
-        //FlxTween.color(overlay, 0.5, c, Palette.White, {ease: FlxEase.cubeInOut, startDelay: 0.25});
-        FlxTween.color(overlay, 0.25, Palette.White, Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.125, loopDelay: 0.125});
+        ship.exists = false;
+        remove(ship);
+
+        new FlxTimer().start(4, function(_) {
+            ProgressData.OnSlaveRewarded();
+            FlxG.camera.fade(Palette.Black, 3, false, function() {
+                // Return with failure!
+                FlxG.switchState(new RewardState(0));
+            });
+        });
     }
 }

@@ -49,9 +49,8 @@ class HomeShip extends Entity
         launching = false;
     }
 
-    public function launch(Callback : Void -> Void)
+    public function launch()
     {
-        callback = Callback;
         launching = true;
 
         thrustTimer.start(2.5, function(_) {
@@ -80,7 +79,7 @@ class HomeShip extends Entity
         thrustOn = false;
     }
 
-    function finalThrust(_)
+    function finalThrust()
     {
         acceleration.set(0, -100);
         velocity.set(FlxG.random.float(-2, 2), -ThrustSpeed*8);
@@ -102,10 +101,8 @@ class HomeShip extends Entity
             thrustTimer.cancel();
             velocity.y *= 0.25;
             acceleration.set(0, Gravity*0.45);
-            // Start vibrating
-            delayTimer.start(3, finalThrust);
 
-            callback();
+            delayTimer.start(3, handleFinalDecision);
         } else if (y >= 232) {
             thrustOff(null);
             delayTimer.cancel();
@@ -149,6 +146,16 @@ class HomeShip extends Entity
         emitter.y = y + height - 1;
     }
 
+    function handleFinalDecision(_)
+    {
+        world.onFinalDecissionTaken();
+
+        if (FlxG.random.bool(50))
+            finalThrust();
+        else
+            explode();
+    }
+
     var emitter : FlxEmitter;
     function initFx()
     {
@@ -165,5 +172,72 @@ class HomeShip extends Entity
         emitter.color.set(Palette.Yellow, Palette.Green, Palette.DarkGreen, Palette.Green);
 
         emitter.start(false, 0.005);
+    }
+
+    var flareEmitter : FlxEmitter;
+    var shineEmitter : FlxEmitter;
+    public function explode()
+    {
+        velocity.set(0, 0);
+        acceleration.set(0, 0);
+        world.stars.starVelocityOffset.y = 0.2;
+
+        emitter.kill();
+
+        explodeSingle();
+        new FlxTimer().start(0.13, function(t:FlxTimer) {
+            explodeSingle();
+        }, 6);
+        new FlxTimer().start(0.13*2, function(t:FlxTimer) {
+            world.effects.add(new BombRowEffect(0, y - Constants.TileSize + 4, Constants.Width, Constants.TileSize*2));
+            t.start(1, function(t : FlxTimer) {
+                // Notify of the dire end
+                world.onShipDestroyed();
+            });
+        });
+    }
+
+    public function explodeSingle()
+    {
+        var xx : Float = FlxG.random.float(x-4, x+width-4);
+        var yy : Float = FlxG.random.float(y-4, y+height-4);
+
+        //if (flareEmitter == null)
+        {
+            flareEmitter = new FlxEmitter(xx, yy, 50);
+            flareEmitter.setSize(12, 12);
+            flareEmitter.alpha.set(0.8, 1, 0.2, 0.5);
+            flareEmitter.lifespan.set(0.5, 0.75);
+            flareEmitter.color.set(Palette.Yellow, Palette.Red, Palette.Brown, Palette.DarkPurple);
+            flareEmitter.blend = flash.display.BlendMode.OVERLAY;
+            // flareEmitter.angularAcceleration.set(2, 3, 5, 7);
+            flareEmitter.speed.set(8, 15, 2, 4);
+            flareEmitter.acceleration.set(-2, -2, 2, 2, -5, 5, -5, 5);
+            flareEmitter.scale.set(1, 1, 1.5, 1.5, 2, 2, 3, 3);
+            // flareEmitter.angularDrag.set(10, 20, 30, 40);
+            flareEmitter.makeParticles(3, 3);
+            world.effects.add(flareEmitter);
+        }
+        flareEmitter.setPosition(xx, yy);
+        flareEmitter.start(true);
+
+        //if (shineEmitter == null)
+        {
+            shineEmitter = new FlxEmitter(xx, yy, 50);
+            shineEmitter.setSize(10, 10);
+            shineEmitter.alpha.set(0.8, 1, 0.2, 0.5);
+            shineEmitter.lifespan.set(0.25, 0.45);
+            shineEmitter.color.set(Palette.White, Palette.Yellow, Palette.White, Palette.Yellow);
+            shineEmitter.blend = flash.display.BlendMode.OVERLAY;
+            // shineEmitter.angularAcceleration.set(2, 3, 5, 7);
+            shineEmitter.speed.set(4, 10, 1, 3);
+            // shineEmitter.acceleration.set(-2, -2, 2, 2, -5, 5, -5, 5);
+            shineEmitter.scale.set(0.3, 0.3, 0.5, 0.5, 1.2, 1.2, 1.6, 1.6);
+            // shineEmitter.angularDrag.set(10, 20, 30, 40);
+            shineEmitter.makeParticles(4, 4);
+            world.effects.add(shineEmitter);
+        }
+        shineEmitter.setPosition(xx, yy);
+        shineEmitter.start(true);
     }
 }

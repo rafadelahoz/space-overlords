@@ -580,7 +580,7 @@ class PlayState extends GarbageState
 
                 for (row in clearRows)
                 {
-                    effects.add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, this));
+                    effects.add(new BombRowEffect(grid.x, grid.y + row * Constants.TileSize, grid.columns*Constants.TileSize, Constants.TileSize));
                 }
             }
 

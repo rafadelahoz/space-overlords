@@ -28,6 +28,7 @@ class MenuState extends GarbageState
     var doorOpenFx : FlxSprite;
     var backgroundShader : FlxSprite;
     var cellSpeaker : FlxSprite;
+    var speechTimer : FlxTimer;
 
     var slave : SlaveCharacter;
 
@@ -127,6 +128,8 @@ class MenuState extends GarbageState
         add(new Scanlines(0, 0, "assets/ui/vcr-overlay.png"));
 
         hideButtons();
+
+        speechTimer = new FlxTimer();
 
         FlxG.camera.scroll.set(0, 0);
     }
@@ -239,42 +242,63 @@ class MenuState extends GarbageState
         // Nop!
     }
 
+    function doSpeechSfx(_)
+    {
+        SfxEngine.play(FlxG.random.getObject([SfxEngine.SFX.SpeakerA, SfxEngine.SFX.SpeakerB]), 0.5);
+        speechTimer.start(FlxG.random.float(0.08, 0.22), doSpeechSfx);
+    }
+
     function onRewardPressed()
     {
         disableButtons();
-
         cellSpeaker.animation.play("speak");
 
-        var settings : MessageBox.MessageSettings =
-        {
-            x : 0, y : 143, w: Constants.Width, h: 68, border: 10,
-            bgOffsetX : 0, bgOffsetY: 25, bgGraphic: "assets/ui/cell-speaker-dialog-bg.png",
-            color: Palette.Black, animatedBackground: true
-        };
+        SfxEngine.play(SfxEngine.SFX.RewardFanfare);
 
-        var message : String =
-                "Slave " + ProgressData.data.slave_id + "!#" +
-                "You have reached your quota, and are going to be rewarded.#" +
-                "You will now have the honor of meeting our space overlord.#" +
-                "Suspicious behaviour or rebellious acts will result in the termination of your being.#" +
-                "You have been warned.#" +
-                "Please, proceed through the door.#" +
-                "Congratulations.";
-        add(new MessageBox().show(message, settings, function() {
-            // Door opening
-            doorOpenFx.animation.finishCallback = function(_) {
-                var doorPosition : FlxPoint = new FlxPoint(126, 204);
-                slave.walkTo(doorPosition, function() {
-                    slave.switchState(SlaveCharacter.StateNone);
-                    slave.colorize(0xFF000000, 0.5, function() {
-                        FlxG.camera.fade(0xFF000000, 0.25, false, function() {
-                            GameController.ToReward();
+        doSpeechSfx(speechTimer);
+
+        new FlxTimer().start(0.1, function(_) {
+
+            var settings : MessageBox.MessageSettings =
+            {
+                x : 0, y : 143, w: Constants.Width, h: 68, border: 10,
+                bgOffsetX : 0, bgOffsetY: 25, bgGraphic: "assets/ui/cell-speaker-dialog-bg.png",
+                color: Palette.Black, animatedBackground: true
+            };
+
+            var message : String =
+                    "Slave " + ProgressData.data.slave_id + "!#" +
+                    "You have reached your quota, and are going to be rewarded.#" +
+                    "You will now have the honor of meeting our space overlord.#" +
+                    "Suspicious behaviour or rebellious acts will result in the termination of your being.#" +
+                    "You have been warned.#" +
+                    "Please, proceed through the door.#" +
+                    "Congratulations.";
+            add(new MessageBox().show(message, settings, function() {
+                speechTimer.cancel();
+
+                SfxEngine.play(SfxEngine.SFX.PauseEnd);
+
+                // Door opening
+                doorOpenFx.animation.finishCallback = function(_) {
+                    var doorPosition : FlxPoint = new FlxPoint(126, 204);
+                    slave.walkTo(doorPosition, function() {
+                        slave.switchState(SlaveCharacter.StateNone);
+                        slave.colorize(0xFF000000, 0.5, function() {
+                            FlxG.camera.fade(0xFF000000, 0.25, false, function() {
+                                GameController.ToReward();
+                            });
                         });
                     });
-                });
-            };
-            doorOpenFx.animation.play("open");
-        }));
+                };
+                doorOpenFx.animation.play("open");
+                SfxEngine.play(SfxEngine.SFX.QuotaPopupFanfare);
+            }, function() {
+                doSpeechSfx(speechTimer);
+            }, function() {
+                speechTimer.cancel();
+            }));
+        });
     }
 
     public function onBackPressed()

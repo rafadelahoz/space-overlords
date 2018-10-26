@@ -412,7 +412,7 @@ class ItemEntity extends Entity
 
     function moveHorizontallyToCell(cellX : Float, cellY : Float)
     {
-        SfxEngine.play(SfxEngine.SFX.Move);
+        SfxEngine.play(SfxEngine.SFX.Move, 0.5);
         movementTween = FlxTween.tween(this, {x: grid.getCellPosition(cellX, cellY).x}, HorizontalMovementDuration, {ease: FlxEase.circInOut, onComplete: onHorizontalMovementEnd});
     }
 
@@ -537,6 +537,10 @@ class ItemEntity extends Entity
             animation.play("open");
             SfxEngine.play(SfxEngine.SFX.BombTrigger);
         }
+        else if (charType == ItemData.SpecialChemdust)
+        {
+            SfxEngine.play(SfxEngine.SFX.BombTrigger);
+        }
     }
 
     public function triggerDissolve(?leaveCallback : Void -> Void = null)
@@ -547,6 +551,12 @@ class ItemEntity extends Entity
 
         FlxTween.color(this, DissolveGrowTime, 0xFFFFFFFF, 0xFF000000, {startDelay: 0.1, ease : FlxEase.expoIn, onComplete: function(t:FlxTween) {
             t.destroy();
+
+            if (charType == ItemData.SpecialChemdust)
+            {
+                SfxEngine.play(SfxEngine.SFX.ChemdustDissolve);
+            }
+
             FlxTween.tween(this, {alpha : 0}, DissolveExitTime, {startDelay: 0.2, ease : FlxEase.expoIn, onComplete: function(tt:FlxTween) {
                 tt.destroy();
 

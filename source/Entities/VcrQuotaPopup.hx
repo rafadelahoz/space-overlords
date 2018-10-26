@@ -52,6 +52,8 @@ class VcrQuotaPopup extends FlxGroup
 
         callback = Callback;
 
+        SfxEngine.play(SfxEngine.SFX.PauseStart);
+
         FlxTween.tween(background.scale, {y: 1}, DisplayAnimTime, {ease : FlxEase.circOut, onComplete: onDisplayAnimFinished});
 
         finished = false;
@@ -91,6 +93,8 @@ class VcrQuotaPopup extends FlxGroup
             var achievedLabel : FlxSprite = new FlxSprite(x+17, y+89, "assets/ui/gameover-popup-quotareached.png");
             add(achievedLabel);
             flixel.effects.FlxFlicker.flicker(achievedLabel, 0, 0.5, true);
+
+            SfxEngine.play(SfxEngine.SFX.QuotaPopupFanfare);
         }
 
         // close, ok button, etc
@@ -113,6 +117,8 @@ class VcrQuotaPopup extends FlxGroup
                 // basic.destroy();
             }
         });
+
+        SfxEngine.play(SfxEngine.SFX.PauseEnd);
 
         FlxTween.tween(background.scale, {y : 0}, DisplayAnimTime, {ease : FlxEase.sineInOut, onComplete: function(t:FlxTween) {
             t.destroy();

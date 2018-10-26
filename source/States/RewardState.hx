@@ -125,6 +125,7 @@ class RewardState extends GarbageState
 
     function onSlavePositioned()
     {
+        SfxEngine.play(SfxEngine.SFX.ScreenOn);
         slave.switchState(SlaveCharacter.StateNone);
         FlxTween.tween(overlordBg.scale, {y : 1}, 0.5, {ease: FlxEase.circOut,
             onComplete: function(_) {
@@ -189,13 +190,13 @@ class RewardState extends GarbageState
 
         responseHome = new VcrButton(101, 186, onResponseHomeHighlighted, onResponseHomeSelected);
         responseHome.loadSpritesheet("assets/images/slave-answer-home.png", 72, 44);
-        // responseHome.invertWhilePressed = false;
+        responseHome.playSfx = false;
         add(responseHome);
         makeResponseAppear(responseHome);
 
         responseReward = new VcrButton(39, 210, onResponseRewardHighlighted, onResponseRewardSelected);
         responseReward.loadSpritesheet("assets/images/slave-answer-reward.png", 72, 40);
-        // responseReward.invertWhilePressed = false;
+        responseReward.playSfx = false;
         add(responseReward);
         makeResponseAppear(responseReward);
     }
@@ -219,22 +220,26 @@ class RewardState extends GarbageState
 
     function onResponseHomeHighlighted()
     {
+        SfxEngine.play(SfxEngine.SFX.FlipMutantA);
         responseReward.clearHighlight();
     }
 
     function onResponseRewardHighlighted()
     {
+        SfxEngine.play(SfxEngine.SFX.FlipMutantA);
         responseHome.clearHighlight();
     }
 
     function onResponseHomeSelected()
     {
+        SfxEngine.play(SfxEngine.SFX.Pair);
         hideSelectedResponse(responseHome, handleHomeEnding);
         hideOtherResponse(responseReward);
     }
 
     function onResponseRewardSelected()
     {
+        SfxEngine.play(SfxEngine.SFX.Pair);
         hideSelectedResponse(responseReward, handleRewardEnding);
         hideOtherResponse(responseHome);
     }
@@ -292,6 +297,8 @@ class RewardState extends GarbageState
 
     function startRewardSequence()
     {
+        SfxEngine.play(SfxEngine.SFX.Flying, true);
+
         rewardBot = new FlxSprite(slave.x-2 , -100);
         rewardBot.loadGraphic("assets/images/reward-robot-arm.png", true, 36, 51);
         rewardBot.animation.add("go", [0, 1], FlxG.random.int(2, 6));
@@ -309,9 +316,16 @@ class RewardState extends GarbageState
 
     function rewardGrabSlave(_)
     {
+        SfxEngine.stop(SfxEngine.SFX.Flying);
+
+        SfxEngine.play(SfxEngine.SFX.MechanicButton);
+        SfxEngine.play(SfxEngine.SFX.Move);
+
         FlxG.camera.shake(0.005);
         var offset : FlxPoint = FlxPoint.get(slave.x - rewardBot.x, slave.y - rewardBot.y);
         new FlxTimer().start(0.5, function(_) {
+            SfxEngine.play(SfxEngine.SFX.Flying, true);
+
             FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
                                             rewardBot.x, rewardBot.y - 60, 2,
                                             true, {ease: FlxEase.quartInOut,
@@ -340,6 +354,8 @@ class RewardState extends GarbageState
 
     function rewardFeedSlave(_)
     {
+        SfxEngine.stop(SfxEngine.SFX.Flying);
+
         overlord.animation.play("open");
         overlord.animation.finishCallback = function(_) {
             // FlxG.camera.shake(0.01,10);
@@ -348,6 +364,8 @@ class RewardState extends GarbageState
 
         new FlxTimer().start(1, function(_) {
             // FlxG.camera.shake(0.02,10);
+
+            SfxEngine.play(SfxEngine.SFX.Flying, 0.5, true);
 
             // Spawn small slave
             var minislaveColor : FlxSprite = new FlxSprite(0, 0);
@@ -371,6 +389,8 @@ class RewardState extends GarbageState
     function rewardEatSlave(_)
     {
         new FlxTimer().start(1.5, function(_) {
+            SfxEngine.stop(SfxEngine.SFX.Flying);
+
             FlxG.camera.shake(0.05);
             // Flash red
             FlxG.camera.flash(Palette.Red, 0.25);

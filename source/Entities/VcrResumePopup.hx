@@ -32,9 +32,6 @@ class VcrResumePopup extends FlxGroup
         background.scale.y = 0;
         add(background);
 
-        var slaveNumber : flixel.text.FlxBitmapText = text.VcrText.New(x + 70, y + 32, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
-        add(slaveNumber);
-
         finished = false;
 
         FlxTween.tween(background.scale, {y: 1}, OpenTime, {ease : FlxEase.sineInOut, onComplete: buildScreen});
@@ -43,6 +40,9 @@ class VcrResumePopup extends FlxGroup
     function buildScreen(t : FlxTween)
     {
         t.destroy();
+
+        var slaveNumber : flixel.text.FlxBitmapText = text.VcrText.New(x + 70, y + 32, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
+        add(slaveNumber);
 
         // close, ok button, etc
         var okButton : VcrButton = new VcrButton(x+70, y+107, null, closePopup);

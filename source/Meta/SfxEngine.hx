@@ -7,10 +7,14 @@ import flixel.tweens.FlxTween;
 
 enum SFX {
     None;
+
     VcrSelect;
     VcrAccept;
+
     PauseStart;
     PauseEnd;
+    QuotaPopupFanfare;
+    RewardFanfare;
 
     FlipEyeA;
     FlipEyeB;
@@ -34,14 +38,22 @@ enum SFX {
 
     BombTrigger;
     BombExplode;
+    ChemdustTrigger;
+    ChemdustDissolve;
 
     Move;
     Pair;
 
     MechanicButton;
 
+    ScreenOn;
     OverlordSpeakA;
     OverlordSpeakB;
+
+    Flying;
+
+    SpeakerA;
+    SpeakerB;
 }
 
 class SfxEngine
@@ -67,11 +79,14 @@ class SfxEngine
         initialized = true;
 
         sfxFiles = new Map<SFX, String>();
+
         sfxFiles.set(SFX.VcrSelect,      path + "vcr-select.wav");
         sfxFiles.set(SFX.VcrAccept,      path + "vcr-accept.wav");
-        
+
         sfxFiles.set(SFX.PauseStart,     path + "pause-in.wav");
         sfxFiles.set(SFX.PauseEnd,       path + "pause-end.wav");
+        sfxFiles.set(SFX.QuotaPopupFanfare, path + "quota-popup-reached.wav");
+        sfxFiles.set(SFX.RewardFanfare,  path + "fanfare.wav");
 
         sfxFiles.set(SFX.FlipEyeA,       path + "turn-eye-a.wav");
         sfxFiles.set(SFX.FlipEyeB,       path + "turn-eye-b.wav");
@@ -95,14 +110,22 @@ class SfxEngine
 
         sfxFiles.set(SFX.BombTrigger,    path + "bomb-trigger.wav");
         sfxFiles.set(SFX.BombExplode,    path + "bomb-explode.wav");
+        sfxFiles.set(SFX.ChemdustTrigger,path + "chemdust-trigger.wav");
+        sfxFiles.set(SFX.ChemdustDissolve, path + "chemdust-dissolve.wav");
 
         sfxFiles.set(SFX.Move,           path + "move.wav");
         sfxFiles.set(SFX.Pair,           path + "pair-b.wav");
 
         sfxFiles.set(SFX.MechanicButton, path + "mechanical-button.wav");
 
+        sfxFiles.set(SFX.ScreenOn,       path + "screen-on.wav");
         sfxFiles.set(SFX.OverlordSpeakA, path + "overlord-a.wav");
         sfxFiles.set(SFX.OverlordSpeakB, path + "overlord-b.wav");
+
+        sfxFiles.set(SFX.Flying,         path + "ship-fly-loop.wav");
+
+        sfxFiles.set(SFX.SpeakerA,       path + "speaker-a.wav");
+        sfxFiles.set(SFX.SpeakerB,       path + "speaker-b.wav");
 
         sfx = new Map<SFX, FlxSound>();
         for (sf in sfxFiles.keys())

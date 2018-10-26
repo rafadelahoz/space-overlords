@@ -44,6 +44,8 @@ enum SFX {
     Move;
     Pair;
 
+    JustLost;
+
     MechanicButton;
 
     ScreenOn;
@@ -115,6 +117,8 @@ class SfxEngine
 
         sfxFiles.set(SFX.Move,           path + "move.wav");
         sfxFiles.set(SFX.Pair,           path + "pair-b.wav");
+
+        sfxFiles.set(SFX.JustLost,       path + "just-lost.wav");
 
         sfxFiles.set(SFX.MechanicButton, path + "mechanical-button.wav");
 

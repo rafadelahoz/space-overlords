@@ -296,6 +296,8 @@ class PlayState extends GarbageState
             case PlayState.StateLost:
                 Logger.log("==== session ends");
 
+                SfxEngine.play(SfxEngine.SFX.JustLost);
+
                 session.endTime = Date.now().getTime();
 
                 showGameOverNotification();
@@ -700,7 +702,7 @@ class PlayState extends GarbageState
         if (matches.length > 0)
         {
             SfxEngine.play(SfxEngine.SFX.Pair);
-            
+
             aftermathCombo += 1;
 
             // Compute matches score

@@ -88,6 +88,13 @@ class ScreenButtons extends FlxSpriteGroup
 			}
 		}
 
+		if (GamePad.justPressed(GamePad.Left) || GamePad.justPressed(GamePad.Right) ||
+			GamePad.justPressed(GamePad.Down) || GamePad.justPressed(GamePad.Shoot) ||
+			GamePad.justPressed(GamePad.Pause))
+		{
+			SfxEngine.play(SfxEngine.SFX.MechanicButton, 0.5);
+		}
+
 		super.update(elapsed);
 	}
 

@@ -37,6 +37,11 @@ enum SFX {
 
     Move;
     Pair;
+
+    MechanicButton;
+
+    OverlordSpeakA;
+    OverlordSpeakB;
 }
 
 class SfxEngine
@@ -64,6 +69,7 @@ class SfxEngine
         sfxFiles = new Map<SFX, String>();
         sfxFiles.set(SFX.VcrSelect,      path + "vcr-select.wav");
         sfxFiles.set(SFX.VcrAccept,      path + "vcr-accept.wav");
+        
         sfxFiles.set(SFX.PauseStart,     path + "pause-in.wav");
         sfxFiles.set(SFX.PauseEnd,       path + "pause-end.wav");
 
@@ -92,6 +98,11 @@ class SfxEngine
 
         sfxFiles.set(SFX.Move,           path + "move.wav");
         sfxFiles.set(SFX.Pair,           path + "pair-b.wav");
+
+        sfxFiles.set(SFX.MechanicButton, path + "mechanical-button.wav");
+
+        sfxFiles.set(SFX.OverlordSpeakA, path + "overlord-a.wav");
+        sfxFiles.set(SFX.OverlordSpeakB, path + "overlord-b.wav");
 
         sfx = new Map<SFX, FlxSound>();
         for (sf in sfxFiles.keys())

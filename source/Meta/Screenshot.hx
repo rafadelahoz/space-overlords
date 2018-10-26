@@ -17,7 +17,7 @@ class Screenshot
     public static function save(bitmap : flash.display.Bitmap, ?fname : String = null) : String
     {
         if (fname == null)
-            fname = "soap-alley-" + Date.now().getTime();
+            fname = "space-overlords-" + Date.now().getTime();
 
         fname += ".png";
 

@@ -14,6 +14,7 @@ class RewardState extends GarbageState
 
     var messages : Array<String>;
     var textBox : text.TypeWriter;
+    var speechTimer : FlxTimer;
 
     var overlord : FlxSprite;
     var overlordBg : FlxSprite;
@@ -40,6 +41,8 @@ class RewardState extends GarbageState
         super.create();
 
         FlxG.camera.bgColor = 0xFF262b44;
+
+        speechTimer = new FlxTimer();
 
         overlordBg = new FlxSprite(14, 127);
         overlordBg.makeGraphic(152, 87, 0xFFe8b796);
@@ -149,6 +152,7 @@ class RewardState extends GarbageState
     function showMessage(message : String, callback : Void -> Void)
     {
         overlord.animation.play("talk");
+        doSpeechSfx(speechTimer);
 
         var settings : MessageBox.MessageSettings =
         {
@@ -159,12 +163,21 @@ class RewardState extends GarbageState
 
         add(new MessageBox().show(message, settings, function() {
             overlord.animation.play("idle");
+            speechTimer.cancel();
             callback();
         }, function() {
             overlord.animation.play("talk");
+            doSpeechSfx(speechTimer);
         }, function() {
             overlord.animation.play("idle");
+            speechTimer.cancel();
         }));
+    }
+
+    function doSpeechSfx(_)
+    {
+        SfxEngine.play(FlxG.random.getObject([SfxEngine.SFX.OverlordSpeakA, SfxEngine.SFX.OverlordSpeakB]), 0.5);
+        speechTimer.start(FlxG.random.float(0.08, 0.22), doSpeechSfx);
     }
 
     function showSlaveResponses()

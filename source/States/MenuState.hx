@@ -37,6 +37,10 @@ class MenuState extends GarbageState
     var rewardButton : VcrButton;
     var cursor : FlxSprite;
 
+    var logo : FlxSprite;
+    var footer : FlxSprite;
+    var clock : VcrClock;
+
     var interactable : Bool;
 
     var stars : flixel.addons.display.FlxStarField.FlxStarField2D;
@@ -88,12 +92,13 @@ class MenuState extends GarbageState
 
         var baseY : Float = 36;
 
-        var logo : FlxSprite = new FlxSprite(0, baseY, "assets/ui/cell-menu-main.png");
+        logo = new FlxSprite(0, baseY, "assets/ui/cell-menu-main.png");
         add(logo);
 
-        var footer : FlxSprite = new FlxSprite(0, 276, "assets/ui/title-menu-footer.png");
+        footer = new FlxSprite(0, 276, "assets/ui/title-menu-footer.png");
         add(footer);
-        add(new VcrClock());
+        clock = new VcrClock();
+        add(clock);
 
         var slaveNumber : FlxBitmapText = text.VcrText.New(107, baseY+24, text.TextUtils.padWith("" + ProgressData.data.slave_id, 7, "0"));
         add(slaveNumber);
@@ -165,6 +170,21 @@ class MenuState extends GarbageState
     override public function destroy():Void
     {
         super.destroy();
+    }
+
+    override public function draw()
+    {
+        super.draw();
+
+        // Take photo?
+        if (FlxG.keys.justPressed.O)
+        {
+            new FlxTimer().start(0.01, function(_) {
+                disableButtons();
+                Screenshot.take("so-" + Date.now());
+                enableButtons();
+            });
+        }
     }
 
     function onBackHighlighted()
@@ -304,5 +324,18 @@ class MenuState extends GarbageState
 
         playButton.visible = false;
         rewardButton.visible = false;
+    }
+
+    function enableButtons()
+    {
+        backButton.enable();
+        playButton.enable();
+        // museumButton.disable();
+        rewardButton.enable();
+
+        cursor.visible = true;
+
+        playButton.visible = true;
+        rewardButton.visible = true;
     }
 }

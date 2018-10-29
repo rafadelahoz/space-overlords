@@ -225,14 +225,18 @@ class MenuState extends GarbageState
     function onCameraPressed()
     {
         disableButtons();
-        FlxG.mouse.visible =  false;
+        #if !mobile
+            FlxG.mouse.visible = false;
+        #end
         new FlxTimer().start(0.01, function(_) {
             draw();
             // Screenshot.take("so-" + Date.now().getTime());
             FlxG.camera.flash(Palette.White, 2, function() {
                 ShareManager.share("Greetings from slave " + ProgressData.data.slave_id + " from the #spaceoverlords mothership.");
                 enableButtons();
-                FlxG.mouse.visible =  true;
+                #if !mobile
+                    FlxG.mouse.visible = true;
+                #end
             });
 
         });

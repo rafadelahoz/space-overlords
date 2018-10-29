@@ -167,7 +167,7 @@ class SlaveCharacter extends FlxSprite
     function isPositionValid(pos : FlxPoint) : Bool
     {
         return (pos.x > 32 && pos.x < Constants.Width - width - 32 &&
-                pos.y > Constants.Height*0.7 && pos.y < Constants.Height - 16 - height);
+                pos.y > Constants.Height*0.7 && pos.y < 276 - height);
     }
 
     override public function update(elapsed : Float)

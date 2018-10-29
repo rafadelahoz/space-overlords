@@ -34,7 +34,7 @@ class MenuState extends GarbageState
 
     var backButton : VcrButton;
     var playButton : VcrButton;
-    var museumButton : VcrButton;
+    var cameraButton : VcrButton;
     var rewardButton : VcrButton;
     var cursor : FlxSprite;
 
@@ -112,9 +112,9 @@ class MenuState extends GarbageState
         playButton.loadSpritesheet("assets/ui/cell-menu-newgame.png", 137, 14);
         add(playButton);
 
-        museumButton = new VcrButton(26, 143, onMuseumHighlighted, onMuseumPressed);
-        // museumButton.loadSpritesheet("assets/ui/cell-menu-museum.png", 137, 14);
-        // add(museumButton);
+        cameraButton = new VcrButton(Constants.Width - 16, 276 - 16, onCameraHighlighted, onCameraPressed);
+        cameraButton.loadSpritesheet("assets/ui/gameconfig-intensity-add.png", 11, 14);
+        add(cameraButton);
 
         rewardButton = new VcrButton(26, 143 /*+ 12*2*/, onRewardHighlighted, onRewardPressed);
         rewardButton.loadSpritesheet("assets/ui/cell-menu-reward.png", 137, 14);
@@ -138,7 +138,7 @@ class MenuState extends GarbageState
     {
         backButton.exists = false;
         playButton.exists = false;
-        museumButton.exists = false;
+        cameraButton.exists = false;
         rewardButton.exists = false;
 
         cursor.visible = false;
@@ -148,18 +148,18 @@ class MenuState extends GarbageState
     {
         backButton.exists = true;
         playButton.exists = true;
-        museumButton.exists = true;
+        cameraButton.exists = true;
         rewardButton.exists = true;
 
         cursor.visible = true;
 
         backButton.alpha = 0;
         playButton.alpha = 0;
-        museumButton.alpha = 0;
+        cameraButton.alpha = 0;
         rewardButton.alpha = 0;
         FlxTween.tween(backButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
         FlxTween.tween(playButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
-        // FlxTween.tween(museumButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
+        FlxTween.tween(cameraButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
         FlxTween.tween(rewardButton, {alpha: 1}, 0.25, {ease: FlxEase.circInOut});
 
         allowInteraction();
@@ -175,60 +175,36 @@ class MenuState extends GarbageState
         super.destroy();
     }
 
-    override public function update(elapsed : Float)
-    {
-        super.update(elapsed);
-
-        // Take photo?
-        if (FlxG.keys.justPressed.O)
-        {
-            disableButtons();
-            FlxG.mouse.visible =  false;
-            new FlxTimer().start(0.01, function(_) {
-                draw();
-                Screenshot.take("so-" + Date.now().getTime());
-                FlxG.camera.flash(Palette.White, 2);
-                enableButtons();
-                FlxG.mouse.visible =  true;
-            });
-        }
-    }
-
-    override public function draw()
-    {
-        super.draw();
-    }
-
     function onBackHighlighted()
     {
         playButton.clearHighlight();
-        museumButton.clearHighlight();
+        cameraButton.clearHighlight();
         rewardButton.clearHighlight();
     }
 
     function onPlayHighlighted()
     {
         backButton.clearHighlight();
-        museumButton.clearHighlight();
+        cameraButton.clearHighlight();
         rewardButton.clearHighlight();
 
         cursor.y = playButton.y+1;
     }
 
-    function onMuseumHighlighted()
+    function onCameraHighlighted()
     {
         backButton.clearHighlight();
         playButton.clearHighlight();
         rewardButton.clearHighlight();
 
-        cursor.y = museumButton.y+1;
+        // cursor.y = cameraButton.y+1;
     }
 
     function onRewardHighlighted()
     {
         backButton.clearHighlight();
         playButton.clearHighlight();
-        museumButton.clearHighlight();
+        cameraButton.clearHighlight();
 
         cursor.y = rewardButton.y+1;
     }
@@ -246,9 +222,20 @@ class MenuState extends GarbageState
         });
     }
 
-    function onMuseumPressed()
+    function onCameraPressed()
     {
-        // Nop!
+        disableButtons();
+        FlxG.mouse.visible =  false;
+        new FlxTimer().start(0.01, function(_) {
+            draw();
+            // Screenshot.take("so-" + Date.now().getTime());
+            FlxG.camera.flash(Palette.White, 2, function() {
+                ShareManager.share("Greetings from slave " + ProgressData.data.slave_id + " from the #spaceoverlords mothership.");
+                enableButtons();
+                FlxG.mouse.visible =  true;
+            });
+
+        });
     }
 
     function doSpeechSfx(_)
@@ -350,12 +337,13 @@ class MenuState extends GarbageState
     {
         backButton.disable();
         playButton.disable();
-        // museumButton.disable();
+        cameraButton.disable();
         rewardButton.disable();
 
         cursor.visible = false;
         backButton.visible = false;
         playButton.visible = false;
+        cameraButton.visible = false;
         rewardButton.visible = false;
     }
 
@@ -363,12 +351,13 @@ class MenuState extends GarbageState
     {
         backButton.enable();
         playButton.enable();
-        // museumButton.disable();
+        cameraButton.disable();
         rewardButton.enable();
 
         cursor.visible = true;
         backButton.visible = true;
         playButton.visible = true;
+        cameraButton.visible = true;
         rewardButton.visible = true;
     }
 }

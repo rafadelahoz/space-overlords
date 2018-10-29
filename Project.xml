@@ -59,7 +59,7 @@
 
 	<!--<haxelib name="haxe-hardware" if="android" />-->
 
-	<!--<haxelib name="extension-share"/>-->
+	<haxelib name="extension-share"/>
 
 	<!--<haxedef name="FLX_NO_TOUCH" if="desktop" />-->
 

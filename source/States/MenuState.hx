@@ -175,19 +175,28 @@ class MenuState extends GarbageState
         super.destroy();
     }
 
-    override public function draw()
+    override public function update(elapsed : Float)
     {
-        super.draw();
+        super.update(elapsed);
 
         // Take photo?
         if (FlxG.keys.justPressed.O)
         {
+            disableButtons();
+            FlxG.mouse.visible =  false;
             new FlxTimer().start(0.01, function(_) {
-                disableButtons();
-                Screenshot.take("so-" + Date.now());
+                draw();
+                Screenshot.take("so-" + Date.now().getTime());
+                FlxG.camera.flash(Palette.White, 2);
                 enableButtons();
+                FlxG.mouse.visible =  true;
             });
         }
+    }
+
+    override public function draw()
+    {
+        super.draw();
     }
 
     function onBackHighlighted()
@@ -345,7 +354,7 @@ class MenuState extends GarbageState
         rewardButton.disable();
 
         cursor.visible = false;
-
+        backButton.visible = false;
         playButton.visible = false;
         rewardButton.visible = false;
     }
@@ -358,7 +367,7 @@ class MenuState extends GarbageState
         rewardButton.enable();
 
         cursor.visible = true;
-
+        backButton.visible = true;
         playButton.visible = true;
         rewardButton.visible = true;
     }

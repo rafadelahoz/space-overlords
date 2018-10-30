@@ -21,6 +21,8 @@ enum SFX {
     SetupC;
     SetupInitialize;
 
+    HighlightTarget;
+
     FlipEyeA;
     FlipEyeB;
     FlipRaddishA;
@@ -98,10 +100,12 @@ class SfxEngine
         sfxFiles.set(SFX.QuotaPopupFanfare, path + "quota-popup-reached.wav");
         sfxFiles.set(SFX.RewardFanfare,  path + "fanfare.wav");
 
-        sfxFiles.set(SFX.SetupA,         path + "gameplay-setup-e.wav");
-        sfxFiles.set(SFX.SetupB,         path + "gameplay-setup-f.wav");
+        sfxFiles.set(SFX.SetupA,         path + "start.wav");
+        sfxFiles.set(SFX.SetupB,         path + "vibration.wav");
         sfxFiles.set(SFX.SetupC,         path + "gameplay-setup-h.wav");
         sfxFiles.set(SFX.SetupInitialize,path + "machine-on.wav");
+
+        sfxFiles.set(SFX.HighlightTarget,path + "pair.wav");
 
         sfxFiles.set(SFX.FlipEyeA,       path + "turn-eye-a.wav");
         sfxFiles.set(SFX.FlipEyeB,       path + "turn-eye-b.wav");

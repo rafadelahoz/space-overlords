@@ -209,8 +209,6 @@ class PlayState extends GarbageState
                 background.alpha = 0;
                 gridFrame.x = -gridFrame.width;
                 gridShader.x = gridFrame.x + 6;
-                // screenButtons.color = 0xFF124e89;
-                // screenButtons.alpha = 0.8;
 
                 var delay : Float = 1;
                 var duration : Float = 0;
@@ -221,7 +219,6 @@ class PlayState extends GarbageState
                         SfxEngine.play(SFX.ScreenOn);
                     },
                     onComplete: function(_) {
-                        SfxEngine.play(SFX.SetupA);
                         SfxEngine.play(SFX.SetupC);
                     }
                 });
@@ -230,8 +227,7 @@ class PlayState extends GarbageState
 
                 duration = 0.75;
                 FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay, onStart: function(_) {
-                    SfxEngine.play(SFX.SetupB);
-                    SfxEngine.play(SFX.SetupC);
+                    SfxEngine.play(SFX.SetupB, 0.67, true);
                 }});
                 FlxTween.tween(gridShader, {x : grid.x-2}, duration, {startDelay: delay});
                 for (itemData in grid.getAll()) {
@@ -244,34 +240,28 @@ class PlayState extends GarbageState
                 }
                 delay += duration;
 
-                var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG, onComplete: function(_) {
-                    SfxEngine.play(SFX.SetupC);
-                }});
+                var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG});
                 new FlxTimer().start(delay+0.075*3, function(t:FlxTimer) {
+                    SfxEngine.stop(SFX.SetupB);
+                    SfxEngine.play(SFX.SetupC);
                     shakeTween.cancel();
-                    SfxEngine.play(SFX.SetupInitialize);
                 });
                 delay += 0.5;
 
                 delay += 0.5;
                 new FlxTimer().start(delay, function(t:FlxTimer) {
+                    SfxEngine.play(SFX.SetupInitialize);
+
                     topDisplay.start();
 
                     for (itemData in grid.getAll()) {
                         if (itemData != null && itemData.entity != null)
                         {
-                            // itemData.entity.color = 0xFFFFFFFF;
                             flixel.effects.FlxFlicker.flicker(itemData.entity, 0.5, true);
                             FlxTween.color(itemData.entity, 0.5, Palette.DarkBlue, 0xFFFFFFFF, {ease: FlxEase.elasticInOut});
                         }
                     }
                 });
-                // delay += 1;
-
-                /*duration = 0.5;
-                FlxTween.color(screenButtons, duration, Palette.DarkBlue, 0xFFFFFFFF, {startDelay: delay, ease: FlxEase.bounceInOut});
-                delay += duration;
-                delay += 0.5;*/
 
                 new FlxTimer().start(delay, function(t:FlxTimer) {
                     generateNextItem();
@@ -282,11 +272,13 @@ class PlayState extends GarbageState
                     topDisplay.startScroller();
 
                     if (mode == Constants.ModeEndless)
+                    {
+                        topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
+                        SfxEngine.play(SFX.SetupA);
                         switchState(StateGenerate);
+                    }
                     else
-                        highlightTargets();
-
-                    topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
+                        highlightTargets(true);
                 });
             case PlayState.StateGenerate:
                 if (nextItem == null)
@@ -323,7 +315,6 @@ class PlayState extends GarbageState
                 showGameOverNotification();
                 topDisplay.handleGameover();
                 FlxG.camera.flash(Palette.Red, function() {
-                    SfxEngine.play(SFX.PowerOff);
                     gameoverLightsout = false;
                     gameoverTimer.start(GameoverLightsoutDelay*2, onGameoverTimer);
                 });
@@ -722,7 +713,7 @@ class PlayState extends GarbageState
 
         if (matches.length > 0)
         {
-            SfxEngine.play(SfxEngine.SFX.Pair);
+            SfxEngine.play(SfxEngine.SFX.Pair, 0.5);
 
             aftermathCombo += 1;
 
@@ -914,7 +905,7 @@ class PlayState extends GarbageState
                     if (mode == Constants.ModeEndless)
                         switchState(StateGenerate);
                     else
-                        highlightTargets();
+                        highlightTargets(false);
                 });
             });
         }
@@ -934,13 +925,13 @@ class PlayState extends GarbageState
                     if (mode == Constants.ModeEndless)
                         switchState(StateGenerate);
                     else
-                        highlightTargets();
+                        highlightTargets(false);
                 });
             });
         }
     }
 
-    function highlightTargets()
+    function highlightTargets(firstInit : Bool)
     {
         // Find targets
         var targets : Array<ItemData> = grid.getAll(ItemData.IsTargetFilter);
@@ -952,6 +943,11 @@ class PlayState extends GarbageState
 
         new FlxTimer().start(1, function(_) {
             // After that
+            if (firstInit)
+            {
+                topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
+                SfxEngine.play(SFX.SetupA);
+            }
             switchState(StateGenerate);
         });
     }
@@ -962,9 +958,15 @@ class PlayState extends GarbageState
         if (times > 0 && target != null)
         {
             target.scale.set(0.9, 0.9);
-            FlxTween.tween(target.scale, {x: 1.1, y: 1.1}, duration, {ease: FlxEase.circOut, startDelay: 0.1, onComplete: function(_) {
-                highlightTarget(target, times-1);
-            }});
+            FlxTween.tween(target.scale, {x: 1.1, y: 1.1}, duration, {ease: FlxEase.circOut, startDelay: 0.1,
+                onStart: function(_) {
+                    if (times > 1)
+                        SfxEngine.play(SFX.HighlightTarget);
+                },
+                onComplete: function(_) {
+                    highlightTarget(target, times-1);
+                }
+            });
         }
         else
         {
@@ -1040,6 +1042,8 @@ class PlayState extends GarbageState
             }
 
             gridShader.alpha = 0.8;
+
+            SfxEngine.play(SFX.PowerOff);
 
             gameoverTimer.start(GameoverLightsoutDelay, onGameoverTimer);
         }

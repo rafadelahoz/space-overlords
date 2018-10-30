@@ -51,6 +51,8 @@ class GameController
 
 	public static function ToMenu(?fromGameOver : Bool = false)
 	{
+		SaveStateManager.loadAndErase();
+
 		var menuStatus : Int = -1;
 		// ProgressData.data.slave_id = -1;
 		if (ProgressData.data.slave_id < 0)

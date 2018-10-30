@@ -16,6 +16,11 @@ enum SFX {
     QuotaPopupFanfare;
     RewardFanfare;
 
+    SetupA;
+    SetupB;
+    SetupC;
+    SetupInitialize;
+
     FlipEyeA;
     FlipEyeB;
     FlipRaddishA;
@@ -45,12 +50,15 @@ enum SFX {
     Pair;
 
     JustLost;
+    PowerOff;
 
     MechanicButton;
 
     ScreenOn;
     OverlordSpeakA;
     OverlordSpeakB;
+    OverlordMunch;
+    OverlordGulp;
 
     Flying;
 
@@ -90,6 +98,11 @@ class SfxEngine
         sfxFiles.set(SFX.QuotaPopupFanfare, path + "quota-popup-reached.wav");
         sfxFiles.set(SFX.RewardFanfare,  path + "fanfare.wav");
 
+        sfxFiles.set(SFX.SetupA,         path + "gameplay-setup-e.wav");
+        sfxFiles.set(SFX.SetupB,         path + "gameplay-setup-f.wav");
+        sfxFiles.set(SFX.SetupC,         path + "gameplay-setup-h.wav");
+        sfxFiles.set(SFX.SetupInitialize,path + "machine-on.wav");
+
         sfxFiles.set(SFX.FlipEyeA,       path + "turn-eye-a.wav");
         sfxFiles.set(SFX.FlipEyeB,       path + "turn-eye-b.wav");
         sfxFiles.set(SFX.FlipRaddishA,   path + "turn-raddish-a.wav");
@@ -119,12 +132,15 @@ class SfxEngine
         sfxFiles.set(SFX.Pair,           path + "pair-b.wav");
 
         sfxFiles.set(SFX.JustLost,       path + "just-lost.wav");
+        sfxFiles.set(SFX.PowerOff,       path + "machine-off.wav");
 
         sfxFiles.set(SFX.MechanicButton, path + "mechanical-button.wav");
 
         sfxFiles.set(SFX.ScreenOn,       path + "screen-on.wav");
         sfxFiles.set(SFX.OverlordSpeakA, path + "overlord-a.wav");
         sfxFiles.set(SFX.OverlordSpeakB, path + "overlord-b.wav");
+        sfxFiles.set(SFX.OverlordMunch,  path + "munch.wav");
+        sfxFiles.set(SFX.OverlordGulp,   path + "gulp.wav");
 
         sfxFiles.set(SFX.Flying,         path + "ship-fly-loop.wav");
 
@@ -164,6 +180,7 @@ class SfxEngine
 
     public static function play(sf : SFX, ?volume : Float = 1, ?loop : Bool = false)
     {
+        trace("PLAY " + sf);
         if (Enabled && sfx.exists(sf))
         {
             sfx.set(sf, FlxG.sound.play(sfxFiles.get(sf), volume, loop));

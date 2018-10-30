@@ -80,6 +80,7 @@ class RewardState extends GarbageState
 
             slave = new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateNone);
             add(slave);
+
             var color : Int = slave.color;
             FlxTween.color(slave, 1, 0xFF000000, color, {onComplete: function(_) {
                 slave.walkTo(new FlxPoint(Constants.Width/2 + 24, 235), onSlavePositioned);
@@ -397,6 +398,10 @@ class RewardState extends GarbageState
             // Close mouth
             rewardMinislave.visible = false;
             rewardMinislave.destroy();
+            SfxEngine.play(SfxEngine.SFX.OverlordMunch, 1.5);
+            new FlxTimer().start(1.05, function(_) {
+                SfxEngine.play(SfxEngine.SFX.OverlordGulp);
+            });
             overlord.animation.play("gulp");
             overlord.animation.finishCallback = function(name : String) {
                 overlord.animation.play("idle");

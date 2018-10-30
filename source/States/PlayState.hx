@@ -13,6 +13,8 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.effects.chainable.FlxEffectSprite;
 import flixel.addons.effects.chainable.FlxWaveEffect;
 
+import SfxEngine.SFX;
+
 class PlayState extends GarbageState
 {
     public static var StateIntro       : Int = 1;
@@ -148,6 +150,10 @@ class PlayState extends GarbageState
         gridDebugger.visible = false;
         stateLabel.visible = false;
 
+        var cameraButton : VcrButton = new VcrButton(Constants.Width - 16, 276 - 16, null, onCameraPressed);
+        cameraButton.loadSpritesheet("assets/ui/gameconfig-intensity-add.png", 11, 14);
+        add(cameraButton);
+
         super.create();
     }
 
@@ -210,12 +216,23 @@ class PlayState extends GarbageState
                 var duration : Float = 0;
 
                 duration = 0.75;
-                FlxTween.tween(background, {alpha : 1}, duration, {startDelay: delay, ease: FlxEase.circIn});
+                FlxTween.tween(background, {alpha : 1}, duration, {startDelay: delay, ease: FlxEase.circIn,
+                    onStart: function(_) {
+                        SfxEngine.play(SFX.ScreenOn);
+                    },
+                    onComplete: function(_) {
+                        SfxEngine.play(SFX.SetupA);
+                        SfxEngine.play(SFX.SetupC);
+                    }
+                });
                 delay += duration;
                 delay += 0.5;
 
                 duration = 0.75;
-                FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay});
+                FlxTween.tween(gridFrame,  {x : grid.x-8}, duration, {startDelay: delay, onStart: function(_) {
+                    SfxEngine.play(SFX.SetupB);
+                    SfxEngine.play(SFX.SetupC);
+                }});
                 FlxTween.tween(gridShader, {x : grid.x-2}, duration, {startDelay: delay});
                 for (itemData in grid.getAll()) {
                     if (itemData != null && itemData.entity != null)
@@ -227,9 +244,12 @@ class PlayState extends GarbageState
                 }
                 delay += duration;
 
-                var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG});
+                var shakeTween : FlxTween = FlxTween.tween(gridFrame, {y : gridFrame.y+1}, 0.075, {startDelay: delay, type: FlxTween.PINGPONG, onComplete: function(_) {
+                    SfxEngine.play(SFX.SetupC);
+                }});
                 new FlxTimer().start(delay+0.075*3, function(t:FlxTimer) {
                     shakeTween.cancel();
+                    SfxEngine.play(SFX.SetupInitialize);
                 });
                 delay += 0.5;
 
@@ -303,6 +323,7 @@ class PlayState extends GarbageState
                 showGameOverNotification();
                 topDisplay.handleGameover();
                 FlxG.camera.flash(Palette.Red, function() {
+                    SfxEngine.play(SFX.PowerOff);
                     gameoverLightsout = false;
                     gameoverTimer.start(GameoverLightsoutDelay*2, onGameoverTimer);
                 });
@@ -1226,5 +1247,25 @@ class PlayState extends GarbageState
                 handleAftermathResult();
             }
         }
+    }
+
+    function onCameraPressed()
+    {
+        // disableButtons();
+        #if !mobile
+            FlxG.mouse.visible = false;
+        #end
+        new FlxTimer().start(0.01, function(_) {
+            draw();
+            // Screenshot.take("so-" + Date.now().getTime());
+            FlxG.camera.flash(Palette.White, 2, function() {
+                ShareManager.share("Greetings from slave " + ProgressData.data.slave_id + " from the #spaceoverlords mothership.");
+                // enableButtons();
+                #if !mobile
+                    FlxG.mouse.visible = true;
+                #end
+            });
+
+        });
     }
 }

@@ -114,7 +114,7 @@ class MenuState extends GarbageState
 
         cameraButton = new VcrButton(Constants.Width - 16, 276 - 16, onCameraHighlighted, onCameraPressed);
         cameraButton.loadSpritesheet("assets/ui/gameconfig-intensity-add.png", 11, 14);
-        add(cameraButton);
+        // add(cameraButton);
 
         rewardButton = new VcrButton(26, 143 /*+ 12*2*/, onRewardHighlighted, onRewardPressed);
         rewardButton.loadSpritesheet("assets/ui/cell-menu-reward.png", 137, 14);

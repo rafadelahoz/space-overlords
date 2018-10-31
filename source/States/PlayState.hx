@@ -150,10 +150,6 @@ class PlayState extends GarbageState
         gridDebugger.visible = false;
         stateLabel.visible = false;
 
-        var cameraButton : VcrButton = new VcrButton(Constants.Width - 16, 276 - 16, null, onCameraPressed);
-        cameraButton.loadSpritesheet("assets/ui/gameconfig-intensity-add.png", 11, 14);
-        add(cameraButton);
-
         super.create();
     }
 
@@ -1251,25 +1247,5 @@ class PlayState extends GarbageState
                 handleAftermathResult();
             }
         }
-    }
-
-    function onCameraPressed()
-    {
-        // disableButtons();
-        #if !mobile
-            FlxG.mouse.visible = false;
-        #end
-        new FlxTimer().start(0.01, function(_) {
-            draw();
-            // Screenshot.take("so-" + Date.now().getTime());
-            FlxG.camera.flash(Palette.White, 2, function() {
-                ShareManager.share("Greetings from slave " + ProgressData.data.slave_id + " from the #spaceoverlords mothership.");
-                // enableButtons();
-                #if !mobile
-                    FlxG.mouse.visible = true;
-                #end
-            });
-
-        });
     }
 }

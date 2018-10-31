@@ -72,6 +72,8 @@ class SlaveCharacter extends FlxSprite
         animation.add("fall", [1, 3], 2, true);
         animation.play("walk");
 
+        animation.callback = animationCallback;
+
         var headType : Int = ProgressData.data.slave_head;
         head = new FlxSprite(x, y);
         head.loadGraphic("assets/images/slave-head-sheet.png", true, 32, 40);
@@ -306,5 +308,17 @@ class SlaveCharacter extends FlxSprite
     function canColorizeDetail() : Bool
     {
         return forcedColorize || ProgressData.data.slave_detail > 2;
+    }
+
+    function animationCallback(name : String, frameNumber : Int, frameIndex : Int)
+    {
+        if (name == "walk")
+        {
+            if (frameIndex == 2 || frameIndex == 4)
+            {
+                SfxEngine.play(FlxG.random.getObject([SfxEngine.SFX.SlaveStepA, SfxEngine.SFX.SlaveStepB,
+                            SfxEngine.SFX.SlaveStepC, SfxEngine.SFX.SlaveStepD, SfxEngine.SFX.SlaveStepE]), 0.15);
+            }
+        }
     }
 }

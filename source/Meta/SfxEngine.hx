@@ -69,6 +69,12 @@ enum SFX {
 
     SpeakerA;
     SpeakerB;
+
+    SlaveStepA;
+    SlaveStepB;
+    SlaveStepC;
+    SlaveStepD;
+    SlaveStepE;
 }
 
 class SfxEngine
@@ -156,6 +162,12 @@ class SfxEngine
 
         sfxFiles.set(SFX.SpeakerA,       path + "speaker-a.wav");
         sfxFiles.set(SFX.SpeakerB,       path + "speaker-b.wav");
+
+        sfxFiles.set(SFX.SlaveStepA,     path + "step-a.wav");
+        sfxFiles.set(SFX.SlaveStepB,     path + "step-b.wav");
+        sfxFiles.set(SFX.SlaveStepC,     path + "step-c.wav");
+        sfxFiles.set(SFX.SlaveStepD,     path + "step-d.wav");
+        sfxFiles.set(SFX.SlaveStepE,     path + "step-e.wav");
 
         sfx = new Map<SFX, FlxSound>();
         for (sf in sfxFiles.keys())

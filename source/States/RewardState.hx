@@ -51,7 +51,7 @@ class RewardState extends GarbageState
         overlord = new FlxSprite(13, 127);
         overlord.loadGraphic("assets/images/overlord-anim-sprite.png", true, 153, 87);
         overlord.animation.add("idle", [0]);
-        overlord.animation.add("talk", [0, 1, 2, 3, 4, 5], 6, true);
+        overlord.animation.add("talk", [1, 2, 3, 4, 5, 0], 6, true);
         overlord.animation.add("open", [0, 6, 7], 8, false);
         overlord.animation.add("drama", [8, 9, 10], 20, true);
         overlord.animation.add("gulp", [11, 12, 0], 1, false);
@@ -367,7 +367,7 @@ class RewardState extends GarbageState
 
         new FlxTimer().start(1, function(_) {
             // FlxG.camera.shake(0.02,10);
-            
+
             SfxEngine.stop(SfxEngine.SFX.Flying);
             SfxEngine.play(SfxEngine.SFX.Flying, 0.5, true);
 

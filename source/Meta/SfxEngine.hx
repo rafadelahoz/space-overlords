@@ -10,6 +10,7 @@ enum SFX {
 
     VcrSelect;
     VcrAccept;
+    VcrToggle;
 
     PauseStart;
     PauseEnd;
@@ -61,6 +62,8 @@ enum SFX {
     OverlordSpeakB;
     OverlordMunch;
     OverlordGulp;
+    DramaA;
+    DramaB;
 
     Flying;
 
@@ -94,6 +97,7 @@ class SfxEngine
 
         sfxFiles.set(SFX.VcrSelect,      path + "vcr-select.wav");
         sfxFiles.set(SFX.VcrAccept,      path + "vcr-accept.wav");
+        sfxFiles.set(SFX.VcrToggle,      path + "toggle.wav");
 
         sfxFiles.set(SFX.PauseStart,     path + "pause-in.wav");
         sfxFiles.set(SFX.PauseEnd,       path + "pause-end.wav");
@@ -145,6 +149,8 @@ class SfxEngine
         sfxFiles.set(SFX.OverlordSpeakB, path + "overlord-b.wav");
         sfxFiles.set(SFX.OverlordMunch,  path + "munch.wav");
         sfxFiles.set(SFX.OverlordGulp,   path + "gulp.wav");
+        sfxFiles.set(SFX.DramaA,         path + "drama-b.wav");
+        sfxFiles.set(SFX.DramaB,         path + "drama-a.wav");
 
         sfxFiles.set(SFX.Flying,         path + "ship-fly-loop.wav");
 

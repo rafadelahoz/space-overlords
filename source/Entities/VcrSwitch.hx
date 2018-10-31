@@ -137,6 +137,8 @@ class VcrSwitch extends FlxSprite
 
         if (callback != null)
             callback(status);
+
+        SfxEngine.play(SfxEngine.SFX.VcrToggle);
     }
 
     function mouseOver()

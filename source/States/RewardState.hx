@@ -327,6 +327,8 @@ class RewardState extends GarbageState
         new FlxTimer().start(0.5, function(_) {
             SfxEngine.play(SfxEngine.SFX.Flying, true);
 
+            SfxEngine.play(SfxEngine.SFX.DramaA, true);
+
             FlxTween.linearMotion(rewardBot, rewardBot.x, rewardBot.y,
                                             rewardBot.x, rewardBot.y - 60, 2,
                                             true, {ease: FlxEase.quartInOut,
@@ -355,17 +357,18 @@ class RewardState extends GarbageState
 
     function rewardFeedSlave(_)
     {
-        SfxEngine.stop(SfxEngine.SFX.Flying);
-
         overlord.animation.play("open");
         overlord.animation.finishCallback = function(_) {
             // FlxG.camera.shake(0.01,10);
             overlord.animation.play("drama");
+            SfxEngine.stop(SfxEngine.SFX.DramaA);
+            SfxEngine.play(SfxEngine.SFX.DramaB, true);
         }
 
         new FlxTimer().start(1, function(_) {
             // FlxG.camera.shake(0.02,10);
-
+            
+            SfxEngine.stop(SfxEngine.SFX.Flying);
             SfxEngine.play(SfxEngine.SFX.Flying, 0.5, true);
 
             // Spawn small slave
@@ -391,6 +394,7 @@ class RewardState extends GarbageState
     {
         new FlxTimer().start(1.5, function(_) {
             SfxEngine.stop(SfxEngine.SFX.Flying);
+            SfxEngine.stop(SfxEngine.SFX.DramaB);
 
             FlxG.camera.shake(0.05);
             // Flash red

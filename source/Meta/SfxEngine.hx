@@ -65,6 +65,7 @@ enum SFX {
     DramaA;
     DramaB;
 
+    Alarm;
     Flying;
 
     SpeakerA;
@@ -158,6 +159,7 @@ class SfxEngine
         sfxFiles.set(SFX.DramaA,         path + "drama-b.wav");
         sfxFiles.set(SFX.DramaB,         path + "drama-a.wav");
 
+        sfxFiles.set(SFX.Alarm,          path + "alarm.wav");
         sfxFiles.set(SFX.Flying,         path + "ship-fly-loop.wav");
 
         sfxFiles.set(SFX.SpeakerA,       path + "speaker-a.wav");

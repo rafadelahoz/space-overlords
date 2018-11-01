@@ -317,7 +317,7 @@ class SlaveCharacter extends FlxSprite
             if (frameIndex == 2 || frameIndex == 4)
             {
                 SfxEngine.play(FlxG.random.getObject([SfxEngine.SFX.SlaveStepA, SfxEngine.SFX.SlaveStepB,
-                            SfxEngine.SFX.SlaveStepC, SfxEngine.SFX.SlaveStepD, SfxEngine.SFX.SlaveStepE]), 0.15);
+                            SfxEngine.SFX.SlaveStepC, SfxEngine.SFX.SlaveStepD, SfxEngine.SFX.SlaveStepE]), 0.25);
             }
         }
     }

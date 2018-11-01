@@ -54,7 +54,7 @@ class GoingHomeState extends GarbageState
         add(button);
         pressed = false;
 
-        FlxTween.tween(button, {x : Constants.Width - 124}, 0.5, {ease : FlxEase.circInOut});
+        FlxTween.tween(button, {x : Constants.Width - 124}, 0.5, {startDelay: 0.5, ease : FlxEase.circInOut});
     }
 
     function onButtonPressed()
@@ -64,7 +64,13 @@ class GoingHomeState extends GarbageState
 
         pressed = true;
 
-        colorTween = FlxTween.color(overlay, 0.5, Palette.White, Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.25, loopDelay: 0.25});
+        var playSfx : Bool = true;
+        colorTween = FlxTween.color(overlay, 0.5, Palette.White, Palette.Red, {type : FlxTween.PINGPONG, ease: FlxEase.cubeInOut, startDelay: 0.25, loopDelay: 0.25, onStart: function(_) {
+            if (playSfx)
+                SfxEngine.play(SfxEngine.SFX.Alarm);
+
+            playSfx = !playSfx;
+        }});
 
         FlxTween.tween(button, {x : Constants.Width}, 0.5, {ease : FlxEase.circInOut});
         FlxG.camera.shake(0.005, 2, function() {

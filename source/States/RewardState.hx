@@ -257,8 +257,11 @@ class RewardState extends GarbageState
 
     function openTrapdoor()
     {
-        FlxTween.tween(homeTrapdoor, {x : homeTrapdoor.x - homeTrapdoor.width}, 2, {startDelay: 0.85});
-        FlxTween.tween(homeTrapdoor, {y : homeTrapdoor.y+1}, 0.0075, {type: FlxTween.PINGPONG});
+        SfxEngine.play(SfxEngine.SFX.SetupB, 0.7, true);
+        FlxTween.tween(homeTrapdoor, {x : homeTrapdoor.x - homeTrapdoor.width}, 2, {startDelay: 0.85, onComplete: function(_) {
+            SfxEngine.stop(SfxEngine.SFX.SetupB);
+        }});
+        FlxTween.tween(homeTrapdoor, {y : homeTrapdoor.y+1}, 0.0175, {type: FlxTween.PINGPONG});
 
         new FlxTimer().start(3.5, function(t : FlxTimer) {
             slave.walkTo(FlxPoint.get(-50, slave.y), 4);

@@ -868,6 +868,7 @@ class PlayState extends GarbageState
         if (themeChange || sideChange)
         {
             var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!MOVING FORWARD     ");
+            SfxEngine.play(SFX.BombTrigger);
             topDisplay.showMessage(24, changeText, 0xFF2ce8f5);
             aftermathTimer.start(ThemeChangeDelay, doThemeChange);
         }
@@ -889,6 +890,7 @@ class PlayState extends GarbageState
         {
             // Each 8 times, new background
             handleThemeBackgroundChange(true);
+            SfxEngine.play(SFX.SetupInitialize);
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     // session.fallSpeed = Math.max(session.fallSpeed - 2, getInitialFallSpeed() + session.timesIncreased / 4);
@@ -909,6 +911,7 @@ class PlayState extends GarbageState
         {
             // Each 4 times, alt bg
             handleThemeSideChange();
+            SfxEngine.play(SFX.SetupInitialize);
             flixel.effects.FlxFlicker.flicker(fxBg, ThemeChangeDelay, true, function(_) {
                 aftermathTimer.start(ThemeChangeDelay, function(_) {
                     // session.fallSpeed = Math.max(session.fallSpeed - 1, getInitialFallSpeed() + session.timesIncreased / 2);

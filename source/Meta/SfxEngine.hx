@@ -208,7 +208,7 @@ class SfxEngine
 
     public static function play(sf : SFX, ?volume : Float = 1, ?loop : Bool = false)
     {
-        trace("PLAY " + sf);
+        // trace("PLAY " + sf);
         if (Enabled && sfx.exists(sf))
         {
             sfx.set(sf, FlxG.sound.play(sfxFiles.get(sf), volume, loop));

@@ -326,7 +326,7 @@ class MenuState extends GarbageState
                 // New slaves fall from top
                 slave.visible = true;
                 slave.switchState(SlaveCharacter.StateFall);
-                t.start(4.5, afterSlaveEntry);
+                t.start(5.5, afterSlaveEntry);
             });
         }
     }

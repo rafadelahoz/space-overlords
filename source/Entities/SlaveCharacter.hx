@@ -39,6 +39,7 @@ class SlaveCharacter extends FlxSprite
     var motionTween : FlxTween;
 
     var forcedColorize : Bool;
+    var bounced : Bool;
 
     public function new(X : Float, Y : Float, World : GarbageState, ?State : Int = -2)
     {
@@ -112,9 +113,11 @@ class SlaveCharacter extends FlxSprite
             case SlaveCharacter.StateFall:
                 playAnim("fall");
                 cancelTween(motionTween);
+                bounced = false;
                 motionTween = FlxTween.linearMotion(this, x, y, x, Constants.Height*0.7+8, 3.5, true, {ease: FlxEase.bounceOut, onComplete: function(_) {
                     pauseAnim(true);
-                    timer.start(0.5, function(_) {
+                    timer.start(1, function(_) {
+                        SfxEngine.play(SfxEngine.SFX.FlipMutantB);
                         switchState(StateIdle);
                     });
                 }});
@@ -197,6 +200,16 @@ class SlaveCharacter extends FlxSprite
             case SlaveCharacter.StateFall:
                 var targetY : Float = Constants.Height*0.7+8;
                 shadow.setPosition(x, targetY+height-6);
+
+                if (!bounced && Math.abs(targetY - y) < 4)
+                {
+                    bounced = true;
+                    SfxEngine.play(SfxEngine.SFX.SlaveStepC);
+                }
+                else if (Math.abs(targetY - y) > 4)
+                {
+                    bounced = false;
+                }
 
                 var scaleX : Float = Math.max(0.75, y / targetY);
                 var scaleY : Float = Math.max(0.4, y / targetY);

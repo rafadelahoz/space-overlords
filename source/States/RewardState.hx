@@ -139,13 +139,13 @@ class RewardState extends GarbageState
     function showMainMessage()
     {
         var message : String =
-            "Welcome, welcome, slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + "#" +
-            FlxG.random.getObject(["Really nice having you here", "Please come in", "..."]) + "#" +
+            "Welcome" + (FlxG.random.bool(30) ? ", welcome" : ",") + " slave " + (FlxG.random.bool(30) ? "uh... " : "") + ProgressData.data.slave_id + ".\n" +
+            FlxG.random.getObject(["Really nice having you here.", "Please come in.", "..."]) + "#" +
             "Its great you reached your quota. It's thanks to hard working " + FlxG.random.getObject(["inferior beings", "friends", "slaves"]) + " like you" +
-            " that we are " + FlxG.random.getObject(["achieving great things. Great things indeed.", "managing to clean this planet."]) + "#" +
+            " that we are " + FlxG.random.getObject(["achieving great things."  + (FlxG.random.bool(50) ? " Great things indeed." : ""), "managing to clean this planet."]) + "#" +
             LoreLibrary.getLore() + "#" +
             "Anyhow!#" +
-            "As you have reached your quota, you can now choose.#" +
+            "You may now choose.#" +
             "Would you like to go back home, or a special reward?";
 
         showMessage(message, showSlaveResponses);

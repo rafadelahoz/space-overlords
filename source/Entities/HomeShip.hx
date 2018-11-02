@@ -55,6 +55,7 @@ class HomeShip extends Entity
 
         thrustTimer.start(2.5, function(_) {
             initFx();
+            SfxEngine.play(SfxEngine.SFX.SetupInitialize);
         });
         delayTimer.start(5, function(_){
             launching = false;
@@ -73,10 +74,15 @@ class HomeShip extends Entity
         delayTimer.start(ThrustDelay * (1+FlxG.random.float(-ThrustDelayVariance, ThrustDelayVariance)), thrust);
         thrustTimer.start(ThrustDelay * (1+FlxG.random.float(-ThrustDelayVariance, ThrustDelayVariance)) * FlxG.random.float(0.25, 0.5), thrustOff);
         thrustOn = true;
+
+        SfxEngine.stop(SfxEngine.SFX.ShipThrust);
+        SfxEngine.play(SfxEngine.SFX.ShipThrust, true);
     }
 
     function thrustOff(_) {
         thrustOn = false;
+        SfxEngine.stop(SfxEngine.SFX.ShipThrust);
+        SfxEngine.play(SfxEngine.SFX.ShipThrust, 0.5, true);
     }
 
     function finalThrust()
@@ -84,6 +90,9 @@ class HomeShip extends Entity
         acceleration.set(0, -100);
         velocity.set(FlxG.random.float(-2, 2), -ThrustSpeed*8);
         emitter.start(false, 0.0025, 1050);
+
+        SfxEngine.stop(SfxEngine.SFX.ShipThrust);
+        SfxEngine.play(SfxEngine.SFX.ShipFinalThrust);
 
         world.stars.starVelocityOffset.set(world.stars.starVelocityOffset.x, 8);
 
@@ -184,10 +193,16 @@ class HomeShip extends Entity
 
         emitter.kill();
 
+        SfxEngine.play(SfxEngine.SFX.ShipExplosionSmall, FlxG.random.float(0.5, 0.75), true);
+
         explodeSingle();
         new FlxTimer().start(0.13, function(t:FlxTimer) {
             explodeSingle();
         }, 6);
+        new FlxTimer().start(0.13*6, function(_) {
+            SfxEngine.stop(SfxEngine.SFX.ShipExplosionSmall);
+            SfxEngine.play(SfxEngine.SFX.ShipExplosionBig);
+        });
         new FlxTimer().start(0.13*2, function(t:FlxTimer) {
             world.effects.add(new BombRowEffect(0, y - Constants.TileSize + 4, Constants.Width, Constants.TileSize*2));
             t.start(1, function(t : FlxTimer) {

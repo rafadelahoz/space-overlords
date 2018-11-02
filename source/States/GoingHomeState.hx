@@ -75,12 +75,16 @@ class GoingHomeState extends GarbageState
         FlxTween.tween(button, {x : Constants.Width}, 0.5, {ease : FlxEase.circInOut});
         FlxG.camera.shake(0.005, 2, function() {
             ship.launch();
+            SfxEngine.play(SfxEngine.SFX.SetupB, 0.3, true);
             FlxG.camera.shake(0.005, 10);
         });
     }
 
     public function onLaunch()
     {
+        // SfxEngine.stop(SfxEngine.SFX.SetupB);
+        // SfxEngine.play(SfxEngine.SFX.SetupInitialize);
+
         FlxTween.tween(tower, {y : tower.y + tower.height}, 0.35);
     }
 

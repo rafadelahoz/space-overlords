@@ -70,6 +70,11 @@ enum SFX {
     Alarm;
     Flying;
 
+    ShipThrust;
+    ShipFinalThrust;
+    ShipExplosionSmall;
+    ShipExplosionBig;
+
     SpeakerA;
     SpeakerB;
 
@@ -165,6 +170,11 @@ class SfxEngine
 
         sfxFiles.set(SFX.Alarm,          path + "alarm.wav");
         sfxFiles.set(SFX.Flying,         path + "ship-fly-loop.wav");
+
+        sfxFiles.set(SFX.ShipThrust,     path + "propulsion.wav");
+        sfxFiles.set(SFX.ShipFinalThrust,path + "final-thrust.wav");
+        sfxFiles.set(SFX.ShipExplosionSmall, path + "explosion-small-a.wav");
+        sfxFiles.set(SFX.ShipExplosionBig, path + "explosion-big-a.wav");
 
         sfxFiles.set(SFX.SpeakerA,       path + "speaker-a.wav");
         sfxFiles.set(SFX.SpeakerB,       path + "speaker-b.wav");

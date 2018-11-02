@@ -8,6 +8,8 @@ import flixel.tweens.FlxTween;
 enum SFX {
     None;
 
+    SystemStartup;
+
     VcrSelect;
     VcrAccept;
     VcrToggle;
@@ -101,6 +103,8 @@ class SfxEngine
         initialized = true;
 
         sfxFiles = new Map<SFX, String>();
+
+        sfxFiles.set(SFX.SystemStartup,  path + "system-startup.wav");
 
         sfxFiles.set(SFX.VcrSelect,      path + "vcr-select.wav");
         sfxFiles.set(SFX.VcrAccept,      path + "vcr-accept.wav");

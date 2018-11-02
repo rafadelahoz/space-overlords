@@ -75,15 +75,19 @@ class TitleState extends GarbageState
             switch (Next)
             {
                 case TitleState.StateLogo:
+                    SfxEngine.play(SfxEngine.SFX.SystemStartup);
+
                     clearGroup(screen);
                     screen.add(new FlxSprite(0, baseY, "assets/ui/title-splash.png"));
                     logoTimer = new FlxTimer();
                     logoTimer.start(1 + flashTime + LogoDelay, function(t:FlxTimer) {
+                        SfxEngine.play(SfxEngine.SFX.SetupC);
                         logoTimer.destroy();
                         logoTimer = null;
                         switchState(StateMain);
                     });
                     var touchArea : TouchArea = new TouchArea(0, 0, Constants.Width, Constants.Height, function() {
+                        SfxEngine.play(SfxEngine.SFX.SetupC);
                         logoTimer.cancel();
                         switchState(StateMain);
                     });

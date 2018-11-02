@@ -1,6 +1,6 @@
 package;
 
-import extension.share.Share;
+// import extension.share.Share;
 
 class ShareManager
 {
@@ -8,7 +8,7 @@ class ShareManager
 
     public static function share(msg : String, ?savedImagePath : String = null)
     {
-        if (!initialized)
+/*        if (!initialized)
 		{
             initialized = true;
 			Share.init(Share.TWITTER);
@@ -20,6 +20,6 @@ class ShareManager
         else if (savedImagePath != null)
             imagePath = savedImagePath;
 
-		Share.share(msg, null, imagePath);
+		Share.share(msg, null, imagePath);*/
     }
 }

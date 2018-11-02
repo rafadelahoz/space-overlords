@@ -2,7 +2,7 @@
 <project>
 	<!------------------------------APPLICATION SETTINGS---------------------------->
 
-	<app title="SPACE OVERLORDS" file="spaceoverlords" main="Main" version="0.1.0" company="The Badladns"/>
+	<app title="SPACE OVERLORDS" file="spaceoverlords" main="Main" version="0.1.2" company="The Badladns"/>
 	<meta package="badladns.the.spaceoverlords"/>
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file

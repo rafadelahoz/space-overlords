@@ -120,7 +120,9 @@ class RewardState extends GarbageState
                     "Now get me another slave!";
             }
 
-            showMessage(message, onSceneEnd);
+            new FlxTimer().start(1, function(_) {
+                showMessage(message, onSceneEnd);
+            });
         }
     }
 

@@ -28,7 +28,9 @@ class SaveStateManager
             // Read data
             data = {
                 session: save.data.session,
-                grid: save.data.grid
+                grid: save.data.grid,
+                theme: save.data.theme,
+                side: save.data.side
             };
         }
 
@@ -36,6 +38,8 @@ class SaveStateManager
         save.data.active = 0;
         save.data.session = null;
         save.data.grid = null;
+        save.data.theme = -1;
+        save.data.side = -1;
 
         save.close();
 
@@ -53,6 +57,8 @@ class SaveStateManager
         save.data.active = 1;
         save.data.session = sessionData;
         save.data.grid = gridData;
+        save.data.theme = state.theme;
+        save.data.side = state.side;
 
         save.close();
     }

@@ -19,6 +19,7 @@ class ThemeManager
         Backgrounds = [];
         Backgrounds[ThemeWasteland] = ["bgThemeWastelandA", "bgThemeWastelandB"];
         Backgrounds[ThemeOcean] = ["bgThemeOceanA", "bgThemeOceanB"];
+        Backgrounds[ThemeCity] = ["bgThemeCityA", "bgThemeCityB"];
     }
 
     public static function GetRandomTheme() : Int
@@ -36,6 +37,6 @@ class ThemeManager
 
     static function isValid(Theme : Int, Side : Int)
     {
-        return Theme >= 1 && Theme < 3 && Side >= 0 && Side < 2;
+        return Theme >= 1 && Theme < 4 && Side >= 0 && Side < 2;
     }
 }

@@ -70,7 +70,8 @@ class PlayState extends GarbageState
     var aftermathTimerActive : Bool;
 
     // Theme
-    var theme : Int;
+    public var theme : Int;
+    public var side : Int;
     var shallChangeBackground : Int;
     var NoChange    : Int = 0;
     var ChangeSide  : Int = 1;
@@ -104,7 +105,15 @@ class PlayState extends GarbageState
         grid.init();
 
         // TODO: Set initial theme from somewhere? random?
-        theme = ThemeManager.GetRandomTheme();
+        if (restoredSessionData != null && restoredSessionData.theme > 0)
+            theme = restoredSessionData.theme;
+        else
+            theme = ThemeManager.GetRandomTheme();
+
+        if (restoredSessionData != null && restoredSessionData.side > -1)
+            side = restoredSessionData.side;
+        else
+            side = 0;
         setupBackground();
 
         gridShader = new FlxSprite(grid.x-2, grid.y-2);
@@ -155,7 +164,7 @@ class PlayState extends GarbageState
 
     function setupBackground()
     {
-        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
+        background = new FlxSprite(0, 0).loadGraphic(ThemeManager.GetBackground(theme, (side == 0 ? ThemeManager.SideA : ThemeManager.SideB)));
         fxBg = new FlxEffectSprite(background);
         var fxWave : FlxWaveEffect = new FlxWaveEffect(FlxWaveMode.ALL, 2);
         fxBg.effects = [fxWave];
@@ -977,6 +986,7 @@ class PlayState extends GarbageState
 
     function handleThemeSideChange()
     {
+        side = 1;
         background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideB));
     }
 
@@ -985,11 +995,13 @@ class PlayState extends GarbageState
         if (cycleTheme)
         {
             theme = theme+1;
-            if (theme > 2)
+            if (theme > 3)
                 theme = 1;
+            side = 0;
         }
 
-        background.loadGraphic(ThemeManager.GetBackground(theme, ThemeManager.SideA));
+
+        background.loadGraphic(ThemeManager.GetBackground(theme, (side == 0 ? ThemeManager.SideA : ThemeManager.SideB)));
         if (theme == ThemeManager.ThemeOcean)
         {
             fxBg.effectsEnabled = true;

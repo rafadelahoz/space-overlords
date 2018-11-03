@@ -23,4 +23,5 @@ class Palette
     public static var AlmostBlack   : Int = 0xFF181425;
     public static var DarkBlue      : Int = 0xFF262b44;
     public static var Red           : Int = 0xFFff0044;
+    public static var Purple        : Int = 0xFF68386c;
 }

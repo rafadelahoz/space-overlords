@@ -995,7 +995,7 @@ class PlayState extends GarbageState
         if (cycleTheme)
         {
             theme = theme+1;
-            if (theme > 3)
+            if (theme > 4)
                 theme = 1;
             side = 0;
         }
@@ -1012,7 +1012,19 @@ class PlayState extends GarbageState
             fxBg.effectsEnabled = false;
             fxBg.x = 0;
         }
+
+        if (theme == ThemeManager.ThemeCave)
+        {
+            bgColorTween = FlxTween.color(fxBg, 60, 0xFFFFFFFF, Palette.Yellow, {ease: FlxEase.quartInOut, type : FlxTween.PINGPONG});
+        }
+        else
+        {
+            if (bgColorTween != null)
+                bgColorTween.cancel();
+        }
     }
+
+    var bgColorTween : FlxTween;
 
     public function onAftermathFinished()
     {
@@ -1256,10 +1268,20 @@ class PlayState extends GarbageState
         {
             if (FlxG.keys.justPressed.I)
             {
-                trace("Increasing items to " + (session.items+5));
-                session.items += 5;
+                /*trace("Increasing items to " + (session.items+39));
+                session.items += 39;
                 aftermathScoreCounter = -1;
-                handleAftermathResult();
+                handleAftermathResult();*/
+                if (currentItem != null)
+                {
+                    remove(currentItem.slave);
+                    remove(currentItem);
+                }
+                if (side == 0)
+                    shallChangeBackground = ChangeSide;
+                else
+                    shallChangeBackground = ChangeTheme;
+                doThemeChange(null);
             }
         }
     }

@@ -25,7 +25,7 @@ class ThemeManager
 
     public static function GetRandomTheme() : Int
     {
-        return FlxG.random.getObject([ThemeWasteland, ThemeOcean]);
+        return FlxG.random.getObject([ThemeWasteland, ThemeOcean, ThemeCity, ThemeCave]);
     }
 
     public static function GetBackground(Theme : Int, Side : Int) : String

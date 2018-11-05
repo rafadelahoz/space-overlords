@@ -26,8 +26,6 @@ class GameController
 		if (ProgressData.data.slave_count < 0)
 			ProgressData.StartNewGame();
 
-		// ToReward();
-
 		// FlxG.autoPause = false;
 		#if (!mobile)
 			FlxG.scaleMode = new flixel.system.scaleModes.PixelPerfectScaleMode();

@@ -24,7 +24,8 @@ class GameSettings
                 };
             }
 
-            if (data.bgm == null)
+            var currentBgm : Null<Int> = data.bgm;
+            if (currentBgm == null)
                 data.bgm = 0;
         }
     }

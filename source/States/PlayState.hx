@@ -280,7 +280,7 @@ class PlayState extends GarbageState
                     {
                         topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
                         SfxEngine.play(SFX.SetupA);
-                        BgmEngine.play(BgmEngine.BGM.SpaceTrouble);
+                        playBgm();
                         switchState(StateGenerate);
                     }
                     else
@@ -325,6 +325,18 @@ class PlayState extends GarbageState
                     gameoverLightsout = false;
                     gameoverTimer.start(GameoverLightsoutDelay*2, onGameoverTimer);
                 });
+        }
+    }
+
+    function playBgm()
+    {
+        trace("Play BGM " + GameSettings.data.bgm);
+        switch (GameSettings.data.bgm)
+        {
+            case 1:
+                BgmEngine.play(BgmEngine.BGM.SpaceTrouble);
+            case 2:
+                BgmEngine.play(BgmEngine.BGM.IndustrialWarp);
         }
     }
 
@@ -964,6 +976,7 @@ class PlayState extends GarbageState
             {
                 topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
                 SfxEngine.play(SFX.SetupA);
+                playBgm();
             }
             switchState(StateGenerate);
         });

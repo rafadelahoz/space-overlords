@@ -26,6 +26,10 @@ class PauseSubstate extends FlxSubState
 
     var scanlines : Scanlines;
     var background : FlxSprite;
+    var top : FlxSprite;
+    var musicSwitch : VcrSwitch;
+    var sfxSwitch : VcrSwitch;
+
     var resumeButton : VcrButton;
     var abortButton : VcrButton;
 
@@ -55,7 +59,11 @@ class PauseSubstate extends FlxSubState
         background.scale.y = 0;
         add(background);
 
+        top = new FlxSprite(0, -36).makeGraphic(Constants.Width, 36, 0xFF0000FF);
+        add(top);
+
         FlxTween.tween(background.scale, {y: 1}, OpenTime, {ease : FlxEase.sineInOut, onComplete: buildScreen});
+        FlxTween.tween(top, {y: 0}, OpenTime, {ease : FlxEase.sineIn, onComplete: buildScreen});
 
         enabled = false;
     }
@@ -72,6 +80,31 @@ class PauseSubstate extends FlxSubState
         resumeButton.loadSpritesheet("assets/ui/pause-resume.png", 70, 14);
         add(resumeButton);
 
+        musicSwitch = new VcrSwitch(17, 11, BgmEngine.Enabled, function() {
+            // backButton.clearHighlight();
+        }, function(Enabled : Bool) {
+            if (Enabled)
+            {
+                BgmEngine.enable(true);
+                BgmEngine.pauseCurrent();
+            }
+            else
+                BgmEngine.disable();
+        });
+        musicSwitch.setupGraphic("assets/ui/pause-bgm-switch.png", 65, 14);
+        add(musicSwitch);
+
+        sfxSwitch = new VcrSwitch(98, 11, SfxEngine.Enabled, function() {
+            // backButton.clearHighlight();
+        }, function(Enabled : Bool) {
+            if (Enabled)
+                SfxEngine.enable();
+            else
+                SfxEngine.disable();
+        });
+        sfxSwitch.setupGraphic("assets/ui/pause-sfx-switch.png", 65, 14);
+        add(sfxSwitch);
+
         enabled = true;
     }
 
@@ -79,15 +112,27 @@ class PauseSubstate extends FlxSubState
     {
         if (resumeButton != null)
         {
-            resumeButton.kill();
+            resumeButton.exists = false;
             remove(resumeButton);
             // resumeButton.destroy();
         }
 
         if (abortButton != null)
         {
-            abortButton.kill();
+            abortButton.exists = false;
             remove(abortButton);
+        }
+
+        if (musicSwitch != null)
+        {
+            musicSwitch.exists = false;
+            remove(musicSwitch);
+        }
+
+        if (sfxSwitch != null)
+        {
+            sfxSwitch.exists = false;
+            remove(sfxSwitch);
         }
     }
 
@@ -110,7 +155,11 @@ class PauseSubstate extends FlxSubState
             // TODO: Disable buttons
 
             clean();
+            clear();
+            add(background);
+            add(top);
             FlxTween.tween(background.scale, {y : 0}, OpenTime, {ease : FlxEase.sineInOut, onComplete: resumeGame});
+            FlxTween.tween(top, {y: -36}, OpenTime, {ease : FlxEase.sineInOut});
         }
     }
 
@@ -122,8 +171,11 @@ class PauseSubstate extends FlxSubState
 
             // What to do?
             clean();
-
+            clear();
+            add(background);
+            add(top);
             FlxTween.tween(background.scale, {y : 0}, OpenTime, {ease : FlxEase.sineInOut, onComplete: endGame});
+            FlxTween.tween(top, {y: -36}, OpenTime, {ease : FlxEase.sineInOut});
         }
     }
 

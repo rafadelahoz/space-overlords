@@ -19,9 +19,13 @@ class GameSettings
             {
                 data = {
                     mode : Constants.ModeEndless,
-                    intensity : 0
+                    intensity : 0,
+                    bgm : 0,
                 };
             }
+
+            if (data.bgm == null)
+                data.bgm = 0;
         }
     }
 
@@ -51,4 +55,5 @@ class GameSettings
 typedef GameSettingsData = {
     var mode : Int;
     var intensity : Int;
+    var bgm : Int;
 };

@@ -22,6 +22,7 @@ class GamePreState extends GarbageState
     var playButton : VcrButton;
     var lessButton : VcrButton;
     var moreButton : VcrButton;
+    var bgmSwitch : VcrBgmSwitch;
     var intensityBar : FlxSprite;
 
     var slave : SlaveCharacter;
@@ -62,6 +63,10 @@ class GamePreState extends GarbageState
         intensityBar = new FlxSprite(9+36, intensityBg.y + 24);
         intensityBar.makeGraphic(90, 12, 0x00000000);
         add(intensityBar);
+
+        bgmSwitch = new VcrBgmSwitch(8, 203, onBgmHighlighted, onBgmPressed);
+        add(bgmSwitch);
+
 
         playButton = new VcrButton(107, 203, onPlayHighlighted, onArcadeButtonPressed);
         playButton.loadSpritesheet("assets/ui/gameconfig-start.png", 65, 14);
@@ -136,6 +141,21 @@ class GamePreState extends GarbageState
         if (GameSettings.data.intensity > 100)
             GameSettings.data.intensity = 100;
 
+        GameSettings.Save();
+    }
+
+    function onBgmHighlighted()
+    {
+        playButton.clearHighlight();
+        backButton.clearHighlight();
+    }
+
+    function onBgmPressed(value : Int)
+    {
+        playButton.clearHighlight();
+        backButton.clearHighlight();
+
+        GameSettings.data.bgm = value;
         GameSettings.Save();
     }
 

@@ -95,8 +95,9 @@ class GameController
 		ToMenu();
 	}
 
-	public static function GameOver(mode : Int, data : PlaySessionData)
+	public static function GameOver(data : PlaySessionData)
 	{
+		var mode : Int = GameSettings.data.mode;
 		// Prepare game over data
 		var goData : GameOverData = ProcessGameoverData(mode, data);
 

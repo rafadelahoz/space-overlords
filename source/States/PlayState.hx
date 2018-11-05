@@ -1084,7 +1084,7 @@ class PlayState extends GarbageState
             // DataServiceClient.SendSessionData(GameSettings.data, session);
             gameoverTimer.start(GameoverLightsoutDelay, function(t:FlxTimer) {
                 FlxG.camera.fade(0xFF000000, GameoverLightsoutDelay * 2, false, function() {
-                    GameController.GameOver(GameSettings.data.mode, session);
+                    GameController.GameOver(session);
                 });
             });
         }

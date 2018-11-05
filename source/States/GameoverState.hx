@@ -15,6 +15,8 @@ class GameoverState extends GarbageState
     var highScoreText : FlxBitmapText;
     var highScoreLabelGroup : FlxGroup;
 
+    var slave : SlaveCharacter;
+
     var touchArea : TouchArea;
     var popup : VcrQuotaPopup;
 
@@ -95,7 +97,7 @@ class GameoverState extends GarbageState
         }
 
         // Add slave
-        add(new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateLeft));
+        add(slave = new SlaveCharacter(Constants.Width, 235, this, SlaveCharacter.StateLeft));
 
         // Header
         add(new FlxSprite(0, 0, "assets/ui/title-menu-header.png"));
@@ -144,21 +146,29 @@ class GameoverState extends GarbageState
 
     function onBackHighlighted()
     {
+        slave.switchState(SlaveCharacter.StateLeft);
         againButton.clearHighlight();
     }
 
     function onAgainHighlighted()
     {
+        slave.switchState(SlaveCharacter.StateRight);
         backButton.clearHighlight();
     }
 
     function onAgainPressed()
     {
-        GameController.StartGameplay();
+        slave.switchState(SlaveCharacter.StateRight, true);
+        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            GameController.StartGameplay();
+        });
     }
 
     function onBackPressed()
     {
-        GameController.ToMenu(true);
+        slave.switchState(SlaveCharacter.StateLeft, true);
+        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            GameController.ToMenu(true);
+        });
     }
 }

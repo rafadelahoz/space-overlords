@@ -150,7 +150,9 @@ class GamePreState extends GarbageState
     public function onBackPressed()
     {
         slave.switchState(SlaveCharacter.StateLeft, true);
-        GameController.ToMenu();
+        FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            GameController.ToMenu();
+        });
     }
 
     function onBackHighlighted()

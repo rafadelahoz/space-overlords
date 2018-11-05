@@ -34,6 +34,8 @@ class BgmEngine
         tunes = new Map<BGM, FlxSound>();
         // tunes.set(BGM.Title, FlxG.sound.load("assets/music/title.ogg"));
 
+        tunes.set(BGM.SpaceTrouble, FlxG.sound.load("assets/music/space-trouble.ogg"));
+
         playing = new Map<BGM, Bool>();
         for (tune in tunes.keys())
         {
@@ -264,4 +266,6 @@ class BgmEngine
 
 enum BGM {
     None;
+
+    SpaceTrouble;
 }

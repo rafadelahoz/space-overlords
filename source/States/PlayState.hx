@@ -280,6 +280,7 @@ class PlayState extends GarbageState
                     {
                         topDisplay.showMessage(24, "!WORK  STARTING!", Palette.Green, true);
                         SfxEngine.play(SFX.SetupA);
+                        BgmEngine.play(BgmEngine.BGM.SpaceTrouble);
                         switchState(StateGenerate);
                     }
                     else
@@ -314,6 +315,7 @@ class PlayState extends GarbageState
                 Logger.log("==== session ends");
 
                 SfxEngine.play(SfxEngine.SFX.JustLost);
+                BgmEngine.stopCurrent();
 
                 session.endTime = Date.now().getTime();
 
@@ -470,6 +472,7 @@ class PlayState extends GarbageState
 
     function onPauseStart()
     {
+        BgmEngine.pauseCurrent();
         paused = true;
         aftermathTimerActive = aftermathTimer.active;
         if (aftermathTimer.active)
@@ -486,6 +489,7 @@ class PlayState extends GarbageState
 
     function onPauseEnd()
     {
+        BgmEngine.resumeCurrent();
         paused = false;
         if (aftermathTimerActive)
             aftermathTimer.active = true;

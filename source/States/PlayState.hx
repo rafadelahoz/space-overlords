@@ -793,7 +793,12 @@ class PlayState extends GarbageState
             // Increase speed?
             if ((session.items - session.lastItemsSpeedIncrease) >= 10)
             {
-                session.fallSpeed += (mode == Constants.ModeEndless ? 2 : 1);
+
+                if (mode == Constants.ModeEndless)
+                    session.fallSpeed += 2;
+                else
+                    session.fallSpeed = Math.min(session.fallSpeed + 1, getInitialFallSpeed() + 11*session.cycle);
+
                 Logger.log("-- fall speed " + session.fallSpeed + " [++] (" + Date.now() + ")");
                 session.lastItemsSpeedIncrease = session.items;
                 session.timesIncreased += 1;
@@ -1076,7 +1081,7 @@ class PlayState extends GarbageState
         }
         else
         {
-            DataServiceClient.SendSessionData(GameSettings.data, session);
+            // DataServiceClient.SendSessionData(GameSettings.data, session);
             gameoverTimer.start(GameoverLightsoutDelay, function(t:FlxTimer) {
                 FlxG.camera.fade(0xFF000000, GameoverLightsoutDelay * 2, false, function() {
                     GameController.GameOver(GameSettings.data.mode, session);

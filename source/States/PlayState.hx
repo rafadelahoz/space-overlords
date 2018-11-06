@@ -596,11 +596,7 @@ class PlayState extends GarbageState
                         item.entity.triggerTriggerAnimation();
                         if (item.type == ItemData.SpecialChemdust)
                         {
-                            session.items += 1;
-
-                            // Score: 2 x (chemdust number) x 50
                             chemdustCounter += 1;
-                            aftermathScoreCounter += 2*chemdustCounter*50;
                         }
                     }
                     if (item.type == ItemData.SpecialBomb)
@@ -621,6 +617,11 @@ class PlayState extends GarbageState
 
             if (chemdustCounter > 0)
             {
+                // Items:1 00 x (chemdust number)^2
+                session.items += 100*chemdustCounter*chemdustCounter;
+                // Score: 1000 x (chemdust number)^2
+                aftermathScoreCounter += 1000*chemdustCounter*chemdustCounter;
+                
                 var comboText = "SPECIAL!";
                 topDisplay.showMessage(96-(1+comboText.length)*8, comboText, 0xFF2ce8f5);
                 topDisplay.showMessage(96, "+ " + aftermathScoreCounter, 0xFFFEE761);

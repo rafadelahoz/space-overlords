@@ -42,7 +42,7 @@ class VcrQuotaPopup extends FlxGroup
 
         data = Data;
 
-        quotaDelta = data.quotaDelta;
+        quotaDelta = 5; // data.quotaDelta;
         quotaTotal = data.previousQuota;
 
         background = new FlxSprite(X, Y, "assets/ui/gameover-popup-bg.png");
@@ -78,14 +78,23 @@ class VcrQuotaPopup extends FlxGroup
         add(progressBar);
 
         var addedQuota : Int = quotaTotal + quotaDelta;
-        FlxTween.tween(this, {quotaDelta: 0, quotaTotal: addedQuota}, QuotaIncreaseTime, {startDelay : QuotaIncreaseDelay,
-                        ease : FlxEase.sineInOut, onComplete: onQuotaIncreased});
+        FlxTween.tween(this, {quotaDelta: 0, quotaTotal: addedQuota}, QuotaIncreaseTime * (quotaDelta < 10 ? 0.2 : 1),
+                    {startDelay : QuotaIncreaseDelay,
+                        ease : FlxEase.sineInOut, onComplete: onQuotaIncreased, onStart: function(_) {
+                            if (quotaDelta > 0)
+                            {
+                                SfxEngine.play(SfxEngine.SFX.FlipRaddishA, true);
+                            }
+                        }
+                    });
     }
 
     function onQuotaIncreased(t : FlxTween)
     {
         if (finished)
             return;
+
+        SfxEngine.stop(SfxEngine.SFX.FlipRaddishA);
 
         // Check if quota reached...
         if (quotaTotal > ProgressData.data.quota_target)

@@ -897,7 +897,7 @@ class PlayState extends GarbageState
 
         if (themeChange || sideChange)
         {
-            var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!MOVING FORWARD     ");
+            var changeText : String = (themeChange ? "TO NEW LOCATION!!!" : "MOVING FORWARD!!!");
             SfxEngine.play(SFX.BombTrigger);
             topDisplay.showMessage(24, changeText, 0xFF2ce8f5);
             aftermathTimer.start(ThemeChangeDelay, doThemeChange);

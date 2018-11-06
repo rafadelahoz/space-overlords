@@ -132,6 +132,8 @@ class MenuState extends GarbageState
         speechTimer = new FlxTimer();
 
         FlxG.camera.scroll.set(0, 0);
+
+        BgmEngine.play(BgmEngine.BGM.DerelictSpaceshipAmbiance, 0.05);
     }
 
     public function hideButtons()
@@ -304,8 +306,11 @@ class MenuState extends GarbageState
     public function onBackPressed()
     {
         disableButtons();
-
-        GameController.ToTitle(true);
+        BgmEngine.fadeCurrent(0.25);
+        FlxG.camera.fade(0xFF000000, 0.25, false, function() {
+            BgmEngine.stopCurrent();
+            GameController.ToTitle(true);
+        });
     }
 
     function initSlave()

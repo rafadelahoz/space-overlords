@@ -162,7 +162,9 @@ class GamePreState extends GarbageState
     public function onArcadeButtonPressed() : Void
     {
         slave.switchState(SlaveCharacter.StateRight, true);
+        BgmEngine.fadeCurrent(0.5);
         FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            BgmEngine.stopCurrent();
             GameController.StartGameplay(true);
         });
     }

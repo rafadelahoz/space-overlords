@@ -33,6 +33,7 @@ class BgmEngine
 
         tunes = new Map<BGM, FlxSound>();
 
+        tunes.set(BGM.DerelictSpaceshipAmbiance, FlxG.sound.load("assets/music/ambiance.ogg", 0.5));
         tunes.set(BGM.SpaceTrouble, FlxG.sound.load("assets/music/space-trouble.ogg"));
         tunes.set(BGM.IndustrialWarp, FlxG.sound.load("assets/music/industrial-warp.ogg"));
 
@@ -267,6 +268,7 @@ class BgmEngine
 enum BGM {
     None;
 
+    DerelictSpaceshipAmbiance;
     SpaceTrouble;
     IndustrialWarp;
 }

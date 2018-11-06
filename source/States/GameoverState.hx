@@ -120,6 +120,8 @@ class GameoverState extends GarbageState
             add(popup = new VcrQuotaPopup(0, Constants.Height * 0.3, session, onPopupClosed));
         });
         add(touchArea);
+
+        BgmEngine.play(BgmEngine.BGM.DerelictSpaceshipAmbiance, 0.05);
     }
 
     function showHighScoreLabel()
@@ -159,7 +161,9 @@ class GameoverState extends GarbageState
     function onAgainPressed()
     {
         slave.switchState(SlaveCharacter.StateRight, true);
+        BgmEngine.fadeCurrent(0.25);
         FlxG.camera.fade(0xFF000000, 0.5, false, function() {
+            BgmEngine.stopCurrent();
             GameController.StartGameplay();
         });
     }

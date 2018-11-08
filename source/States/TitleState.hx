@@ -142,6 +142,7 @@ class TitleState extends GarbageState
                     screen.add(sfxSwitch);
 
                     // DEBUG BUTTONS SECTION
+                    /*#if !release
                     {
                         var newSlaveButton : VcrButton = new VcrButton(98, baseY + 131 + 3*12, null, function() {
                             ProgressData.data.slave_id = -1;
@@ -163,6 +164,7 @@ class TitleState extends GarbageState
                         sendLogButton.loadSpritesheet("assets/ui/gameover-btn-again.png", 64, 14);
                         screen.add(sendLogButton);
                     }
+                    #end*/
 
                 case TitleState.StateCredits:
                     clearGroup(screen);

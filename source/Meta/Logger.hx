@@ -3,25 +3,28 @@ package;
 class Logger
 {
     public static function log(line : String) {
-
-        var path = getPath();
-        var filepath = path + "/" + getFilename();
-
-        trace(line);
-
-        try
+        #if !release
         {
-            #if (!flash && !html5)
-                sys.FileSystem.createDirectory(path);
-                var file : sys.io.FileOutput = sys.io.File.append(filepath, false);
-                file.writeString(line + "\n");
-                file.close();
-            #end
+            var path = getPath();
+            var filepath = path + "/" + getFilename();
+
+            trace(line);
+
+            try
+            {
+                #if (!flash && !html5)
+                    sys.FileSystem.createDirectory(path);
+                    var file : sys.io.FileOutput = sys.io.File.append(filepath, false);
+                    file.writeString(line + "\n");
+                    file.close();
+                #end
+            }
+            catch (e : Dynamic)
+            {
+                trace("Couldn't write log in " + path + " due to: " + e);
+            }
         }
-        catch (e : Dynamic)
-        {
-            trace("Couldn't write log in " + path + " due to: " + e);
-        }
+        #end
     }
 
     public static function getPath() : String
@@ -60,15 +63,21 @@ class Logger
     static var batchLines : Array<String>;
     public static function batch(line : String)
     {
-        if (batchLines == null)
-            batchLines = [];
+        #if !release
+        {
+            if (batchLines == null)
+                batchLines = [];
 
-        batchLines.push(line);
+            batchLines.push(line);
+        }
+        #end
     }
 
     public static function done()
     {
-        log(batchLines.join("\n"));
-        batchLines = [];
+        #if !release
+            log(batchLines.join("\n"));
+            batchLines = [];
+        #end
     }
 }

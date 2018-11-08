@@ -42,7 +42,7 @@ class VcrQuotaPopup extends FlxGroup
 
         data = Data;
 
-        quotaDelta = 5; // data.quotaDelta;
+        quotaDelta = data.quotaDelta;
         quotaTotal = data.previousQuota;
 
         background = new FlxSprite(X, Y, "assets/ui/gameover-popup-bg.png");

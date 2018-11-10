@@ -330,13 +330,12 @@ class PlayState extends GarbageState
 
     function playBgm()
     {
-        trace("Play BGM " + GameSettings.data.bgm);
         switch (GameSettings.data.bgm)
         {
             case 1:
-                BgmEngine.play(BgmEngine.BGM.SpaceTrouble);
+                BgmEngine.play(BgmEngine.BGM.SpaceTrouble, 0.75);
             case 2:
-                BgmEngine.play(BgmEngine.BGM.IndustrialWarp);
+                BgmEngine.play(BgmEngine.BGM.IndustrialWarp, 0.75);
         }
     }
 
@@ -621,7 +620,7 @@ class PlayState extends GarbageState
                 session.items += 100*chemdustCounter*chemdustCounter;
                 // Score: 1000 x (chemdust number)^2
                 aftermathScoreCounter += 1000*chemdustCounter*chemdustCounter;
-                
+
                 var comboText = "SPECIAL!";
                 topDisplay.showMessage(96-(1+comboText.length)*8, comboText, 0xFF2ce8f5);
                 topDisplay.showMessage(96, "+ " + aftermathScoreCounter, 0xFFFEE761);

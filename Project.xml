@@ -108,17 +108,11 @@
 	<template path="android/MainActivity.java" rename="src/badladns/the/spaceoverlords/MainActivity.java" if="android" />
 
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-	<!--<icon path="assets/icons/bubble-icon16.png" size="16" />
-	<icon path="assets/icons/bubble-icon32.png" size="32" />
-	<icon path="assets/icons/bubble-icon36.png" size="36" if="android"/>
-	<icon path="assets/icons/bubble-icon48.png" size="48" if="android"/>
-	<icon path="assets/icons/bubble-icon64.png" size="64" />
-	<icon path="assets/icons/bubble-icon72.png" size="72" if="android"/>
-	<icon path="assets/icons/bubble-icon96.png" size="96" if="android"/>
-	<icon path="assets/icons/bubble-icon114.png" size="114" if="android"/>
-	<icon path="assets/icons/bubble-icon128.png" size="128"/>
-	<icon path="assets/icons/bubble-icon144.png" size="144" if="android"/>
-	<icon path="assets/icons/bubble-icon192.png" size="192" if="android"/>
-	<icon path="assets/icons/bubble-icon512.png" size="512" if="android"/>-->
+	<icon path="assets/icons/vcr-icon-48.png" size="48" if="android"/>
+	<icon path="assets/icons/vcr-icon-72.png" size="72" if="android"/>
+	<icon path="assets/icons/vcr-icon-96.png" size="96" if="android"/>
+	<icon path="assets/icons/vcr-icon-144.png" size="144" if="android"/>
+	<icon path="assets/icons/vcr-icon-192.png" size="192" if="android"/>
+	<icon path="assets/icons/vcr-icon-512.png" size="512" if="android"/>
 
 </project>

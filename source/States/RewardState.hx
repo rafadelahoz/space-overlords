@@ -19,6 +19,7 @@ class RewardState extends GarbageState
     var overlord : FlxSprite;
     var overlordBg : FlxSprite;
 
+    var responseChosen : Bool;
     var responseReward : VcrButton;
     var responseHome : VcrButton;
 
@@ -191,6 +192,8 @@ class RewardState extends GarbageState
         // showMainMessage();
         // return;
 
+        responseChosen = false;
+
         responseHome = new VcrButton(101, 186, onResponseHomeHighlighted, onResponseHomeSelected);
         responseHome.loadSpritesheet("assets/images/slave-answer-home.png", 72, 44);
         responseHome.playSfx = false;
@@ -223,28 +226,42 @@ class RewardState extends GarbageState
 
     function onResponseHomeHighlighted()
     {
-        SfxEngine.play(SfxEngine.SFX.FlipMutantA);
-        responseReward.clearHighlight();
+        if (!responseChosen)
+        {
+            SfxEngine.play(SfxEngine.SFX.FlipMutantA);
+            responseReward.clearHighlight();
+        }
     }
 
     function onResponseRewardHighlighted()
     {
-        SfxEngine.play(SfxEngine.SFX.FlipMutantA);
-        responseHome.clearHighlight();
+        if (!responseChosen)
+        {
+            SfxEngine.play(SfxEngine.SFX.FlipMutantA);
+            responseHome.clearHighlight();
+        }
     }
 
     function onResponseHomeSelected()
     {
-        SfxEngine.play(SfxEngine.SFX.Pair);
-        hideSelectedResponse(responseHome, handleHomeEnding);
-        hideOtherResponse(responseReward);
+        if (!responseChosen)
+        {
+            responseChosen = true;
+            SfxEngine.play(SfxEngine.SFX.Pair);
+            hideSelectedResponse(responseHome, handleHomeEnding);
+            hideOtherResponse(responseReward);
+        }
     }
 
     function onResponseRewardSelected()
     {
-        SfxEngine.play(SfxEngine.SFX.Pair);
-        hideSelectedResponse(responseReward, handleRewardEnding);
-        hideOtherResponse(responseHome);
+        if (!responseChosen)
+        {
+            responseChosen = true;
+            SfxEngine.play(SfxEngine.SFX.Pair);
+            hideSelectedResponse(responseReward, handleRewardEnding);
+            hideOtherResponse(responseHome);
+        }
     }
 
     function handleHomeEnding()

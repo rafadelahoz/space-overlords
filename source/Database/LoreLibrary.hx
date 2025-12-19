@@ -77,6 +77,7 @@ class LoreLibrary
             Videogames.push("Axe Throwing Arcade");
             Videogames.push("Radox Boquet");
             Videogames.push("The Ripges Effect - Adventures at Calx");
+            Videogames.push("PAL12");
 
             BookTitles = [];
             BookTitles.push("50 ways to drink urine");

@@ -190,7 +190,7 @@ class TypeWriter extends FlxBitmapText
 
         _finalText = Text;
 
-        lineHeight = Size;
+        // lineHeight = Size;
 		targetHeight = Height;
 		targetLines = Std.int(targetHeight / lineHeight);
 	}

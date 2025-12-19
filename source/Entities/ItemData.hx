@@ -2,10 +2,10 @@ package;
 
 class ItemData
 {
-    public static var SpecialChemdust : Int = 24;
-    public static var SpecialTrigger : Int = 25;
-    public static var SpecialBomb : Int = 26;
-    public static var SpecialTarget : Int = 27;
+    public static inline var SpecialChemdust : Int = 24;
+    public static inline var SpecialTrigger : Int = 25;
+    public static inline var SpecialBomb : Int = 26;
+    public static inline var SpecialTarget : Int = 27;
 
     public var type : Int;
     public var entity : ItemEntity;

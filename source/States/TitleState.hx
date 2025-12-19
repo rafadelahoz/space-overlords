@@ -11,10 +11,10 @@ import text.PixelText;
 
 class TitleState extends GarbageState
 {
-    static var StateLogo : Int = 1;
-    static var StateMain : Int = 2;
-    static var StateSettings : Int = 3;
-    static var StateCredits : Int = 4;
+    static inline var StateLogo : Int = 1;
+    static inline var StateMain : Int = 2;
+    static inline var StateSettings : Int = 3;
+    static inline var StateCredits : Int = 4;
 
     public var avoidLogo : Bool = false;
 

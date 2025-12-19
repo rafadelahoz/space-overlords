@@ -9,13 +9,13 @@ import flixel.tweens.FlxTween;
 
 class SlaveCharacter extends FlxSprite
 {
-    public static var StateNone : Int = -1;
-    public static var StateFall : Int = 0;
-    public static var StateIdle : Int = 1;
-    public static var StateWalk : Int = 2;
-    public static var StateRight : Int = 3;
-    public static var StateLeft : Int = 4;
-    public static var StateReturn : Int = 5;
+    public static inline var StateNone : Int = -1;
+    public static inline var StateFall : Int = 0;
+    public static inline var StateIdle : Int = 1;
+    public static inline var StateWalk : Int = 2;
+    public static inline var StateRight : Int = 3;
+    public static inline var StateLeft : Int = 4;
+    public static inline var StateReturn : Int = 5;
 
     var IdleDelayTime : Float = 5;
     var IdleDelayVariation : Float = 0.6;

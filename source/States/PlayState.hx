@@ -15,13 +15,15 @@ import flixel.addons.effects.chainable.FlxWaveEffect;
 
 import SfxEngine.SFX;
 
+import PauseSubState;
+
 class PlayState extends GarbageState
 {
-    public static var StateIntro       : Int = 1;
-    public static var StateGenerate    : Int = 2;
-    public static var StateWait        : Int = 3;
-    public static var StateAftermath   : Int = 4;
-    public static var StateLost        : Int = 5;
+    public static inline var StateIntro       : Int = 1;
+    public static inline var StateGenerate    : Int = 2;
+    public static inline var StateWait        : Int = 3;
+    public static inline var StateAftermath   : Int = 4;
+    public static inline var StateLost        : Int = 5;
 
     var TriggerAnimationTime : Float = 1;
     var TriggerBombsAnimationTime : Float = 2;

@@ -4,10 +4,10 @@ import flixel.FlxG;
 
 class LoreLibrary
 {
-    static var LoreOther : Int = -1;
-    static var LoreArtifact : Int = 1;
-    static var LoreComplaint : Int = 2;
-    static var LoreMutants : Int = 3;
+    static inline var LoreOther : Int = -1;
+    static inline var LoreArtifact : Int = 1;
+    static inline var LoreComplaint : Int = 2;
+    static inline var LoreMutants : Int = 3;
 
     static var LoreSequence : Array<Int>;
 

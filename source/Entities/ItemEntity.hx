@@ -9,14 +9,14 @@ import flixel.effects.FlxFlicker;
 
 class ItemEntity extends Entity
 {
-    public static var StateNone         : Int = -1;
-    public static var StateGenerating   : Int = 0;
-    public static var StateFalling      : Int = 1;
-    public static var StateGrace        : Int = 2;
-    public static var StatePositioned   : Int = 3;
-    public static var StateSlave        : Int = 4;
-    public static var StateLeaving      : Int = 5;
-    public static var StateDissolving   : Int = 6;
+    public static inline var StateNone         : Int = -1;
+    public static inline var StateGenerating   : Int = 0;
+    public static inline var StateFalling      : Int = 1;
+    public static inline var StateGrace        : Int = 2;
+    public static inline var StatePositioned   : Int = 3;
+    public static inline var StateSlave        : Int = 4;
+    public static inline var StateLeaving      : Int = 5;
+    public static inline var StateDissolving   : Int = 6;
 
     var GenerationTime : Float = 0.2;
     var FlipTime : Float = 0.1;
